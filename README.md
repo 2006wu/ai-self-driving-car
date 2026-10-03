@@ -20,6 +20,20 @@ replayJLL source、dataC/dataB6/aJLL。官方編譯產物叫 replay，不是 rep
 
 ## 日常使用
 
+建議使用快捷工具，不必每次輸入完整的 Docker Compose 指令：
+
+```bash
+./scripts/openpilot.sh up
+./scripts/openpilot.sh display
+./scripts/openpilot.sh status
+```
+
+之後新增功能也會集中在 `scripts/openpilot.sh`，先查看所有可用命令：
+
+```bash
+./scripts/openpilot.sh help
+```
+
 以下指令都在專案根目錄執行。先開啟 Docker Desktop：
 
 ```bash
@@ -95,9 +109,10 @@ docker compose -f docker/docker-compose.yaml up -d --force-recreate compute disp
 先在 VNC 開啟 UI，再在終端機執行：
 
 ```bash
-docker compose -f docker/docker-compose.yaml exec compute \
-  tools/replay/replay --demo --qcam --no-hw-decoder -c 1
+./scripts/openpilot.sh replay-demo
 ```
+
+這個快捷命令會自動啟動需要的 services，然後執行官方 demo。
 
 Ctrl+C 停止。`--qcam` 使用較小的影片，`-c 1` 限制快取 segment 數量。
 demo 需要舊版程式指定的遠端 route 可取得。
@@ -113,6 +128,13 @@ docker compose -f docker/docker-compose.yaml exec compute \
   "8bfda98c9c9e4291|2020-05-11--03-00-57--61"
 ```
 
+也可以使用快捷命令：
+
+```bash
+./scripts/openpilot.sh replay-route /data/dataC \
+  "8bfda98c9c9e4291|2020-05-11--03-00-57--61"
+```
+
 必須先取得並驗證 route 資料的實際目錄結構；上述指令不會自動下載 dataC。
 要完成原筆記的 replayJLL，需提供 tools092.zip/replayJLL source 及指定設定檔，
 比較修改後再整合；不要將官方 binary 改名來取代。
@@ -125,6 +147,14 @@ docker compose -f docker/docker-compose.yaml ps -a
 docker compose -f docker/docker-compose.yaml logs --tail=80 compute display
 docker compose -f docker/docker-compose.yaml exec display tail -80 /tmp/launcher.log
 docker compose -f docker/docker-compose.yaml exec display tail -80 /tmp/openpilot-ui.log
+```
+
+對應的快捷命令：
+
+```bash
+./scripts/openpilot.sh validate
+./scripts/openpilot.sh logs
+./scripts/openpilot.sh down
 ```
 
 驗證腳本只檢查現有服務，不會自行 build 或關閉服務，也不認證 replay 資料完整性。
@@ -157,4 +187,23 @@ scripts/validate-docker.sh 非破壞性的執行環境檢查
 
 重建 image 不會覆蓋既有 openpilot-repo volume。需要更新 source 時，
 先檢查 volume 裡的 Git 狀態；不要刪 volume 當作更新方法。
-Git remote 已設定，尚未 push。
+Git remote 已設定，專案目前已推送到 `origin/main`；後續修改需重新 commit/push。
+
+## 原始 README 對照結果
+
+原始 JLL 筆記的 Docker 對照如下：
+
+| 原始步驟 | 目前結果 |
+| --- | --- |
+| Python 3.8 | 已完成，container 內為 3.8.10 |
+| Poetry 1.3.2 | 已完成 |
+| openpilot v0.9.1 | 已完成，固定 tag checkout |
+| submodules | 已初始化並驗證 |
+| Linux / Qt dependencies | 已寫入 Dockerfile 並驗證 |
+| SCons build | 已完成，輸出 `done building targets` |
+| UI | 已完成，VNC/noVNC 可顯示 |
+| 官方 replay | 已完成，demo qcamera 跨容器顯示成功 |
+| tools092 / replayJLL | 缺少原始外部檔案 |
+| dataC / dataB6 / aJLL | 缺少資料與來源 |
+
+因此目前環境已可用；JLL 專屬部分要取得原始檔案後才能繼續，不應用官方 `replay` 假裝替代。

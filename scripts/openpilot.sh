@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+# Convenient command entry point for the ai-self-driving-car environment.
+set -euo pipefail
+
+project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+compose=(docker compose -f "$project_dir/docker/docker-compose.yaml")
+
+usage() {
+  cat <<'EOF'
+Usage: ./scripts/openpilot.sh <command> [options]
+
+Environment:
+  up                 Start compute and display
+  down               Stop containers and keep volumes
+  restart            Restart both services
+  status             Show service status
+  validate           Run non-destructive environment checks
+  build              Build both Docker images
+  build-compute      Build only the compute image
+  build-display      Build only the display image
+
+Display and logs:
+  display            Print VNC/noVNC connection details
+  logs [service]     Follow logs for compute, display, or both
+
+OpenPilot:
+  shell              Open a shell in compute
+  versions           Show Python, Poetry, SCons, Git, and submodules
+  build-op            Compile openpilot with SCons
+  replay-demo        Run the official demo replay
+  replay-route DIR ROUTE
+                     Replay a route from a local data directory
+
+Examples:
+  ./scripts/openpilot.sh up
+  ./scripts/openpilot.sh replay-demo
+  ./scripts/openpilot.sh replay-route /data/dataC 'route|segment'
+EOF
+}
+
+require_service() {
+  "${compose[@]}" up -d "$@"
+}
+
+case "${1:-help}" in
+  up)
+    require_service compute display
+    ;;
+  down)
+    "${compose[@]}" down
+    ;;
+  restart)
+    "${compose[@]}" restart
+    ;;
+  status)
+    "${compose[@]}" ps -a
+    ;;
+  validate)
+    "$project_dir/scripts/validate-docker.sh"
+    ;;
+  build)
+    "${compose[@]}" build compute display
+    ;;
+  build-compute)
+    "${compose[@]}" build compute
+    ;;
+  build-display)
+    "${compose[@]}" build display
+    ;;
+  display)
+    cat <<'EOF'
+VNC:   vnc://127.0.0.1:5910
+Web:   http://localhost:6080/vnc.html
+Pass:  0000
+EOF
+    ;;
+  logs)
+    if [[ -n "${2:-}" ]]; then
+      "${compose[@]}" logs -f "$2"
+    else
+      "${compose[@]}" logs -f compute display
+    fi
+    ;;
+  shell)
+    require_service compute
+    "${compose[@]}" exec compute bash
+    ;;
+  versions)
+    require_service compute
+    "${compose[@]}" exec compute sh -lc '
+      python3.8 --version
+      poetry --version
+      scons --version | head -n 1
+      git -C /opt/openpilot describe --tags --always
+      git -C /opt/openpilot submodule status
+    '
+    ;;
+  build-op)
+    require_service compute
+    "${compose[@]}" exec compute sh -lc 'cd /opt/openpilot && scons -u -j2'
+    ;;
+  replay-demo)
+    require_service compute display
+    echo 'Open VNC/noVNC first, then the official demo will start.'
+    "${compose[@]}" exec compute sh -lc \
+      'TERM=xterm tools/replay/replay --demo --qcam --no-hw-decoder -c 1'
+    ;;
+  replay-route)
+    if [[ $# -ne 3 ]]; then
+      echo 'Usage: ./scripts/openpilot.sh replay-route DATA_DIR ROUTE' >&2
+      exit 2
+    fi
+    require_service compute display
+    data_dir="$2"
+    route="$3"
+    "${compose[@]}" exec -e TERM=xterm compute sh -lc \
+      'tools/replay/replay --no-hw-decoder --data_dir "$1" "$2"' \
+      sh "$data_dir" "$route"
+    ;;
+  help|-h|--help)
+    usage
+    ;;
+  *)
+    echo "Unknown command: $1" >&2
+    usage >&2
+    exit 2
+    ;;
+esac
