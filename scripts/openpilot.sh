@@ -30,11 +30,15 @@ OpenPilot:
   replay-demo        Run the official demo replay
   replay-route DIR ROUTE
                      Replay a route from a local data directory
+  replay-jll-demo    Run the supplied JLL demo replay
+  replay-jll-datac   Run the supplied JLL dataC replay
 
 Examples:
   ./scripts/openpilot.sh up
   ./scripts/openpilot.sh replay-demo
   ./scripts/openpilot.sh replay-route /data/dataC 'route|segment'
+  ./scripts/openpilot.sh replay-jll-demo
+  ./scripts/openpilot.sh replay-jll-datac
 EOF
 }
 
@@ -116,6 +120,18 @@ EOF
     "${compose[@]}" exec -e TERM=xterm compute sh -lc \
       'tools/replay/replay --no-hw-decoder --data_dir "$1" "$2"' \
       sh "$data_dir" "$route"
+    ;;
+  replay-jll-demo)
+    require_service compute display
+    echo 'Open VNC/noVNC first, then the supplied JLL demo will start.'
+    "${compose[@]}" exec -e TERM=xterm compute sh -lc \
+      'tools/replay/replayJLL --demo'
+    ;;
+  replay-jll-datac)
+    require_service compute display
+    echo 'Open VNC/noVNC first, then the supplied JLL dataC replay will start.'
+    "${compose[@]}" exec -e TERM=xterm compute sh -lc \
+      'tools/replay/replayJLL --data_dir tools/replay/dataC "8bfda98c9c9e4291|2020-05-11--03-00-57--61"'
     ;;
   help|-h|--help)
     usage

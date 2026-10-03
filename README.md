@@ -14,9 +14,15 @@ macOS Apple Silicon 上的 openpilot v0.9.1 Docker 編譯與顯示環境。兩�
 官方 demo 的 qcamera 回放也已實測成功：compute 解碼，display 顯示道路、車速與車道標記。
 這是片段回放驗證，未逐一播放完 route 的全部 11 個 segments。
 
-**JLL 流程尚未全部完成**：目前沒有原筆記指定的 tools092.zip、JLL 設定檔、
-replayJLL source、dataC/dataB6/aJLL。官方編譯產物叫 replay，不是 replayJLL。
-健康 socket 成功不等於錄製資料回放成功；最後驗證結果見實作紀錄。
+**JLL 資產已依 `InstallOP.docx` 的來源取得並放入持久化 compute volume**：
+`tools092.zip` 內的 `replayJLL`、`replayJLL230316`、JLL `dataC`、
+`pyproject.toml`、`poetry.lock` 與 `update_requirements.sh` 已整合；JLL
+`dataC` 已實測進入 `playing`。`dataB6` 也已解壓至 `/data/dataB6`，但其
+`UHD--...--37` 目錄格式不是 `replayJLL` 要求的 `route|segment` 格式，不能
+直接當作 JLL replay route。`aJLL` 來源是 Google Drive 資料夾，目前沒有可
+辨識的直接檔案清單，因此保留為待確認資產，不假設它是可執行檔。
+官方編譯產物仍叫 `replay`，不是 `replayJLL`。健康 socket 成功不等於錄製
+資料回放成功；每種 replay 的實測結果見實作紀錄。
 
 ## 日常使用
 
@@ -112,6 +118,13 @@ docker compose -f docker/docker-compose.yaml up -d --force-recreate compute disp
 ./scripts/openpilot.sh replay-demo
 ```
 
+JLL 版本快捷命令：
+
+```bash
+./scripts/openpilot.sh replay-jll-demo
+./scripts/openpilot.sh replay-jll-datac
+```
+
 這個快捷命令會自動啟動需要的 services，然後執行官方 demo。
 
 Ctrl+C 停止。`--qcam` 使用較小的影片，`-c 1` 限制快取 segment 數量。
@@ -136,8 +149,9 @@ docker compose -f docker/docker-compose.yaml exec compute \
 ```
 
 必須先取得並驗證 route 資料的實際目錄結構；上述指令不會自動下載 dataC。
-要完成原筆記的 replayJLL，需提供 tools092.zip/replayJLL source 及指定設定檔，
-比較修改後再整合；不要將官方 binary 改名來取代。
+JLL 資產來源、SHA256 與容器內位置見 [DOCX 資產紀錄](docs/INSTALLOP_ASSETS.md)。
+`dataB6` 已完成完整性檢查與解壓，但須另行確認原筆記預期的消費程式；不要
+把它改名成 route 來繞過格式檢查，也不要把官方 `replay` 改名取代 JLL binary。
 
 ## 檢查與停止
 
@@ -172,6 +186,7 @@ docker compose -f docker/docker-compose.yaml down
 ```text
 README.md                  使用說明
 docs/IMPLEMENTATION.md     實作、修正與驗證紀錄
+docs/INSTALLOP_ASSETS.md   InstallOP.docx 資產來源、hash 與驗證紀錄
 codex_command/             使用者提供的原始指示
 docker/                    Compose、Dockerfiles、entrypoints、啟動器、健康 socket
 scripts/validate-docker.sh 非破壞性的執行環境檢查
@@ -203,7 +218,9 @@ Git remote 已設定，專案目前已推送到 `origin/main`；後續修改需�
 | SCons build | 已完成，輸出 `done building targets` |
 | UI | 已完成，VNC/noVNC 可顯示 |
 | 官方 replay | 已完成，demo qcamera 跨容器顯示成功 |
-| tools092 / replayJLL | 缺少原始外部檔案 |
-| dataC / dataB6 / aJLL | 缺少資料與來源 |
+| tools092 / replayJLL | 已由 DOCX Google Drive 來源整合，dataC 進入 playing |
+| dataB6 | 已驗證 ZIP 並解壓至 `/data/dataB6`；格式不直接相容 replayJLL |
+| aJLL | DOCX 僅提供資料夾連結，未取得可辨識檔案清單，保留待確認 |
 
-因此目前環境已可用；JLL 專屬部分要取得原始檔案後才能繼續，不應用官方 `replay` 假裝替代。
+因此目前環境已可用；官方 replay 與 JLL dataC 可使用，dataB6/aJLL 的原始
+用途仍依原筆記保留為明確的相容性待辦。

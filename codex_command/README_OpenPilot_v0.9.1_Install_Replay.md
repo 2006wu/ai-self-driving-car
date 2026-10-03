@@ -1473,7 +1473,12 @@ Docker 版本對應指令：
 ./scripts/openpilot.sh replay-demo
 ```
 
-目前仍缺少本文件前文提到的 `tools092.zip`、JLL 版 `replayJLL`、
-`pyproject.toml` / `poetry.lock`、`dataC`、`dataB6` 與 `aJLL`。
-它們沒有被放入本專案，也沒有來源 URL，因此原始 JLL Replay checklist 的最後兩項不能標記完成。
-取得後請先記錄來源、版本與 SHA256，再放入 `replay-data` volume 驗證。
+本專案已依使用者提供的 `InstallOP.docx` 取得並整合可下載的
+`tools092.zip`、JLL `replayJLL`、`pyproject.toml`、`poetry.lock`、
+`update_requirements.sh`、`dataC` 與 `dataB6`。來源 URL、SHA256、容器位置與
+驗證限制記錄在 `docs/INSTALLOP_ASSETS.md`。
+
+JLL `dataC` 已實測進入 `playing`；`dataB6` 已解壓至 `/data/dataB6`，但其
+`UHD--...--37` 結構不是 JLL `route|segment` 格式，不能直接用
+`replayJLL --data_dir` 播放。DOCX 的 `aJLL` 只有 Google Drive 資料夾連結，
+目前無法安全辨識其內容，因此不把它假設為 executable 或 library。
