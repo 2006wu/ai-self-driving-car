@@ -1,5 +1,10 @@
 # 實作與驗證紀錄
 
+> 本文下方保留歷史操作紀錄。2026-10-03 後續重新稽核發現 JLL/UI 的 msgq
+> ABI 不一致，`playing` 並不代表 JLL 畫面成功；目前 `tools/replay/replay`
+> 也是 tools092 附帶 binary。最新結果以 [InstallOP 稽核](INSTALLOP_AUDIT.md)
+> 為準。dataB6 沒有 Replay 要求，aJLL 現已保存於 host external/aJLL。
+
 此文件記錄目前專案從建置到顯示的變更；操作方式見根目錄 README.md。
 原始需求保留在 `codex_command/README_OpenPilot_v0.9.1_Install_Replay.md`。
 
@@ -114,3 +119,19 @@ tools/replay/replayJLL --data_dir tools/replay/dataC \
 画面警告是回放的官方 UI alert，保留原樣；不代表實車部署已驗證。
 本次沒有建立全新空 volume 重新完整編譯；image 可建置與既有 source volume 的
 完整編譯已分別驗證。完整編譯成功也不等於所有測試 binary 都已執行。
+
+## 8. 2026-10-03 後續修復
+
+- compute/display 已新增 healthcheck 與啟動順序，Xvfb 啟動改為等待 socket
+  就緒並重試；數次冷啟動後均為 `healthy`。
+- 在隔離 volume 以 tools092 SCons source 成功編譯 `replayJLL.compat`，
+  並驗證教授原版 `replayJLL` 雜湊不變。`scripts/build-jll-compatible.sh`
+  已實際成功重跑，編譯副本成功後自動移除。
+- Taiwan dataC 的相容版 Replay 已在 VNC 顯示夜間道路與車速。
+  `-b uiDebug` 會過濾舊資料的 `pandaStateDEPRECATED`，因此不使用它。
+- USA demo 的相容版 qcam workaround 已進入 `playing`，且重新連上目前
+  display 容器（VNC 視窗 hostname 與容器一致）後，實際看到白天道路、
+  車道疊圖與車速 52 mph。
+- `scripts/openpilot.sh` 快捷指令改為官方備份 Replay／JLL 相容版。
+  `scripts/validate-docker.sh` 新增健康、資料存在與 binary 雜湊檢查，
+  實際執行通過。詳見 [最新稽核](INSTALLOP_AUDIT.md)。

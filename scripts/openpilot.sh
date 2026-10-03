@@ -27,11 +27,12 @@ OpenPilot:
   shell              Open a shell in compute
   versions           Show Python, Poetry, SCons, Git, and submodules
   build-op            Compile openpilot with SCons
+  build-jll-compat    Rebuild JLL in an isolated Docker volume
   replay-demo        Run the official demo replay
   replay-route DIR ROUTE
                      Replay a route from a local data directory
-  replay-jll-demo    Run the supplied JLL demo replay
-  replay-jll-datac   Run the supplied JLL dataC replay
+  replay-jll-demo    Run the compatible JLL USA demo (qcam workaround)
+  replay-jll-datac   Run the compatible JLL Taiwan dataC replay
 
 Examples:
   ./scripts/openpilot.sh up
@@ -103,11 +104,14 @@ EOF
     require_service compute
     "${compose[@]}" exec compute sh -lc 'cd /opt/openpilot && scons -u -j2'
     ;;
+  build-jll-compat)
+    "$project_dir/scripts/build-jll-compatible.sh"
+    ;;
   replay-demo)
     require_service compute display
     echo 'Open VNC/noVNC first, then the official demo will start.'
-    "${compose[@]}" exec compute sh -lc \
-      'TERM=xterm tools/replay/replay --demo --qcam --no-hw-decoder -c 1'
+    "${compose[@]}" exec -e TERM=xterm compute sh -lc \
+      'tools-official-backup-20261003/replay/replay --demo --qcam --no-hw-decoder --no-loop -c 1'
     ;;
   replay-route)
     if [[ $# -ne 3 ]]; then
@@ -118,20 +122,20 @@ EOF
     data_dir="$2"
     route="$3"
     "${compose[@]}" exec -e TERM=xterm compute sh -lc \
-      'tools/replay/replay --no-hw-decoder --data_dir "$1" "$2"' \
+      'tools-official-backup-20261003/replay/replay --no-hw-decoder --data_dir "$1" "$2"' \
       sh "$data_dir" "$route"
     ;;
   replay-jll-demo)
     require_service compute display
-    echo 'Open VNC/noVNC first, then the supplied JLL demo will start.'
+    echo 'Open the UI in VNC/noVNC first, then the JLL USA demo will start.'
     "${compose[@]}" exec -e TERM=xterm compute sh -lc \
-      'tools/replay/replayJLL --demo'
+      'test -x tools/replay/replayJLL.compat || { echo "Compatible JLL binary missing; run ./scripts/openpilot.sh build-jll-compat" >&2; exit 1; }; exec tools/replay/replayJLL.compat --demo --qcam --no-hw-decoder --no-loop -c 1'
     ;;
   replay-jll-datac)
     require_service compute display
-    echo 'Open VNC/noVNC first, then the supplied JLL dataC replay will start.'
+    echo 'Open the UI in VNC/noVNC first, then the JLL Taiwan dataC replay will start.'
     "${compose[@]}" exec -e TERM=xterm compute sh -lc \
-      'tools/replay/replayJLL --data_dir tools/replay/dataC "8bfda98c9c9e4291|2020-05-11--03-00-57--61"'
+      'test -x tools/replay/replayJLL.compat || { echo "Compatible JLL binary missing; run ./scripts/openpilot.sh build-jll-compat" >&2; exit 1; }; exec tools/replay/replayJLL.compat --no-hw-decoder --data_dir tools/replay/dataC "8bfda98c9c9e4291|2020-05-11--03-00-57--61"'
     ;;
   help|-h|--help)
     usage

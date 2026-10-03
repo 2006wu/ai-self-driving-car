@@ -1,27 +1,70 @@
+# ========================================
+# macOS
+# ========================================
 .DS_Store
-.env
-.env.*
-docker/__pycache__/
+
+
+# ========================================
+# Python generated files
+# ========================================
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
+
+
+# ========================================
+# Local environment / secrets
+# ========================================
+.env
+.env.*
+
+
+# ========================================
+# Logs
+# ========================================
 *.log
 
-# Local replay data and generated build outputs
-dataB6/
-dataC/
-replay-data/
+
+# ========================================
+# Editor settings
+# ========================================
+.idea/
+.vscode/
+
+
+# ========================================
+# Generated build outputs
+# ========================================
 build/
 dist/
 
-# Local editor files
-.idea/
-.vscode/
-# Python cache and local tooling output
-__pycache__/
-*.py[cod]
-.DS_Store
 
-# Local Docker/runtime artifacts
-.env
+# ========================================
+# Large local datasets
+# ========================================
+
+# Professor-provided dataB6 (~2.8 GB).
+# Keep locally / archive separately.
+dataB6/
+
+
+# ========================================
+# External reference material
+# ========================================
+
+# Professor's aJLL reference/development folder.
+# Not required by current runtime.
+external/aJLL/
+
+
+# Original downloaded archives.
+# Keep locally but don't push large archives to GitHub.
+external/installop-assets/
+
+
+# ========================================
+# Sensitive files - NEVER COMMIT
+# ========================================
+**/c2key089.ppk
+*.ppk
