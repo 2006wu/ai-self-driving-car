@@ -1,0 +1,47 @@
+FROM --platform=linux/amd64 ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    POETRY_VERSION=1.3.2 \
+    SCONS_VERSION=4.4.0 \
+    OP_VERSION=v0.9.1
+
+# Build toolchain and runtime libraries required by openpilot v0.9.1.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl git git-lfs build-essential clang cmake pkg-config gcc-arm-none-eabi \
+    python3.8 python3.8-dev python3.8-venv python3-pip \
+    libcapnp-dev capnproto libzmq3-dev libeigen3-dev \
+    libcurl4-openssl-dev libssl-dev libbz2-dev \
+    libavcodec-dev libavformat-dev libavutil-dev libswscale-dev \
+    qtbase5-dev qt5-qmake qtbase5-dev-tools qtmultimedia5-dev \
+    qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev \
+    opencl-headers ocl-icd-opencl-dev libgles2-mesa-dev libusb-1.0-0-dev \
+    netcat-openbsd unzip && rm -rf /var/lib/apt/lists/*
+# Pin the two tools used by the original installation procedure.
+RUN python3.8 -m pip install --no-cache-dir --upgrade 'pip<24' && \
+    python3.8 -m pip install --no-cache-dir \
+    "poetry==${POETRY_VERSION}" "scons==${SCONS_VERSION}" \
+    casadi libusb1 cython 'pycapnp<1.1' numpy pycryptodome hatanaka \
+    pycurl atomicwrites sympy cffi pyzmq smbus2 setproctitle
+WORKDIR /opt
+# Keep the source checkout in a named volume at runtime so build output survives.
+RUN git clone --branch "${OP_VERSION}" --depth 1 https://github.com/commaai/openpilot.git /opt/openpilot && \
+    cd /opt/openpilot && git submodule update --init --depth 1 || true
+# Python 3.8 rejects acados' obsolete future_fstrings encoding marker.
+RUN find /opt/openpilot/third_party/acados -type f \( -name '*.py' -o -name '*.pyx' -o -name '*.pxd' \) \
+    -exec sed -i 's/^#.*future_fstrings.*$/# Python 3.8 compatibility: future_fstrings is no longer a valid encoding/' {} +
+COPY docker/compute-entrypoint /usr/local/bin/compute-entrypoint
+COPY docker/socket_server.py /usr/local/bin/socket_server.py
+RUN chmod +x /usr/local/bin/compute-entrypoint
+# Additional dependencies discovered by the complete (including tests) build.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    qttools5-dev-tools libjpeg-dev libsystemd-dev libqt5charts5-dev \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /opt/openpilot
+RUN apt-get update && apt-get install -y --no-install-recommends libncurses5-dev \
+    && rm -rf /var/lib/apt/lists/*
+# Fail explicitly if the earlier checkout was incomplete; materialize Catch2 LFS.
+RUN test "$(git rev-parse HEAD)" = d891d3df476cdaca52dc350bcfdaaa137bbc3840 \
+    && git submodule update --init --depth 1 \
+    && git lfs pull --include="third_party/catch2/**"

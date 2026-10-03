@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+socket_path="${OP_SOCKET:-/run/openpilot/replay.sock}"
+mkdir -p "$(dirname "$socket_path")" "${OP_DATA_DIR:-/data}"
+
+python3.8 /usr/local/bin/socket_server.py &
+server_pid="$!"
+trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+for _ in $(seq 1 30); do
+  [[ -S "$socket_path" ]] && break
+  sleep 1
+done
+test -S "$socket_path"
+
+python3.8 --version
+scons --version | head -n 1
+test -d /opt/openpilot
+echo "[compute] socket ready: $socket_path"
+echo '[compute] openpilot repository ready'
+exec tail -f /dev/null

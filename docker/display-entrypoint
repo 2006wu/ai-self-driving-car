@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+socket_path="${OP_SOCKET:-/run/openpilot/replay.sock}"
+for _ in $(seq 1 60); do [[ -S "$socket_path" ]] && break; sleep 1; done
+test -S "$socket_path"
+echo "[display] socket found: $socket_path"
+export DISPLAY="${DISPLAY:-:99}"
+# openpilot's PC UI is laid out on a 1920x1080 canvas.  A smaller Xvfb
+# screen makes the Qt window resize below the UI's design coordinates.
+Xvfb "$DISPLAY" -screen 0 1920x1080x24 -nolisten tcp >/tmp/xvfb.log 2>&1 &
+xvfb_pid=$!
+vnc_port="${VNC_PORT:-5900}"
+novnc_port="${NOVNC_PORT:-6080}"
+vnc_password_file=/tmp/x11vnc.pass
+if [[ -z "${VNC_PASSWORD:-}" ]]; then
+  echo '[display] VNC_PASSWORD is required' >&2
+  exit 1
+fi
+x11vnc -storepasswd "$VNC_PASSWORD" "$vnc_password_file" >/tmp/x11vnc-passwd.log 2>&1
+chmod 600 "$vnc_password_file"
+x11vnc -display "$DISPLAY" -rfbport "$vnc_port" -listen 0.0.0.0 -forever -shared -rfbauth "$vnc_password_file" >/tmp/x11vnc.log 2>&1 &
+vnc_pid=$!
+websockify --web=/usr/share/novnc "$novnc_port" 127.0.0.1:"$vnc_port" >/tmp/novnc.log 2>&1 &
+novnc_pid=$!
+trap 'kill "$xvfb_pid" "$vnc_pid" "$novnc_pid" 2>/dev/null || true' EXIT
+sleep 1
+kill -0 "$xvfb_pid"
+kill -0 "$vnc_pid"
+kill -0 "$novnc_pid"
+echo "[display] virtual display ready: $DISPLAY"
+echo "[display] VNC ready: localhost:$vnc_port"
+echo "[display] noVNC ready: http://localhost:$novnc_port/vnc.html"
+openbox >/tmp/openbox.log 2>&1 &
+openbox_pid=$!
+launcher_pid=''
+trap 'kill "$xvfb_pid" "$vnc_pid" "$novnc_pid" "$openbox_pid" "$launcher_pid" 2>/dev/null || true' EXIT
+echo '[display] starting desktop launcher'
+python3 /usr/local/bin/launcher.py >/tmp/launcher.log 2>&1 &
+launcher_pid=$!
+trap 'kill "$xvfb_pid" "$vnc_pid" "$novnc_pid" "$openbox_pid" "$launcher_pid" 2>/dev/null || true' EXIT
+while true; do
+  python3 /usr/local/bin/display_client.py
+  kill -0 "$launcher_pid"
+  kill -0 "$openbox_pid"
+  kill -0 "$xvfb_pid"
+  kill -0 "$vnc_pid"
+  kill -0 "$novnc_pid"
+  sleep 5
+done

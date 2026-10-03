@@ -1,0 +1,57 @@
+name: ai-self-driving-car
+
+# Both services use amd64 because openpilot v0.9.1 targets x86_64 Linux.
+# Docker Desktop runs these containers through Apple Silicon emulation.
+services:
+  compute:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.compute
+    platform: linux/amd64
+    container_name: ai-self-driving-car-compute
+    restart: unless-stopped
+    working_dir: /opt/openpilot
+    ipc: shareable
+    shm_size: "1gb"
+    environment:
+      PYTHONPATH: "/opt/openpilot"
+      OP_SOCKET: "/run/openpilot/replay.sock"
+      OP_DATA_DIR: "/data"
+    volumes:
+      - openpilot-repo:/opt/openpilot
+      - replay-data:/data
+      - op-socket:/run/openpilot
+      - op-runtime:/tmp
+    command: ["/usr/local/bin/compute-entrypoint"]
+
+  display:
+    # Official msgq uses /dev/shm; VisionIPC exchanges FDs over /tmp sockets.
+    ipc: service:compute
+    pid: service:compute
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.display
+    platform: linux/amd64
+    container_name: ai-self-driving-car-display
+    restart: unless-stopped
+    depends_on:
+      - compute
+    environment:
+      OP_SOCKET: "/run/openpilot/replay.sock"
+      VNC_PORT: "5900"
+      NOVNC_PORT: "6080"
+      VNC_PASSWORD: "0000"
+    ports:
+      - "127.0.0.1:5910:5900"
+      - "127.0.0.1:6080:6080"
+    volumes:
+      - openpilot-repo:/opt/openpilot:ro
+      - op-socket:/run/openpilot
+      - op-runtime:/tmp
+    command: ["/usr/local/bin/display-entrypoint"]
+
+volumes:
+  openpilot-repo:
+  replay-data:
+  op-socket:
+  op-runtime:

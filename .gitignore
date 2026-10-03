@@ -1,0 +1,27 @@
+.DS_Store
+.env
+.env.*
+docker/__pycache__/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+*.log
+
+# Local replay data and generated build outputs
+dataB6/
+dataC/
+replay-data/
+build/
+dist/
+
+# Local editor files
+.idea/
+.vscode/
+# Python cache and local tooling output
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Local Docker/runtime artifacts
+.env
