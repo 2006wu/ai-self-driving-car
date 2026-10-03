@@ -1452,3 +1452,33 @@ last known working date:
 > 我正在重建一個舊版 openpilot v0.9.1 Replay 環境。這不是完全官方原版，而是依 JLL 筆記混合了 tools092、replayJLL、自訂 poetry 設定與數個 SConstruct workaround。請先閱讀 README，確認我目前進行到哪一步，再針對我貼出的「第一個真正 error」除錯。不要直接叫我重裝全部，也不要假設新版 openpilot 的安裝方式適用於 v0.9.1。
 
 這樣後續除錯時，比直接重新貼整份原始筆記容易判斷問題。
+
+---
+
+# 30. 本專案 Docker 實作對照（2026-10-03）
+
+本專案已把本文件能在 macOS ARM64 上重現的環境放入 Docker：
+
+- `compute` 使用 Ubuntu 20.04 amd64，包含 Python 3.8.10、Poetry 1.3.2、SCons 4.4.0。
+- `display` 使用 Ubuntu 20.04 amd64，包含 Xvfb、Openbox、Qt、VNC 與 noVNC。
+- openpilot 固定在 `v0.9.1` tag，實際 commit 為 `d891d3df476cdaca52dc350bcfdaaa137bbc3840`。
+- 官方 SCons target 名稱是 `tools/replay/replay`；它不會產生 `replayJLL`。
+- 官方 demo 已使用 `--demo --qcam --no-hw-decoder -c 1` 驗證跨容器影像顯示。
+
+Docker 版本對應指令：
+
+```bash
+./scripts/openpilot.sh up
+./scripts/openpilot.sh validate
+./scripts/openpilot.sh replay-demo
+```
+
+本專案已依使用者提供的 `InstallOP.docx` 取得並整合可下載的
+`tools092.zip`、JLL `replayJLL`、`pyproject.toml`、`poetry.lock`、
+`update_requirements.sh`、`dataC` 與 `dataB6`。來源 URL、SHA256、容器位置與
+驗證限制記錄在 `docs/INSTALLOP_ASSETS.md`。
+
+JLL `dataC` 已實測進入 `playing`；`dataB6` 已解壓至 `/data/dataB6`，但其
+`UHD--...--37` 結構不是 JLL `route|segment` 格式，不能直接用
+`replayJLL --data_dir` 播放。DOCX 的 `aJLL` 只有 Google Drive 資料夾連結，
+目前無法安全辨識其內容，因此不把它假設為 executable 或 library。

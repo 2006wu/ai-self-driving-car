@@ -1,5 +1,10 @@
 # 實作與驗證紀錄
 
+> 本文下方保留歷史操作紀錄。2026-10-03 後續重新稽核發現 JLL/UI 的 msgq
+> ABI 不一致，`playing` 並不代表 JLL 畫面成功；目前 `tools/replay/replay`
+> 也是 tools092 附帶 binary。最新結果以 [InstallOP 稽核](INSTALLOP_AUDIT.md)
+> 為準。dataB6 沒有 Replay 要求，aJLL 現已保存於 host external/aJLL。
+
 此文件記錄目前專案從建置到顯示的變更；操作方式見根目錄 README.md。
 原始需求保留在 `codex_command/README_OpenPilot_v0.9.1_Install_Replay.md`。
 
@@ -9,12 +14,12 @@
 - compute 處理編譯與資料；display 提供 Xvfb、Openbox、Qt 啟動器、VNC/noVNC。
 - 官方 openpilot v0.9.1 tag：`d891d3df476cdaca52dc350bcfdaaa137bbc3840`。
 - tag checkout 是 detached HEAD，符合固定版本需求。
-- Git remote 已設定為使用者的 ai-self-driving-car repository；未 push。
+- Git remote 已設定為使用者的 ai-self-driving-car repository；目前修改需另行 commit/push。
 
 ## 2. 編譯環境
 
 Python 3.8.10、Poetry 1.3.2、SCons 4.4.0，安裝在 container 內。
-目前沒有依原筆記另建 sconsvenv，也尚未取得 JLL 自訂 Poetry 設定。
+目前沒有依原筆記另建 sconsvenv；JLL 自訂 Poetry 設定已放入持久化 source volume。
 Docker 隔離環境是本專案與原本主機安裝流程的差異。
 
 先前處理過 ARM firmware compiler、Git LFS Catch2 header、libusb headers、
@@ -55,14 +60,27 @@ op-socket 保存健康檢查 socket。
 - 修正先前「修改 entrypoint 不必 build」的說明：COPY 進 image 的檔案修改後必須 build。
 - 修正先前「官方完整編譯會產生 replayJLL」的說明：官方 target 名稱是 replay。
 
-## 6. JLL 流程的外部缺件
+## 6. JLL 外部資產整合
 
-目前專案與 /data 沒有 tools092.zip、JLL 指定 pyproject.toml/poetry.lock、
-update_requirements.sh、replayJLL 原始碼、dataC、dataB6 或 aJLL。
-原 README 也沒有它們的下載位址。
-不能用官方 replay 改名，宣稱已完成指定的 JLL 流程。
-取得以上檔案及來源版本後，需比較差異、整合編譯，再驗證 demo/dataC。
-不會為了略過編譯錯誤任意下載來源不明的 libvisionipc.a。
+已從使用者提供的 `Downloads/InstallOP.docx` 解析出 Google Drive 來源，並將
+可取得的資產整合到 compute 的持久化 volume。來源與 hash 詳見
+`docs/INSTALLOP_ASSETS.md`。
+
+- `tools092.zip` 已解壓覆蓋 `/opt/openpilot/tools`；原官方 tools 保留於
+  `/opt/openpilot/tools-official-backup-20261003`。
+- `replayJLL`、`replayJLL230316` 與 `tools/replay/dataC` 已存在，dataC
+  實測成功載入 1 個有效 segment 並進入 `playing`。
+- `pyproject.toml`、`poetry.lock`、`update_requirements.sh` 已放入
+  `/opt/openpilot`。
+- `dataB6` 已通過 `unzip -t`，解壓後 129 個檔案、約 2.8 GB，位置為
+  `/data/dataB6`；其資料夾命名不符合 JLL `route|segment` 目錄格式，故不
+  宣稱可直接由 `replayJLL` 播放。
+- DOCX 的 `libvisionipc.a` 與既有已驗證 library 不同；未覆蓋既有檔案，另存
+  為 `/opt/openpilot/cereal/libvisionipc.a.jll-source-20261003`。
+- `aJLL` 只有資料夾連結，未取得可辨識的公開檔案清單；不能安全推斷其用途。
+
+不能用官方 `replay` 改名宣稱 JLL 完成；目前是「JLL dataC 已驗證、dataB6
+已保存但格式待釐清、aJLL 待取得明確檔案」的狀態。
 
 ## 7. 本次最終實測結果（2026-10-03）
 
@@ -76,7 +94,8 @@ update_requirements.sh、replayJLL 原始碼、dataC、dataB6 或 aJLL。
 | UI 關閉返回重開 | 實際發送 WM 關閉事件，連續兩輪成功 |
 | 視窗初始尺寸 | PID 對應確認 1600×900 |
 | 跨容器 demo | 成功顯示道路影片、59 mph、車道與前車標記 |
-| replayJLL / dataC | 缺少指定來源與資料，未完成 |
+| JLL 資產 / dataC | 已整合；JLL dataC 實測進入 playing |
+| dataB6 | 已驗證並解壓；尚未宣稱可由 replayJLL 直接使用 |
 
 demo route 為 `4cf7a6ad03080c90|2021-09-29--13-46-36`。
 最初高畫質下載的 50 秒限時測試停在下載階段，之後以
@@ -85,8 +104,34 @@ demo route 為 `4cf7a6ad03080c90|2021-09-29--13-46-36`。
 此為片段驗證，未宣稱全部 11 個 segments 都已播放。
 測試後以 SIGINT 停止測試 replay，關閉測試 UI，保留啟動器與兩個服務。
 
+JLL dataC 測試使用：
+
+```text
+tools/replay/replayJLL --data_dir tools/replay/dataC \
+  "8bfda98c9c9e4291|2020-05-11--03-00-57--61"
+```
+
+測試結果為載入 1 個有效 segment、Car Fingerprint `TOYOTA PRIUS 2017`、
+狀態 `playing`；命令以測試 timeout 收尾，沒有顯示載入錯誤。
+
 ![跨容器官方 demo 實測](replay-verified.png)
 
 画面警告是回放的官方 UI alert，保留原樣；不代表實車部署已驗證。
 本次沒有建立全新空 volume 重新完整編譯；image 可建置與既有 source volume 的
 完整編譯已分別驗證。完整編譯成功也不等於所有測試 binary 都已執行。
+
+## 8. 2026-10-03 後續修復
+
+- compute/display 已新增 healthcheck 與啟動順序，Xvfb 啟動改為等待 socket
+  就緒並重試；數次冷啟動後均為 `healthy`。
+- 在隔離 volume 以 tools092 SCons source 成功編譯 `replayJLL.compat`，
+  並驗證教授原版 `replayJLL` 雜湊不變。`scripts/build-jll-compatible.sh`
+  已實際成功重跑，編譯副本成功後自動移除。
+- Taiwan dataC 的相容版 Replay 已在 VNC 顯示夜間道路與車速。
+  `-b uiDebug` 會過濾舊資料的 `pandaStateDEPRECATED`，因此不使用它。
+- USA demo 的相容版 qcam workaround 已進入 `playing`，且重新連上目前
+  display 容器（VNC 視窗 hostname 與容器一致）後，實際看到白天道路、
+  車道疊圖與車速 52 mph。
+- `scripts/openpilot.sh` 快捷指令改為官方備份 Replay／JLL 相容版。
+  `scripts/validate-docker.sh` 新增健康、資料存在與 binary 雜湊檢查，
+  實際執行通過。詳見 [最新稽核](INSTALLOP_AUDIT.md)。

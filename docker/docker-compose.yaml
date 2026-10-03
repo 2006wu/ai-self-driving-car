@@ -23,6 +23,12 @@ services:
       - op-socket:/run/openpilot
       - op-runtime:/tmp
     command: ["/usr/local/bin/compute-entrypoint"]
+    healthcheck:
+      test: ["CMD-SHELL", "test -S /run/openpilot/replay.sock && pgrep -f '^python3.8 /usr/local/bin/socket_server.py$' >/dev/null && test -d /opt/openpilot && test -d /data"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   display:
     # Official msgq uses /dev/shm; VisionIPC exchanges FDs over /tmp sockets.
@@ -35,7 +41,8 @@ services:
     container_name: ai-self-driving-car-display
     restart: unless-stopped
     depends_on:
-      - compute
+      compute:
+        condition: service_healthy
     environment:
       OP_SOCKET: "/run/openpilot/replay.sock"
       VNC_PORT: "5900"
@@ -49,6 +56,12 @@ services:
       - op-socket:/run/openpilot
       - op-runtime:/tmp
     command: ["/usr/local/bin/display-entrypoint"]
+    healthcheck:
+      test: ["CMD-SHELL", "python3 /usr/local/bin/display_client.py >/dev/null && pgrep -x Xvfb >/dev/null && pgrep -x x11vnc >/dev/null && pgrep -x openbox >/dev/null && pgrep -f '^python3 /usr/local/bin/launcher.py$' >/dev/null && nc -z 127.0.0.1 5900 && nc -z 127.0.0.1 6080"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 volumes:
   openpilot-repo:

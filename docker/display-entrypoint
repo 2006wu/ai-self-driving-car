@@ -7,8 +7,33 @@ echo "[display] socket found: $socket_path"
 export DISPLAY="${DISPLAY:-:99}"
 # openpilot's PC UI is laid out on a 1920x1080 canvas.  A smaller Xvfb
 # screen makes the Qt window resize below the UI's design coordinates.
-Xvfb "$DISPLAY" -screen 0 1920x1080x24 -nolisten tcp >/tmp/xvfb.log 2>&1 &
-xvfb_pid=$!
+# On Docker Desktop the shared /tmp X socket can take a moment to settle
+# during a cold start. Keep the first failure log and retry only Xvfb.
+start_xvfb() {
+  local attempt
+  for attempt in 1 2 3; do
+    Xvfb "$DISPLAY" -screen 0 1920x1080x24 -nolisten tcp \
+      >"/tmp/xvfb-attempt-${attempt}.log" 2>&1 &
+    xvfb_pid=$!
+    for _ in $(seq 1 20); do
+      if [[ -S /tmp/.X11-unix/X99 ]] && kill -0 "$xvfb_pid" 2>/dev/null; then
+        echo "[display] Xvfb ready on attempt $attempt"
+        return 0
+      fi
+      if ! kill -0 "$xvfb_pid" 2>/dev/null; then
+        break
+      fi
+      sleep 0.25
+    done
+    echo "[display] Xvfb attempt $attempt failed; log follows" >&2
+    sed -n '1,40p' "/tmp/xvfb-attempt-${attempt}.log" >&2
+    kill "$xvfb_pid" 2>/dev/null || true
+    wait "$xvfb_pid" 2>/dev/null || true
+    sleep 1
+  done
+  return 1
+}
+start_xvfb
 vnc_port="${VNC_PORT:-5900}"
 novnc_port="${NOVNC_PORT:-6080}"
 vnc_password_file=/tmp/x11vnc.pass
@@ -23,7 +48,6 @@ vnc_pid=$!
 websockify --web=/usr/share/novnc "$novnc_port" 127.0.0.1:"$vnc_port" >/tmp/novnc.log 2>&1 &
 novnc_pid=$!
 trap 'kill "$xvfb_pid" "$vnc_pid" "$novnc_pid" 2>/dev/null || true' EXIT
-sleep 1
 kill -0 "$xvfb_pid"
 kill -0 "$vnc_pid"
 kill -0 "$novnc_pid"
