@@ -26,7 +26,7 @@ Display and logs:
 OpenPilot:
   shell              Open a shell in compute
   versions           Show Python, Poetry, SCons, Git, and submodules
-  build-op            Compile openpilot with SCons
+  build-op            Compile openpilot with SCons (may update replay binaries)
   build-jll-compat    Rebuild JLL in an isolated Docker volume
   replay-demo        Run the official demo replay
   replay-route DIR ROUTE
@@ -129,13 +129,24 @@ EOF
     require_service compute display
     echo 'Open the UI in VNC/noVNC first, then the JLL USA demo will start.'
     "${compose[@]}" exec -e TERM=xterm compute sh -lc \
-      'test -x tools/replay/replayJLL.compat || { echo "Compatible JLL binary missing; run ./scripts/openpilot.sh build-jll-compat" >&2; exit 1; }; exec tools/replay/replayJLL.compat --demo --qcam --no-hw-decoder --no-loop -c 1'
+      'if [ ! -x tools/replay/replayJLL.compat ]; then
+         echo "Compatible JLL binary missing; run ./scripts/openpilot.sh build-jll-compat" >&2
+         exit 1
+       fi
+       exec tools/replay/replayJLL.compat \
+         --demo --qcam --no-hw-decoder --no-loop -c 1'
     ;;
   replay-jll-datac)
     require_service compute display
     echo 'Open the UI in VNC/noVNC first, then the JLL Taiwan dataC replay will start.'
     "${compose[@]}" exec -e TERM=xterm compute sh -lc \
-      'test -x tools/replay/replayJLL.compat || { echo "Compatible JLL binary missing; run ./scripts/openpilot.sh build-jll-compat" >&2; exit 1; }; exec tools/replay/replayJLL.compat --no-hw-decoder --data_dir tools/replay/dataC "8bfda98c9c9e4291|2020-05-11--03-00-57--61"'
+      'if [ ! -x tools/replay/replayJLL.compat ]; then
+         echo "Compatible JLL binary missing; run ./scripts/openpilot.sh build-jll-compat" >&2
+         exit 1
+       fi
+       exec tools/replay/replayJLL.compat --no-hw-decoder \
+         --data_dir tools/replay/dataC \
+         "8bfda98c9c9e4291|2020-05-11--03-00-57--61"'
     ;;
   help|-h|--help)
     usage

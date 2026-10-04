@@ -77,10 +77,11 @@ op-socket 保存健康檢查 socket。
   宣稱可直接由 `replayJLL` 播放。
 - DOCX 的 `libvisionipc.a` 與既有已驗證 library 不同；未覆蓋既有檔案，另存
   為 `/opt/openpilot/cereal/libvisionipc.a.jll-source-20261003`。
-- `aJLL` 只有資料夾連結，未取得可辨識的公開檔案清單；不能安全推斷其用途。
+- `aJLL` 已下載至 host `external/aJLL`，共 181 files，歸類為 reference/archive；
+  沒有掛載到 runtime，也沒有執行其中內容。Google Drive 遠端 manifest 尚未核對。
 
-不能用官方 `replay` 改名宣稱 JLL 完成；目前是「JLL dataC 已驗證、dataB6
-已保存但格式待釐清、aJLL 待取得明確檔案」的狀態。
+教授原版 `replayJLL` 保留；實際 UI 播放使用另行編譯的 `replayJLL.compat`。
+`dataB6` 只依文件下載解壓，不建立 replay 流程。
 
 ## 7. 本次最終實測結果（2026-10-03）
 
@@ -104,7 +105,7 @@ demo route 為 `4cf7a6ad03080c90|2021-09-29--13-46-36`。
 此為片段驗證，未宣稱全部 11 個 segments 都已播放。
 測試後以 SIGINT 停止測試 replay，關閉測試 UI，保留啟動器與兩個服務。
 
-JLL dataC 測試使用：
+首次整合時的 JLL dataC 測試使用教授原命令：
 
 ```text
 tools/replay/replayJLL --data_dir tools/replay/dataC \
@@ -135,3 +136,23 @@ tools/replay/replayJLL --data_dir tools/replay/dataC \
 - `scripts/openpilot.sh` 快捷指令改為官方備份 Replay／JLL 相容版。
   `scripts/validate-docker.sh` 新增健康、資料存在與 binary 雜湊檢查，
   實際執行通過。詳見 [最新稽核](INSTALLOP_AUDIT.md)。
+
+## 9. 2026-10-04 從頭驗證
+
+- `docker compose config --quiet` 通過，compute/display images 均重新 build 成功
+  （Docker layers 命中快取）。以 `docker compose down` 後 `up -d --no-build`
+  重建容器與 network；保留所有 named volumes，兩服務皆達 `healthy`。
+- 從桌面啟動器開啟 OpenPilot UI，VNC 實際顯示 UI。UI 關閉後桌面回到啟動器。
+- 依序執行 `./scripts/openpilot.sh replay-demo`、`replay-jll-demo`、
+  `replay-jll-datac`。每個 Replay 都在目前 VNC 視窗看到對應道路畫面、
+  車道疊圖及速度；JLL USA 載入 11 valid segments，Taiwan 使用指定 dataC route。
+  每次以 `q` 正常退出，再執行環境驗證。
+- 收尾 `scripts/validate-docker.sh` 通過：compute/display healthy、共享 socket、
+  dataB6 129 files、dataC 必要檔、原版與相容版 JLL hashes、5910 VNC 與
+  6080 noVNC。沒有背景 Replay。
+- `external/installop-assets/` 六份原始 archive hash 再次符合資產清單；
+  教授原版 replayJLL hash 未變。dataB6 未修改。
+
+目前仍未驗證全新空 volumes 的自動還原及 tools092 overlay 全量 clean build；
+教授原始 `replayJLL --demo` 也因 msgq ABI 與目前 UI 不一致而保留未覆蓋，
+可用的畫面驗收走相容版 qcam workaround。以上不影響目前已測的三種 Replay。
