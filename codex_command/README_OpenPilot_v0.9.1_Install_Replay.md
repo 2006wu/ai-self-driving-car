@@ -6,6 +6,10 @@
 > 目標環境是 **openpilot v0.9.1 + Python 3.8 + Poetry 1.3.2 + SCons 4.4.0**，並執行 `replayJLL` / openpilot UI Replay。
 >
 > **重要**：原筆記包含不少針對舊版 openpilot 與較新 Ubuntu/系統函式庫的 workaround。它們不是標準 openpilot 安裝方式，不應一開始全部套用；應在遇到對應錯誤時才使用。
+>
+> **本專案現況**：目前實際環境是 macOS ARM64 + Docker linux/amd64。已驗證
+> 官方 Replay、JLL USA demo 與 Taiwan dataC 都能在 VNC 顯示畫面。最新逐項狀態
+> 請看本文件第 30 節；Docker 指令以根目錄 [README](../README.md) 為準。
 
 ---
 
@@ -1414,6 +1418,10 @@ last known working date:
 
 # 28. 一頁版 Checklist
 
+以下保留原始 Ubuntu 安裝流程的檢查項目。它不是目前 Docker 專案的狀態表；
+Docker 實測清單見第 30 節。尤其不要因這份 native Ubuntu 清單未勾選，
+就重做會覆蓋目前 volumes 的安裝步驟。
+
 ## Install
 
 - [ ] 使用適合的 Ubuntu 環境
@@ -1455,7 +1463,7 @@ last known working date:
 
 ---
 
-# 30. 本專案 Docker 實作對照（2026-10-03）
+# 30. 本專案 Docker 實作與最新驗證（2026-10-04）
 
 本專案已把本文件能在 macOS ARM64 上重現的環境放入 Docker：
 
@@ -1463,7 +1471,8 @@ last known working date:
 - `display` 使用 Ubuntu 20.04 amd64，包含 Xvfb、Openbox、Qt、VNC 與 noVNC。
 - openpilot 固定在 `v0.9.1` tag，實際 commit 為 `d891d3df476cdaca52dc350bcfdaaa137bbc3840`。
 - 官方 SCons target 名稱是 `tools/replay/replay`；它不會產生 `replayJLL`。
-- 官方 demo 已使用 `--demo --qcam --no-hw-decoder -c 1` 驗證跨容器影像顯示。
+- 官方 demo、JLL USA demo、Taiwan dataC 均已在 VNC 實際看到道路影像、車道疊圖與速度資訊。
+- `replayJLL.compat` 是由 tools092 SCons source 在隔離 volume 編譯，與教授原版 binary 分開保存。
 
 Docker 版本對應指令：
 
@@ -1478,7 +1487,24 @@ Docker 版本對應指令：
 `update_requirements.sh`、`dataC` 與 `dataB6`。來源 URL、SHA256、容器位置與
 驗證限制記錄在 `docs/INSTALLOP_ASSETS.md`。
 
-JLL `dataC` 已實測進入 `playing`；`dataB6` 已解壓至 `/data/dataB6`，但其
-`UHD--...--37` 結構不是 JLL `route|segment` 格式，不能直接用
-`replayJLL --data_dir` 播放。DOCX 的 `aJLL` 只有 Google Drive 資料夾連結，
-目前無法安全辨識其內容，因此不把它假設為 executable 或 library。
+| 項目 | 最新狀態 | 證據／限制 |
+| --- | --- | --- |
+| openpilot v0.9.1 | PASS | 固定 commit `d891d3df476cdaca52dc350bcfdaaa137bbc3840`；submodules 已初始化 |
+| Python / Poetry / SCons | PASS（平台差異） | Python 3.8.10、Poetry 1.3.2、SCons 4.4.0；教授範例 Python 為 3.8.20，Docker 未另建 `sconsvenv` |
+| Docker images 與冷啟動 | PASS | 兩個 image build 成功；不刪 volumes 重建容器後皆 healthy |
+| 桌面 UI | PASS | launcher 可開啟官方 UI；VNC/noVNC 端口及共享 socket 通過檢查 |
+| 官方 Replay | PASS | `./scripts/openpilot.sh replay-demo`；VNC 實際看到道路畫面 |
+| JLL USA demo | PASS（相容版） | `./scripts/openpilot.sh replay-jll-demo`；11 segments，進入 `playing` 且 VNC 顯示道路 |
+| Taiwan dataC | PASS（相容版） | `./scripts/openpilot.sh replay-jll-datac`；指定 route 進入 `playing` 且 VNC 顯示台灣夜間道路 |
+| dataB6 | PASS（保存要求） | `/data/dataB6` 129 files，逐檔大小與 ZIP CRC 已驗證；教授未要求 Replay |
+| aJLL | PASS（本地保存） | `external/aJLL` 181 files，作為 reference/archive；未執行、未 mount；Drive 遠端完整 manifest 未核對 |
+| tools092 overlay 全量 clean build | PENDING | JLL target 已在隔離 volume 編譯成功；全量重建與全新空 volumes 還原尚未驗證 |
+| 教授原樣 `./replayJLL --demo` | PENDING | 原版保留未覆蓋；目前 UI 與原版 msgq ABI 不相容。已驗證可用的是獨立編譯的 `.compat` 與 qcam workaround |
+
+依 InstallOP.docx，**dataB6 不需要 replay**，aJLL 也沒有指定執行命令；
+不要自行建立 dataB6 replay、ModelB6 training 或 simulation 流程。
+
+長期原始下載檔放在 Git 忽略的 `external/installop-assets/`，不會隨 Git clone
+進入新環境。完整 archive hash、Docker 資產路徑與稽核細節見
+[`docs/INSTALLOP_ASSETS.md`](../docs/INSTALLOP_ASSETS.md) 和
+[`docs/INSTALLOP_AUDIT.md`](../docs/INSTALLOP_AUDIT.md)。

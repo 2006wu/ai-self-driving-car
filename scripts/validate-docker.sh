@@ -4,13 +4,27 @@ set -euo pipefail
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 compose=(docker compose -f "$project_dir/docker/docker-compose.yaml")
 "${compose[@]}" config --quiet
-"${compose[@]}" ps
 for service in compute display; do
   container_id="$("${compose[@]}" ps -q "$service")"
   test -n "$container_id"
-  health="$(docker inspect --format '{{.State.Health.Status}}' "$container_id")"
-  test "$health" = healthy || { echo "$service health: $health" >&2; exit 1; }
+  health=starting
+  for attempt in $(seq 1 45); do
+    health="$(docker inspect --format '{{.State.Health.Status}}' "$container_id")"
+    [[ "$health" == healthy ]] && break
+    if [[ "$health" == unhealthy ]]; then
+      echo "$service health: $health" >&2
+      "${compose[@]}" logs --tail=40 "$service" >&2
+      exit 1
+    fi
+    sleep 2
+  done
+  if [[ "$health" != healthy ]]; then
+    echo "$service health did not become healthy (last state: $health)" >&2
+    "${compose[@]}" logs --tail=40 "$service" >&2
+    exit 1
+  fi
 done
+"${compose[@]}" ps
 "${compose[@]}" exec -T compute python3.8 --version
 "${compose[@]}" exec -T compute sh -ec '
   test -d /data

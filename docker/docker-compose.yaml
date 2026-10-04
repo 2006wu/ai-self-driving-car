@@ -24,7 +24,12 @@ services:
       - op-runtime:/tmp
     command: ["/usr/local/bin/compute-entrypoint"]
     healthcheck:
-      test: ["CMD-SHELL", "test -S /run/openpilot/replay.sock && pgrep -f '^python3.8 /usr/local/bin/socket_server.py$' >/dev/null && test -d /opt/openpilot && test -d /data"]
+      test:
+        - CMD-SHELL
+        - >-
+          test -S /run/openpilot/replay.sock &&
+          pgrep -f '^python3.8 /usr/local/bin/socket_server.py$' >/dev/null &&
+          test -d /opt/openpilot && test -d /data
       interval: 15s
       timeout: 5s
       retries: 3
@@ -57,7 +62,15 @@ services:
       - op-runtime:/tmp
     command: ["/usr/local/bin/display-entrypoint"]
     healthcheck:
-      test: ["CMD-SHELL", "python3 /usr/local/bin/display_client.py >/dev/null && pgrep -x Xvfb >/dev/null && pgrep -x x11vnc >/dev/null && pgrep -x openbox >/dev/null && pgrep -f '^python3 /usr/local/bin/launcher.py$' >/dev/null && nc -z 127.0.0.1 5900 && nc -z 127.0.0.1 6080"]
+      test:
+        - CMD-SHELL
+        - >-
+          python3 /usr/local/bin/display_client.py >/dev/null &&
+          pgrep -x Xvfb >/dev/null &&
+          pgrep -x x11vnc >/dev/null &&
+          pgrep -x openbox >/dev/null &&
+          pgrep -f '^python3 /usr/local/bin/launcher.py$' >/dev/null &&
+          nc -z 127.0.0.1 5900 && nc -z 127.0.0.1 6080
       interval: 15s
       timeout: 5s
       retries: 3
