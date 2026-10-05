@@ -68,3 +68,15 @@ external/installop-assets/
 # ========================================
 **/c2key089.ppk
 *.ppk
+course-materials/
+
+
+# ========================================
+# Project 2 generated ModelB6 artifacts
+# ========================================
+# Student source remains trackable under projects/project2/.
+# Keep derived teacher labels, checkpoints, plots, and logs local.
+projects/project2/modelb6/derived-data/
+projects/project2/modelb6/artifacts/
+projects/project2/modelb6/logs/
+projects/project2/modelb6/wheelhouse/

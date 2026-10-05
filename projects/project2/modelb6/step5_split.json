@@ -1,0 +1,14 @@
+{
+  "train_sequences": [
+    "UHD--2018-08-02--08-34-47--33",
+    "UHD--2018-08-02--08-34-47--37"
+  ],
+  "validation_sequences": [
+    "UHD--2018-08-02--08-34-47--32"
+  ],
+  "batch_size": 2,
+  "steps_per_epoch": 20,
+  "validation_steps": 10,
+  "epochs": 60,
+  "target_width": 2383
+}
