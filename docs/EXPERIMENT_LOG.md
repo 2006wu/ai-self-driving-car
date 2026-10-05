@@ -318,7 +318,7 @@ P2.9 completed the actual supervised-loss gradient audit: both checkpoints show 
 - `B6BW.hdf5` resume restores weights, not the exact optimizer/scheduler/epoch state; any restart is a new segment rather than an exact continuation.
 - Keras warns that the HDF5 checkpoint format is legacy. Save and fresh-process reload passed, but the warning remains.
 - Project 1's full tools092-overlay clean rebuild, fresh empty-volume restoration, and remote aJLL manifest comparison remain unverified. The cause of one early Xvfb restart was not captured conclusively.
-- The Agent baseline now has an isolated Python 3.11 environment and offline import/source checks. A live Gemini call and original “Do New” feature remain unexecuted because no runtime `GOOGLE_API_KEY` was supplied; the key must never enter the repository.
+- The Agent baseline now has an isolated Python 3.11 environment and offline import/source checks. A live Gemini call remains unexecuted because no runtime `GOOGLE_API_KEY` was supplied; the key must never enter the repository. The read-only evidence reporter Do New feature is implemented and offline-tested below.
 - The P2.6 source-audit camera gate was resolved from the user-reviewed professor slide; the source/slide right-lane discrepancy remains documented. Step 6 `[0,0]` traffic differs from Step 5 `[1,0]`. P2.7 measured small one-step traffic effects but did not test their long recurrent accumulation.
 - Both checkpoints' tested image representations become nearly invariant by `top_activation`. P2.8 traced progressive stage attenuation and found the same behavior in three fresh initialization controls. P2.9 confirms actual-loss gradient attenuation, but the supervised-gradient behavior before training, global behavior outside tested samples, and driving quality remain open.
 - P2.9 confirms teacher forcing, not current/future target leakage. Final-USA state-removal effects do not generalize to best or Taiwan. Taiwan diagnostic teacher targets are not human ground truth; local raw gradients cannot establish the historical Adam optimization trajectory.
@@ -343,7 +343,7 @@ The environment now pins Agno **3.1.1**, Google GenAI **2.28.0**, DuckDuckGo Sea
 
 ### Result / remaining issue
 
-The isolated Agent baseline environment is ready and its offline compatibility gate passes. The live professor baseline still needs a user-provided runtime API key and network authorization. The assigned five-level framework has not yet been treated as complete, and no “Do New” feature has been selected or implemented; those steps follow baseline review.
+The isolated Agent baseline environment is ready and its offline compatibility gate passes. The live professor baseline still needs a user-provided runtime API key and network authorization. The assigned five-level framework has not yet been treated as complete; the evidence reporter below is an implemented, offline-tested Do New feature.
 
 ## AI Agent “Do New”: Project 2 evidence reporter (2026-10-06)
 
