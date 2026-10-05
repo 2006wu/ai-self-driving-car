@@ -145,7 +145,7 @@ The minimum Project 2 storage/runtime design is now:
 | Derived ModelB6 data and outputs | Future ignored `projects/project2/modelb6/derived-data/`, `artifacts/`, and `logs/`, mounted writable only in the Project 2 service |
 | Secrets | Runtime environment or ignored local configuration; never image, Compose, source, or Git |
 
-Because the baseline generator writes `outSC.h5` next to `yuv.h5`, the Project 2 runtime must generate teacher labels in a copied/derived dataset tree, not the original replay-data volume. The minimum reproducible ModelB6 direction is a separate service/container with pinned TensorFlow/Keras, read-only professor/OpenPilot/data inputs, and the dedicated writable Project 2 locations above. The Agent should use an isolated host Python 3.11 virtual environment first; it is smaller than another service and can be replaced with a container later if reproducibility requires it. Neither environment has been created or installed in this remediation step.
+Because the baseline generator writes `outSC.h5` next to `yuv.h5`, the Project 2 runtime must generate teacher labels in a copied/derived dataset tree, not the original replay-data volume. The minimum reproducible ModelB6 direction is a separate service/container with pinned TensorFlow/Keras, read-only professor/OpenPilot/data inputs, and the dedicated writable Project 2 locations above. The Agent now uses an isolated host Python 3.11 virtual environment; it does not share the ModelB6 runtime.
 
 ## 11. P2.1 ModelB6 runtime and compatibility scaffold (2026-10-04)
 
@@ -667,3 +667,13 @@ Fresh models already have a very small image/state input-gradient ratio (**1.626
 The result refines P2.9-B/H1 rather than replacing it. It does not reconstruct the historical Adam trajectory or prove a unique repair; the fresh controls are not the unavailable historical P2.5 initialization. No behavior-quality claim follows.
 
 P2.10 validation: **4 new tests**, 54 finite records, three distinct seeds, all 13,039,435 parameters trainable per model, zero optimizer creation, unchanged fresh-model weight hashes, and the 248-file protected inventory unchanged. Results are in `/output/p210-gradient-controls/` (`records.json`, `summary.json`, `run_metadata.json`, `integrity_before.json`).
+
+## 22. AI Agent baseline environment (2026-10-06)
+
+The ModelB6 line was pushed before beginning the Agent work. The professor reference `external/aJLL/Agent/agent.py` was inspected without copying its copyrighted source into tracked files. It imports Agno `Agent`, Gemini, YFinanceTools, DuckDuckGoTools, ReasoningTools and Image, and selects Gemini `gemini-2.5-flash`; its active request is a reasoning-based travel prompt. The Agent does not share the OpenPilot Python 3.8 runtime.
+
+Student-owned files now live under `projects/project2/agent/`: an ignored Python 3.11 `.venv`, pinned `requirements.txt`, `baseline_check.py` (offline source/import audit), and `baseline_agent.py` (minimal runtime baseline). Installation resolved Agno **3.1.1**, Google GenAI **2.28.0**, DuckDuckGo Search **8.1.1**, `ddgs` **9.16.0** and YFinance **1.7.0**, with transitive versions recorded in the requirements file. The first offline check exposed Agno's current DuckDuckGo implementation requiring the additional `ddgs` package; adding that isolated pin fixed the import check.
+
+Offline validation passed: all required imports, reference source symbols and Python compilation passed. `GOOGLE_API_KEY` was absent, so the live Gemini request was deliberately skipped. No key was created, stored, logged or committed. The 5-Level framework and original “Do New” feature are not yet claimed complete; they require baseline behavior evidence and a design decision after the assigned material is reviewed.
+
+The original “Do New” feature is now implemented as `projects/project2/agent/evidence_agent.py`. Its `summarize_p2_evidence` tool is read-only, permits evidence roots only under `/output` or temporary test storage, and extracts saved P2.9 checkpoint metrics without loading a model or changing any artifact. `do_new_tests.py` verifies structured output, read-only behavior and rejection of an unapproved root (**2/2 passed**). The live Gemini wrapper remains gated on a runtime `GOOGLE_API_KEY`; no key was available during this run. The local course doc names the 5-Level framework but does not include its definitions, so the repository records that boundary in `FRAMEWORK_REVIEW.md` rather than inventing a review.

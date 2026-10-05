@@ -318,7 +318,7 @@ P2.9 completed the actual supervised-loss gradient audit: both checkpoints show 
 - `B6BW.hdf5` resume restores weights, not the exact optimizer/scheduler/epoch state; any restart is a new segment rather than an exact continuation.
 - Keras warns that the HDF5 checkpoint format is legacy. Save and fresh-process reload passed, but the warning remains.
 - Project 1's full tools092-overlay clean rebuild, fresh empty-volume restoration, and remote aJLL manifest comparison remain unverified. The cause of one early Xvfb restart was not captured conclusively.
-- The professor Agent/Python 3.11 work is identified but has not been implemented here.
+- The Agent baseline now has an isolated Python 3.11 environment and offline import/source checks. A live Gemini call and original “Do New” feature remain unexecuted because no runtime `GOOGLE_API_KEY` was supplied; the key must never enter the repository.
 - The P2.6 source-audit camera gate was resolved from the user-reviewed professor slide; the source/slide right-lane discrepancy remains documented. Step 6 `[0,0]` traffic differs from Step 5 `[1,0]`. P2.7 measured small one-step traffic effects but did not test their long recurrent accumulation.
 - Both checkpoints' tested image representations become nearly invariant by `top_activation`. P2.8 traced progressive stage attenuation and found the same behavior in three fresh initialization controls. P2.9 confirms actual-loss gradient attenuation, but the supervised-gradient behavior before training, global behavior outside tested samples, and driving quality remain open.
 - P2.9 confirms teacher forcing, not current/future target leakage. Final-USA state-removal effects do not generalize to best or Taiwan. Taiwan diagnostic teacher targets are not human ground truth; local raw gradients cannot establish the historical Adam optimization trajectory.
@@ -326,3 +326,31 @@ P2.9 completed the actual supervised-loss gradient audit: both checkpoints show 
 ## Next Experiment
 
 Begin the isolated AI Agent baseline: establish a separate Python 3.11 environment, resolve the professor Agent dependencies without sharing the ModelB6 runtime, run the baseline with a runtime-provided API key if available, and document the assigned framework before designing the original “Do New” feature.
+
+## AI Agent baseline environment (2026-10-06)
+
+### Goal and attempt
+
+After P2.10, the next Project 2 work moved to the Agent portion. The preserved professor source was inspected in place. A separate Python **3.11** virtual environment was created under the ignored `projects/project2/agent/.venv`; no package was installed into the OpenPilot/ModelB6 Python 3.8 environment. Student wrappers were added for an offline baseline check and an optional live baseline runner.
+
+### Problem and root cause
+
+The initial dependency set (`agno`, Google GenAI, DuckDuckGo Search and YFinance) installed successfully, but the first import audit failed because Agno 3.1.1's current `DuckDuckGoTools` imports the separate `ddgs` package. This was a transitive dependency/API evolution issue in the isolated Agent environment, not a Project 1 or ModelB6 issue.
+
+### Solution and validation
+
+The environment now pins Agno **3.1.1**, Google GenAI **2.28.0**, DuckDuckGo Search **8.1.1**, `ddgs` **9.16.0**, YFinance **1.7.0**, and all resolved transitive packages in `projects/project2/agent/requirements.txt`. `baseline_check.py` passed all required Agno/Gemini/tool imports, confirmed the preserved reference source contains the expected symbols, and passed Python compilation. No `GOOGLE_API_KEY` was present, so the live Gemini request was skipped deliberately. No secret was written to source, logs or Git.
+
+### Result / remaining issue
+
+The isolated Agent baseline environment is ready and its offline compatibility gate passes. The live professor baseline still needs a user-provided runtime API key and network authorization. The assigned five-level framework has not yet been treated as complete, and no “Do New” feature has been selected or implemented; those steps follow baseline review.
+
+## AI Agent “Do New”: Project 2 evidence reporter (2026-10-06)
+
+### Goal and design
+
+After inspecting the baseline and confirming that the local course document only names the 5-Level framework without providing its definitions, an original feature was selected that is grounded in the completed project evidence: a read-only evidence reporter. `evidence_agent.py` exposes `summarize_p2_evidence`, which reads saved P2.9 JSON and returns final/best loss, image-gradient RMS, state-gradient RMS and image/state ratios for Gemini to present in a compact table. It never loads a checkpoint, runs inference, writes an artifact, or changes source/data.
+
+### Validation and limits
+
+`do_new_tests.py` passed **2/2**: structured extraction is read-only and an unapproved filesystem root is rejected. The wrapper still requires a runtime `GOOGLE_API_KEY` for a live Gemini response; no key was available, so no external API call was attempted. The feature is therefore locally implemented and tool-tested, while live LLM behavior remains pending authorized credentials. `FRAMEWORK_REVIEW.md` records the missing local framework definitions and avoids inventing the five levels.
