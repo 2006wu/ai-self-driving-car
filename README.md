@@ -7,6 +7,8 @@ macOS Apple Silicon 上的 openpilot v0.9.1 Docker 編譯與顯示環境。兩�
 - [完整實作紀錄](docs/IMPLEMENTATION.md)
 - [InstallOP 最新需求、實測與清理稽核](docs/INSTALLOP_AUDIT.md)
 - [原始 JLL 安裝筆記](codex_command/README_OpenPilot_v0.9.1_Install_Replay.md)
+- [Project 2 最新完成狀態與證據](docs/PROJECT2_AUDIT.md#32-baseline-complete-diagnosis-and-unified-waiting-on-quota-2026-10-08)
+- [Project 2 ModelB6 使用方式](projects/project2/modelb6/README.md)／[AI Agent 與離線展示](projects/project2/agent/README.md)
 
 ## 目前完成範圍
 
@@ -29,7 +31,17 @@ SCons source 在隔離 volume 編出，供目前 UI 使用。不要混用這兩�
 目前 `/data/dataB6` 的 129 files、2,977,906,784 bytes 全部與原 ZIP 的大小／CRC 相符。
 `external/aJLL` 有 181 files，分類為 REFERENCE / ARCHIVE；根目錄重複副本已移出專案，Docker/build/runtime
 沒有引用它，教授也沒有給出執行命令。Google Drive 遠端完整 manifest 尚未核對。
-本階段不增加 ModelB6 training、simulation 或 dataB6 轉換。
+以上是 Project 1 階段的驗證範圍。後續 Project 2 已在隔離環境完成 ModelB6
+訓練、USA／Taiwan 技術驗證與 P2.10 診斷；駕駛品質尚未驗證。Agent 離線
+建構、證據工具展示與指定框架 review 已通過。Evidence Agent live 工具呼叫、
+八個數值與完整回答已核對通過（解釋限制見 audit）；Baseline Agent 也已完成
+一次含 think/analyze 呼叫與完整回答的 live run。
+目前原始 Project 2 課程範圍為 22/22 項完成；額外的 Do New v2 Diagnosis
+與 Unified 線上驗收仍待 Gemini 配額重置後重試。這不代表駕駛品質通過。
+新增 [Do New v2](projects/project2/agent/DO_NEW_V2.md)：唯讀多實驗診斷、
+定性影像驗證與整合模式已通過離線測試；USA/final Vision live 已通過，
+Diagnosis 與 Unified 最新重試遇到 Gemini 429 每日配額耗盡，完整 live 驗證尚待完成。
+詳見上方連結。
 
 ## 日常使用
 

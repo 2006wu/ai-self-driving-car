@@ -1,5 +1,24 @@
 # Project 2 — Model B6 Training, Verification, and AI Agent
 
+**Current status (2026-10-08):** the latest user-submitted Baseline Agent run
+completed with visible `think` and `analyze` calls and a full travel-planning
+answer; see [audit §32](PROJECT2_AUDIT.md#32-baseline-complete-diagnosis-and-unified-waiting-on-quota-2026-10-08).
+The original audited course scope is **22/22 grouped deliverables complete**.
+ModelB6 technical work is **100%**; driving quality remains unverified. The assigned
+[5-Level review](../projects/project2/agent/FRAMEWORK_REVIEW.md) is COMPLETE.
+Historical professor model: `gemini-2.5-flash`; student default:
+`gemini-3.8-flash`, optionally overridden with `GEMINI_MODEL_ID`.
+Percentages count deliverables, not grades or driving quality. Historical
+guidance below does not authorize retraining.
+
+**Additional Do New v2:** read-only multi-experiment diagnosis, qualitative
+image verification and unified mode are implemented and tested offline.
+See [implementation and commands](../projects/project2/agent/DO_NEW_V2.md).
+Live v2 status: USA/final Vision PASS. Diagnosis and Taiwan/best Unified
+returned 429 daily quota exhaustion in the latest attempts and await quota
+reset before retry (audit §§31–32). These extra v2 acceptance runs are separate
+from the original 22-group course count.
+
 > This document summarizes the Project 2 requirements from professor-provided
 > course materials and defines how Project 2 should be developed in this repository.
 >
@@ -1175,40 +1194,46 @@ as complete when the required baseline and original work have been demonstrated.
 ## Model B6
 
 ```text
-[ ] Step 5 environment understood
-[ ] dataB6 training inputs accessible
-[ ] training server works
-[ ] validation server works
-[ ] train_modelB6.py works
-[ ] B6.keras generated
-[ ] best weights generated
-[ ] training/validation results inspected
+[x] Step 5 environment understood
+[x] dataB6 training inputs accessible
+[x] training server works (student correction layer)
+[x] validation server works (student correction layer)
+[x] training works (student-owned train_corrected.py / step5.py)
+[x] B6.keras generated
+[x] best weights generated
+[x] training/validation results inspected
 
-[ ] Step 6 simulator works
-[ ] trained B6 model can be loaded
-[ ] USA verification performed
-[ ] Taiwan verification performed where required/appropriate
-[ ] path/lane predictions inspected
-[ ] model behavior analyzed
-[ ] overfitting/generalization considered
+[x] Step 6 simulator works (student technical pipeline)
+[x] trained B6 model can be loaded
+[x] USA technical verification performed
+[x] Taiwan technical verification performed
+[x] path/lane predictions inspected
+[x] model behavior analyzed (P2.7–P2.10; diagnostic question closed)
+[x] overfitting/generalization considered
 ```
 
 ## AI Agent
 
 ```text
-[ ] isolated Python 3.11 environment prepared
-[ ] Agno installed
-[ ] required dependencies installed
-[ ] Gemini API access configured securely
-[ ] professor baseline agent.py runs
-[ ] baseline behavior understood
-[ ] 5-Level Framework reviewed
-[ ] original "Do New" feature designed
-[ ] original feature implemented
-[ ] original feature demonstrated/evaluated
+[x] isolated Python 3.11 environment prepared
+[x] Agno installed
+[x] required dependencies installed (63 installed pins validated)
+[x] Gemini API access configured securely (user confirms live API connectivity)
+[x] professor baseline successful live response (completed 2026-10-08; visible think/analyze calls and full answer)
+[x] complete live baseline run verified (see audit §32)
+[x] 5-Level Framework reviewed (assigned public article read; student mappings documented)
+[x] original "Do New" feature designed
+[x] original feature implemented
+[x] original feature demonstrated offline and live (tool call and eight metrics verified)
 ```
 
 The exact grading criteria may be updated by later professor instructions.
+
+Technical completion does not establish driving quality: independent
+path/lane/lead ground truth evaluation is absent, and image influence is extremely
+weak. Do New's offline tool and live integration have been demonstrated;
+the live explanation has a documented scientific-interpretation caveat. The final audit gives detailed states and evidence for each
+item. No additional ModelB6 experiment is required for this task.
 
 Latest explicit professor instructions always take priority.
 

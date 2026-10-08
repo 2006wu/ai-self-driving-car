@@ -1,6 +1,7 @@
 """Small unit tests for the P2.10 control audit."""
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import step10_gradient_controls as audit
 
@@ -13,11 +14,13 @@ class GradientControlTests(unittest.TestCase):
     def test_output_isolated(self):
         self.assertEqual(audit.OUTPUT, Path('/output/p210-gradient-controls'))
 
-    def test_conditions_are_original_supervised_inputs(self):
-        self.assertIn('previous teacher state', 'P2.9 original condition: real image, previous teacher state, desire zero, traffic [1,0]')
+    def test_completed_output_rejected_before_any_model_construction(self):
+        with patch.object(audit.Path, 'exists', return_value=True), patch.object(audit, 'get_model') as build:
+            with self.assertRaises(FileExistsError): audit.run()
+            build.assert_not_called()
 
-    def test_no_optimizer_update_path(self):
-        self.assertFalse(False)
+    def test_original_gradient_collection_rejects_disconnected_tensor(self):
+        with self.assertRaises(ValueError): audit.p29.grad_stats(None)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 # Engineering experiment log
 
-This is the chronological account of how the OpenPilot environment and ModelB6 P2.0–P2.9 milestones were reached. It records decisions, failed attempts, repairs, and evidence boundaries. Current commands belong in [README](../README.md) and the [ModelB6 README](../projects/project2/modelb6/README.md); current verification status belongs in [PROJECT2_AUDIT](PROJECT2_AUDIT.md). Dates below are local project dates (Asia/Taipei) unless a UTC timestamp is explicitly shown. Historical entries are reconstructed from those records and the saved run metadata, rather than from a complete shell transcript.
+This is the chronological account of how the OpenPilot environment, ModelB6 P2.0–P2.10, and Agent offline closure milestones were reached. It records decisions, failed attempts, repairs, and evidence boundaries. Current commands belong in [README](../README.md) and the [ModelB6 README](../projects/project2/modelb6/README.md); current verification status belongs in [PROJECT2_AUDIT](PROJECT2_AUDIT.md). Dates below are local project dates (Asia/Taipei) unless a UTC timestamp is explicitly shown. Historical entries are reconstructed from those records and the saved run metadata, rather than from a complete shell transcript.
 
 | Milestone | Status | Goal | Major outcome |
 | --- | --- | --- | --- |
@@ -15,7 +15,7 @@ This is the chronological account of how the OpenPilot environment and ModelB6 P
 | P2.7 | Complete diagnostic; cause unresolved | Test each input with frozen weights | Both checkpoints near image-invariant on tested frames; encoder response collapses before top, while recurrent state changes output materially. |
 | P2.8 | Complete diagnostic; training mechanism still open | Locate encoder attenuation and inspect scale/gradients | Native train/inference inputs agree; three fresh seeds also attenuate image signals, supporting an architecture-initialization issue. |
 | P2.9 | Complete diagnostic; P2.9-B / H1 | Attribute the actual supervised-loss gradients | Image gradients attenuate toward early encoder layers in both checkpoints; state-removal effects differ by checkpoint/domain, challenging a universal shortcut explanation. |
-| P2.10 | Complete diagnostic; fresh controls | Separate pre-training attenuation from trained state dominance | Three fresh default-initialized models reproduced low image/state ratios before training; trained checkpoints have much smaller image gradients and much stronger state gradients. |
+| P2.10 | Complete; P2.10-A, investigation closed | Test whether supervised-gradient attenuation precedes training | Three fresh models reproduce attenuation; trained image gradients are 2–10× smaller and state gradients much larger. |
 
 ## Project 1 — OpenPilot v0.9.1 environment (through 2026-10-03)
 
@@ -299,7 +299,7 @@ All **54** records were finite and structurally identical to the P2.9 original c
 | 3102 | 2.111e-14 | 1.245e-3 | 1.626e-11 | 6.674e-14 / 4.952e-9 / 1.343e-4 | 60.3723 |
 | 3103 | 2.182e-14 | 1.307e-3 | 1.751e-11 | 6.579e-14 / 5.108e-9 / 1.379e-4 | 60.3453 |
 
-Fresh models already show a small image/state ratio before training, so the full image-gradient weakness is not created solely by P2.5 optimization. Their image input gradients are about three orders larger than trained P2.9 medians, while their state gradients are much smaller; training further changes branch balance. Depthwise attenuation remains visible before training, with gradients falling from top to middle to stem. The supported timeline is: architecture-level attenuation precedes training, then training strengthens recurrent dominance. This does not reconstruct the historical optimizer trajectory or prove a repair.
+Fresh models already show a small image/state ratio before training, so the full image-gradient weakness is not created solely by P2.5 optimization. Their image input gradients are **2.16–2.59× final / 8.19–9.80× best**, while their state gradients are much smaller. Depthwise attenuation remains visible before training, with gradients falling from top to middle to stem. Intrinsic attenuation is strongly supported; trained checkpoints show greater state/image imbalance. This does not reconstruct the historical optimizer trajectory or prove a repair. The closure audit corrected the earlier erroneous “three orders” image-gradient comparison without changing saved results.
 
 ### Validation and handoff
 
@@ -309,7 +309,7 @@ P2.10 unit tests passed **4/4**; 54 records, three distinct seeds, 13,039,435 tr
 
 OpenPilot v0.9.1's existing compute/display services and previously observed official/compatible USA and Taiwan replay paths work within the documented Project 1 evidence limits. ModelB6 has a compatible isolated Python 3.8/TensorFlow 2.13.1 runtime, a tested student correction layer, validated derived labels, a complete 60-epoch Step 5 run, and independently reloadable final/best artifacts. The four-cell Step 6 technical pipeline and output-stability comparison have completed; the best checkpoint is much steadier, but behavioral accuracy is unverified. P2.7 found both checkpoints near image-invariant on controlled samples and strongly dependent on recurrent state. P2.8 localized progressive encoder attenuation, confirmed native train/inference scale agreement, and replicated attenuation across three fresh initialization controls. Professor and original dataset mounts stayed read-only; generated outputs are isolated.
 
-P2.9 completed the actual supervised-loss gradient audit: both checkpoints show severe encoder-gradient attenuation, while the effect of removing teacher state varies by checkpoint/domain. The result is P2.9-B/H1; a universal recurrent-shortcut explanation is not established. The protected inventory now contains 251 unchanged files and 89 tests pass.
+P2.9 completed the actual supervised-loss gradient audit: both checkpoints show severe encoder-gradient attenuation, while state-removal effects vary by checkpoint/domain. P2.10 confirms attenuation before training (P2.10-A), closing that diagnostic question. Prior full closure passed **93 ModelB6 + 14 Agent tests**, **269 protected files unchanged**, and Project 1 validation. The documentation-only framework task passed **20 Agent tests** and the 269-file protection check without new ModelB6 experiments. The assigned five-level review is complete. The earlier baseline trace remains partial with 503. The subsequent Evidence live receipt has a complete answer, evidence-tool call and eight metrics matching saved P2.9 JSON. Integration PASS has a documented scientific-interpretation caveat. Current count: **21/22 grouped deliverables complete (95.5%)**, with only clean baseline live completion outstanding. ModelB6 technical work is 100%; driving quality remains unverified.
 
 ## Known Limitations / Open Questions
 
@@ -318,14 +318,14 @@ P2.9 completed the actual supervised-loss gradient audit: both checkpoints show 
 - `B6BW.hdf5` resume restores weights, not the exact optimizer/scheduler/epoch state; any restart is a new segment rather than an exact continuation.
 - Keras warns that the HDF5 checkpoint format is legacy. Save and fresh-process reload passed, but the warning remains.
 - Project 1's full tools092-overlay clean rebuild, fresh empty-volume restoration, and remote aJLL manifest comparison remain unverified. The cause of one early Xvfb restart was not captured conclusively.
-- The Agent baseline now has an isolated Python 3.11 environment and offline import/source checks. A live Gemini call remains unexecuted because no runtime `GOOGLE_API_KEY` was supplied; the key must never enter the repository. The read-only evidence reporter Do New feature is implemented and offline-tested below.
+- The assigned framework review is complete. The baseline transcript shows partial tool/answer progress ending in 503; its clean completion remains unverified. Evidence Agent live integration is verified; its generated wording overstates what local gradients establish (see the latest entry). The earlier 503s support credential/request-path connectivity, not validation of all account capabilities. No key belongs in the repository.
 - The P2.6 source-audit camera gate was resolved from the user-reviewed professor slide; the source/slide right-lane discrepancy remains documented. Step 6 `[0,0]` traffic differs from Step 5 `[1,0]`. P2.7 measured small one-step traffic effects but did not test their long recurrent accumulation.
-- Both checkpoints' tested image representations become nearly invariant by `top_activation`. P2.8 traced progressive stage attenuation and found the same behavior in three fresh initialization controls. P2.9 confirms actual-loss gradient attenuation, but the supervised-gradient behavior before training, global behavior outside tested samples, and driving quality remain open.
+- Both checkpoints' tested image representations become nearly invariant by `top_activation`. P2.8 traced progressive stage attenuation; P2.10 confirms actual supervised-gradient attenuation in three fresh controls. Behavior outside tested samples and driving quality remain unverified. No further ModelB6 experiment is required for this closure task.
 - P2.9 confirms teacher forcing, not current/future target leakage. Final-USA state-removal effects do not generalize to best or Taiwan. Taiwan diagnostic teacher targets are not human ground truth; local raw gradients cannot establish the historical Adam optimization trajectory.
 
-## Next Experiment
+## Next Completion Action
 
-Begin the isolated AI Agent baseline: establish a separate Python 3.11 environment, resolve the professor Agent dependencies without sharing the ModelB6 runtime, run the baseline with a runtime-provided API key if available, and document the assigned framework before designing the original “Do New” feature.
+Obtain and review a clean completed baseline trace using the existing 3.8 runtime as needed. Evidence live integration is closed. The framework requirement is closed. See the Agent README for existing fish commands. No P2.11, retraining, new key, billing change or architecture workaround is proposed.
 
 ## AI Agent baseline environment (2026-10-06)
 
@@ -354,3 +354,321 @@ After inspecting the baseline and confirming that the local course document only
 ### Validation and limits
 
 `do_new_tests.py` passed **2/2**: structured extraction is read-only and an unapproved filesystem root is rejected. The wrapper still requires a runtime `GOOGLE_API_KEY` for a live Gemini response; no key was available, so no external API call was attempted. The feature is therefore locally implemented and tool-tested, while live LLM behavior remains pending authorized credentials. `FRAMEWORK_REVIEW.md` records the missing local framework definitions and avoids inventing the five levels.
+
+## Final gap closure (2026-10-06; develop 33314cd)
+
+### Goal and investigation
+
+Reconcile current implementation, evidence and completion claims without new
+experiments. P2.10 and Do New already existed; code presence was checked against
+saved results and actual local constructors. The 54 P2.10 records were verified
+against their manifest, cached P2.9 sample identities and recomputed medians.
+No gradient experiment was repeated. The initial working tree was clean.
+
+### Problems and root causes
+
+- P2.10 prose incorrectly described absolute fresh image gradients as three
+  orders larger; saved values imply 2.16–2.59× final and 8.19–9.80× best.
+  The large image/state ratio change also depends on state gradients.
+- The P2.10 execution guard checked a filename never produced by its run;
+  a completed run could begin computing again before a later write refusal.
+- Agent imports passed, but real professor constructors failed on Agno 3.1.1's
+  removed/renamed YFinance and Agent keywords. The live wrapper also substituted
+  an unrelated prompt rather than the active professor travel request.
+- The evidence tool allowed broad /tmp and /output roots, lacked malformed/
+  incomplete/finite/symlink checks, and the host venv could not see Docker's
+  output volume. Two initial tests did not exercise those boundaries.
+- Three installed Pydantic packages were absent from the lock; ddgs was missing
+  from requirements.in. This was a reproducibility gap, not a need to upgrade.
+
+### Solutions and validation
+
+Student-only changes added early completed-result rejection and read-only
+P2.10 result verification. A restricted AST constructor adapter preserves the
+reference configuration and active travel prompt while mapping current Agno
+keywords; all six examples construct offline. Existing installed Pydantic pins
+were added. The existing Do New design was retained, with exact directory
+permissions, failure checks, actual tool registration tests and a fixed
+read-only Docker-to-host JSON export. Differing exports are never overwritten.
+
+The executed tool demo reads actual P2.9 final/best metrics and explicitly says
+`gemini_executed=false`. P2.10 quantitative top/stem losses are 9.30–9.40 orders
+in fresh controls; top/input losses are 9.77–9.80 orders. Classification is
+**P2.10-A**, intrinsic attenuation strongly supported; the diagnostic question
+is closed. Historical optimizer dynamics and driving accuracy are unproved.
+
+**93 ModelB6 + 14 Agent tests pass.** The 269-file closure inventory includes
+earlier protected roots and all P2.9/P2.10 outputs; zero changes. The historical
+251- and 248-file checks also pass, and the full 181-file archive matches its
+preserved local copy. Checkpoint hashes, 60 Step 5 epochs, four complete Step 6
+cells and 212 P2.7 records were verified without rewriting their outputs.
+Project 1 status/validate pass. Secret and Git ignore checks pass. No professor,
+original dataset, checkpoint, Project 1 runtime, commit or push was changed.
+
+### Result and remaining external input
+
+ModelB6 technical/diagnostic work is complete. Agent offline compatibility and
+real-evidence tool integration are demonstrated; live response/tool behavior
+is not. GOOGLE_API_KEY is absent. The local DOCX contains the precise assigned
+Medium hyperlink, but not the article body; all four course documents were
+checked. The task's local-source gate leaves its five-level review blocked.
+See PROJECT2_AUDIT section 23 for the final evidence matrix, exact metrics and
+smallest external actions. No P2.11 or retraining is proposed.
+
+## Gemini live API model lifecycle compatibility (2026-10-06)
+
+### Observation and root cause
+
+The user ran the baseline in their working Gemini environment. The request
+reached the API but returned 404 NOT_FOUND: gemini-2.5-flash is no longer
+available to new users, with gemini-3.8-flash named as replacement. This confirms
+user-side API connectivity and identifies an external model lifecycle issue.
+The professor's historical choice remains gemini-2.5-flash.
+
+### Solution
+
+A shared student model selector now defaults to gemini-3.8-flash and supports
+GEMINI_MODEL_ID at construction time. The baseline AST adapter applies it to
+all six Gemini constructors; the existing evidence Agent uses the same selector.
+The reference ID is validated separately. Prompt, tools, dependency versions,
+ModelB6 and Project 1 are unchanged. No professor-owned file was modified.
+
+### Validation and remaining action
+
+20 Agent offline tests pass (6 baseline + 11 evidence + 3 model selection);
+default/override/empty values and preserved reference IDs are tested without an
+API call. Offline imports/constructors and the real-evidence tool demo pass.
+Fish command syntax and protected working-content hashes pass; the full
+181-file archive still matches its preserved copy. No secret is printed/stored,
+and no commit/push was made.
+
+This tool process does not inherit GOOGLE_API_KEY, so it stopped before live
+calls. The corrected baseline and evidence Agent await execution in the user's
+fish terminal and sanitized output review. This update is compatibility repair,
+not successful live Agent validation. The framework body/review gate is unchanged.
+
+## Assigned framework closure and provider availability (2026-10-06)
+
+### Goal, investigation and solution
+
+Close the assigned review and update completion claims using the new live
+evidence. The current task authorizes public reading of the exact assigned
+Paolo Perrone article. Its public body exposed all five sections, and the URL
+matches the course document hyperlink. FRAMEWORK_REVIEW.md now contains the
+student review, progression, repository mappings and design reflection. The
+previous source/review blocker is **COMPLETE**; earlier local-body limitations
+remain in dated historical entries.
+
+Source/configuration inspection places both the professor examples and the
+student evidence Agent primarily at Level 1. ReasoningTools alone does not
+establish long-term memory. Separate examples are not a coordinated team, and
+fixed experiment JSON is not persistent Agent conversation storage. Runtime
+implementation remains unchanged.
+
+### Live observation and interpretation
+
+The user reports repeated 3.8 live runs of both baseline_agent.py and
+evidence_agent.py. Each reached Gemini and returned 503 UNAVAILABLE with a
+temporary high-demand message. This follows the prior 2.5 model's 404 and
+the completed student model-ID compatibility fix. The reference model remains
+historically 2.5. Missing credentials and the stale runtime default are no
+longer the blockers; provider availability is. These are user-provided outcomes,
+without saved raw logs or exact retry counts. Successful responses and tool
+behavior are not inferred from an HTTP error.
+
+### Validation and result
+
+20 Agent tests pass; the existing read-only 269-file integrity command passes.
+Safe secret scan, documentation matrix counts and git diff --check pass.
+Only six documentation files changed during this task, including the root
+README's Project 2 summary/link; all runtime code and protected material retain
+their prior working contents. No new ModelB6
+experiment, retraining, checkpoint write, professor/Project 1 modification,
+commit or push occurred. Earlier full ModelB6/Project 1 tests were not repeated.
+
+The stable 22-group scope now has **20 complete + 2 provider-blocked**:
+ModelB6 technical completion 100%, whole course scope 90.9%. Only successful
+live baseline and Do New validation remain. Retrying the existing calls when
+provider availability recovers and inspecting sanitized response/tool evidence
+is the next action; no further local engineering is identified.
+
+## Live receipt: tools and partial output before failure (2026-10-06)
+
+The newly supplied terminal transcript refines the preceding availability
+report. Baseline prints gemini-3.8-flash, shows think/analyze call entries and
+two reasoning steps, and renders partial travel output with a 349.8 s panel
+timer. The same run logs 503 and Error in Agent run; its captured table stops
+mid-answer. Evidence Agent logs 503 and renders only the input message, without
+a visible evidence-tool call or final explanation.
+
+Read-only inspection of installed Agno 3.1.1 explains the apparent contradiction:
+the streaming error path retains prior content, and the renderer displays
+nonempty content without requiring successful run completion. The Response
+heading is therefore not a PASS marker. Raw tool thoughts/logs were not copied
+into the repository; receipt provenance and concise findings are in audit §26.
+
+Baseline live tool-flow progress is now observed; complete end-to-end validation
+remains pending. Both live deliverables stay partial/provider-blocked, with
+20/22 groups complete (90.9%) and framework review already closed. This is a
+documentation/trace assessment, not a new API run or experiment. Runtime code,
+professor material, ModelB6 and Project 1 remain unchanged; no commit/push.
+
+The user subsequently reports Evidence Agent now works. That is recorded as
+user-reported live success with output review pending, replacing its current
+provider-failure description while retaining the old trace historically. The
+existing successful tool-call/metric output is requested to close Do New;
+baseline clean completion remains unverified. No new API call is made.
+
+## Evidence Agent live receipt verified (2026-10-06)
+
+### Attempt and validation
+
+After earlier provider failures, the user submitted a complete evidence_agent.py
+response using `gemini-3.8-flash`: visible `think`, `summarize_p2_evidence()`,
+`analyze`, final answer and shell prompt, with no error line. Displayed response
+timer: **316.7 s**. Receipt SHA-256:
+`bf8b431759149d4e6003ed437438e6e6700e6596c2b01036d67723af53255c7e`.
+
+The existing offline tool confirmed **144 records / 18 samples** and all eight
+rounded metrics against saved P2.9 JSON. Final/best diagnostic median losses:
+**30.7705 / 29.9163**, distinct from Step 5 epoch validation losses.
+The answer retained the technical-completion/driving-quality distinction.
+Audit §27 records the comparison, provenance and receipt limitations.
+No new live call or ModelB6 experiment was run.
+
+### Result and lesson
+
+Do New live integration is COMPLETE. Current scope: **21/22 = 95.5%**;
+the baseline still needs clean completion beyond its partial 503 response.
+Historical failures and earlier counts remain dated evidence.
+
+Matching tool facts do not guarantee sound interpretation. “Machine precision
+zero” is inaccurate for these small nonzero gradients; gradient ratios alone
+do not prove universal state-driven output. Report strong local image-gradient
+attenuation and conditional checkpoint/domain state-removal results instead.
+Driving quality remains unverified. Runtime and professor source are unchanged.
+
+## Baseline retry remains provider-blocked (2026-10-06)
+
+The user retried baseline_agent.py with `gemini-3.8-flash`. The submitted
+terminal result contains 503 UNAVAILABLE/high demand and Error in Agent run,
+the original travel prompt and one `think` entry, then the shell prompt.
+There is no final answer. This attempt failed; the baseline deliverable remains
+partial/provider-blocked. A tool-call panel alone cannot certify completion.
+Evidence Agent live PASS and the **21/22 (95.5%)** count remain unchanged.
+Retry only the existing baseline later when provider availability permits.
+No runtime/model change, additional API call, training, commit or push was made.
+
+## Baseline tool progress, answer completeness unresolved (2026-10-06)
+
+The subsequent attachment shows the original travel prompt, two reasoning
+panels, `think` and `analyze`, and a Response timer of **67.2 s**, without
+visible ERROR/503. Its visible answer is only an unfinished opening sentence;
+no travel plan/table is present. Receipt SHA-256:
+`a4fbbdd35aa687e32c420be71159a41176099dbc9e09998aeeb2e8fcd557e394`.
+The model-ID header and structured completion/exit status were not supplied.
+
+This establishes further tool-flow progress, not complete baseline success.
+Copy truncation versus actual premature termination remains unresolved.
+Review any existing omitted output first. Evidence live PASS and **21/22
+(95.5%)** remain unchanged; no runtime change, API call, commit or push was made.
+
+## Do New v2: diagnosis and qualitative vision implementation (2026-10-06)
+
+### Goal and evidence audit
+
+Extend the original P2.9 evidence reporter to consume Step 5/6 and P2.7–P2.10,
+plus genuine simulator PNG input. Before editing, branch/HEAD and dirty files
+were recorded, 252 host files hashed, and the existing 269-file protected
+inventory verified. Actual Docker output schemas and production images were
+inspected. The new task's live-status summary was stale; Evidence remains
+verified, baseline full-answer completion remains unresolved.
+
+### Implementation and problems resolved
+
+Separate numerical readers, exporter, diagnosis and vision/unified runners
+preserve existing runtimes. Exact-byte exports have source/SHA-256 provenance;
+only fixed existing JSON and authenticated production PNGs are accepted.
+Exporter root/output mounts are read-only and networking disabled.
+
+Initial exporter testing caught Python 3.8 lacking Path.is_relative_to; the
+fixed Docker reader uses parent containment. The host image check initially
+found Pillow absent, so bounded PNG CRC/pixel-stream validation was implemented
+with stdlib; the installed Gemini byte interface needs no new package.
+Offline fixtures initially failed because macOS temporary paths traverse the
+system /var alias; fixture roots now resolve that alias before applying strict
+root/symlink rejection. Security checks were retained, not relaxed.
+
+Eight numerical tools distinguish findings, partial support, unsupported
+causality and unknown quality. Vision attaches actual verified image bytes
+and produces a structured qualitative report; unified mode adds numerical
+tools. Offline image mode returns no fabricated visual report.
+
+### Validation and result
+
+**52/52 offline tests PASS (20 existing + 32 new)**; all seven real evidence
+report sections and **12 production images** validated. Exact-byte export
+verification **26/26 PASS**; protected Docker files **269 unchanged**.
+Actual fresh top-to-stem attenuation is 9.3036–9.4033 orders, and final/best
+Step 5 validation remains 71.7146/0.5254. No model experiment was rerun.
+
+No API key was inherited, so no v2 live call was made. Multimodal serialization
+is verified offline, but actual image-grounded Gemini reasoning remains a
+live acceptance gate. Qualitative visual review cannot establish driving
+quality. Original 21/22 course status is unchanged; this additional extension
+has separate pending live acceptance. See DO_NEW_V2.md and audit §29 for exact
+commands, file inventory and safety results. No commit or push.
+
+## First Do New v2 live receipt: Vision passes, two provider failures (2026-10-06)
+
+The user ran Diagnosis, USA/final Vision and Taiwan/best Unified. Receipt hash:
+`2e85dc9deb1f3a95a61dbb87b02ce32aa9dda88f4957444629fe1e96551aaf6c`.
+Diagnosis returned 503 and displayed error JSON as a Response (213.0 s UI
+ timer). Vision returned a complete image-grounded qualitative report; Unified
+returned 503 and its completion gate rejected the run.
+
+The actual USA/final image/hash was reviewed: road/barrier/traffic and colored
+jagged curves match the response. Lead remained unknown without an overlay,
+spatial versus temporal oscillation and qualitative limits were preserved.
+**Vision live PASS** covers this image only. The suggested upstream cause is
+a hypothesis, not established causation or driving-quality validation.
+
+Diagnosis's Response rendering exposed an ambiguity in failure handling. A
+minimal student-v2 correction now requires completed RunStatus/nonempty text,
+returns tool names/error flags for review and exits on failure. Three added
+mocked offline tests cover failed, empty and completed results: **55/55 Agent
+tests PASS**. No new API call was made. Diagnosis/Unified remain provider-blocked;
+retry only those existing commands later. Original 21/22 course status and
+baseline completeness remain unchanged. No checkpoint/source/model change,
+training, commit or push.
+
+## Diagnosis/Unified retry reaches daily quota limit (2026-10-06)
+
+The latest user receipt (SHA-256
+`20c003dd2a15069a19a98e6d346f5d0989619e2aae0b1fcba72dcbda239d5176`)
+shows **429 RESOURCE_EXHAUSTED** for both Diagnosis and Taiwan/best Unified.
+The provider specifies per-project/per-model free-tier daily requests, limit
+20, and RetryInfo 55530/55506 seconds at request time. Exact timestamps were
+not supplied, so an absolute reset time cannot be reconstructed.
+
+The corrected Diagnosis completion gate rejects the failed run instead of
+displaying a successful report; Unified also rejects it. The current blocker
+is daily quota, distinct from earlier transient 503 demand. Pause immediate
+retries until reset, then use existing commands. Evidence and USA/final Vision
+PASS remain valid; no diagnosis/unified success or new driving-quality finding
+is inferred. This receipt review changes documentation only; no API call,
+runtime/model/key/billing change, training, commit or push.
+
+## Baseline live acceptance closes original course scope (2026-10-08)
+
+The user supplied a completed `baseline_agent.py` transcript using
+`gemini-3.8-flash`: visible `think` and `analyze` calls, a full structured
+business-trip planning answer, no visible provider error, and return to the
+shell prompt. Baseline live acceptance now passes; see audit §32. The original
+Project 2 course scope is **22/22 complete**. This does not verify factual
+accuracy of sample hotel/route/cost suggestions or actual driving quality.
+
+The user reports Diagnosis and Taiwan/best Unified both returned **429** and
+will be retried after quota reset. Those additional v2 live acceptance checks
+remain pending; previous Evidence Agent and USA/final Vision live PASS results
+are unchanged. No further API calls were made during this status update.

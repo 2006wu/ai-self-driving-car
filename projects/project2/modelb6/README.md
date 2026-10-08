@@ -297,6 +297,13 @@ log for evidence and limitations. The P2.10 fresh-control experiment has now
 been completed. It constructs three default-initialized controls and
 reuses the P2.9 cached samples without training or optimizer updates:
 
+The commands below document historical execution; do not rerun `snapshot`
+or `run` against completed evidence. For current read-only validation use:
+
+```sh
+docker compose -f docker/docker-compose.yaml --profile project2 run --rm --no-deps modelb6 python3.8 step10_gradient_controls.py verify-results
+```
+
 ```sh
 docker compose -f docker/docker-compose.yaml --profile project2 run --rm --no-deps modelb6 python3.8 step10_gradient_tests.py
 docker compose -f docker/docker-compose.yaml --profile project2 run --rm --no-deps modelb6 python3.8 step10_gradient_controls.py snapshot
@@ -308,4 +315,9 @@ Results are stored in `/output/p210-gradient-controls/`. Seeds are 3101, 3102
 and 3103; each covers the 18 P2.9 original-condition samples. The result
 shows that low image/state gradient ratios predate training, while the trained
 checkpoints have smaller image gradients and stronger state gradients. The
-control is complete and no additional ModelB6 training is implied.
+control is complete: **P2.10-A — intrinsic attenuation strongly supported**.
+Fresh top→stem gradients lose 9.30–9.40 orders, top→input 9.77–9.80 orders
+(ratios of medians). Fresh absolute image gradients are only 2.16–2.59× final
+and 8.19–9.80× best; this corrects the former three-orders prose claim.
+The diagnostic investigation is closed. Driving accuracy remains unverified;
+no P2.11 or additional ModelB6 training is proposed.
