@@ -1,0 +1,29 @@
+{
+  "packaged_date": "2026-10-14",
+  "files": [
+    {
+      "path": "reports/project1/Project1-Final-Report.pptx",
+      "page_or_slide_count": 26,
+      "bytes": 2273514,
+      "sha256": "eb6004e33741d59df96bd9cd02b3f27dce6572300b6e230ef3b6e4d87411e5d3"
+    },
+    {
+      "path": "reports/project1/Project1-Final-Report.pdf",
+      "page_or_slide_count": 26,
+      "bytes": 860725,
+      "sha256": "16e1e12e36e3397282094734ca87107f2a29eccfe7e94b56050002d8329624a6"
+    },
+    {
+      "path": "reports/project2/Project2-Final-Report-v5.pptx",
+      "page_or_slide_count": 38,
+      "bytes": 6798337,
+      "sha256": "0424f2a45b2ebcd73e88dfcc06b17b4894874b3451c826956883653b4a46f5eb"
+    },
+    {
+      "path": "reports/project2/Project2-Final-Report-v5.pdf",
+      "page_or_slide_count": 38,
+      "bytes": 1851385,
+      "sha256": "62c20d736941d3e03be9723ff9cc62e1a14e5c148fcb7fd54db4dca282510e27"
+    }
+  ]
+}

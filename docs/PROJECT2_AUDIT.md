@@ -1,6 +1,6 @@
 # Project 2 readiness audit
 
-**Current status (2026-10-08):** see [section 32](#32-baseline-complete-diagnosis-and-unified-waiting-on-quota-2026-10-08). The latest Baseline Agent run completed with visible `think`/`analyze` calls and a full response, closing the final item in the original course scope: **22/22 grouped deliverables complete**. ModelB6 technical scope: **100%**; driving quality remains unverified. The additional Do New v2 Diagnosis and Unified live demos returned 429 quota exhaustion and await quota reset. Earlier sections preserve dated findings and counts.
+**Current status (2026-10-14):** see [section 33](#33-current-checkout-cleanup-and-report-delivery-2026-10-14). Original course scope remains **22/22 grouped deliverables complete**, with accepted baseline and historical Evidence v1 live results. ModelB6 technical work is complete; driving quality is unverified. Diagnosis/Unified live acceptance is pending and currently deferred. Current retained Agent tests: **44/44**; canonical export verification: **26/26**. Earlier sections preserve dated findings, file availability and test counts rather than current-checkout instructions.
 
 Audit date: 2026-10-04. This is an inspection of the current checkout, Docker metadata, repository documentation, and local course files. No training, package installation, container startup, volume write, commit, or push was performed. Historical Project 1 validation is cited as historical evidence; the Project 1 workloads were not rerun for this audit.
 
@@ -1639,3 +1639,56 @@ work is complete; independent driving-quality evaluation remains unverified.
 Next action: after quota reset, rerun only Diagnosis and Taiwan/best Unified,
 then review completed outputs and tool evidence. No API calls, model changes,
 training, or runtime modifications were made while recording this update.
+
+## 33. Current checkout cleanup and report delivery (2026-10-14)
+
+This entry reconciles the retained checkout and final report delivery; earlier
+sections remain dated evidence. Starting branch `develop` and HEAD
+`e1a1bc5c75a085e1b39629986b98302f1842fe4b` were inspected. Existing working
+changes already removed `evidence_agent.py`, `prepare_demo.py` and
+`do_new_tests.py`, with corresponding Agent documentation updates. They are
+preserved and included in this cleanup, not restored as current commands.
+The v1 source and accepted live result remain traceable at Git `e1a1bc5`
+and audit §27. Baseline, model selection and v2 runners remain present.
+
+### Recorded live progress and deferral
+
+The existing live-verification report for run `agent-live-20261012-01`, actually
+executed on 2026-10-13, records Diagnosis numerical-tool calls followed by
+**429 input-token-per-minute quota**, and Taiwan/best Unified image bytes sent
+to the SDK followed by **503 high demand**. Diagnosis used eight distinct
+tools; 17 transmitted payloads matched canonical readers or bounded unknown-ID
+handling. These are tool-payload checks, not final-answer fact checks. Neither
+mode produced a completed report. The user deferred further retries.
+
+This updates the current provider limitation without rewriting the older
+daily-quota receipt. Both modes remain **LIVE VERIFICATION PENDING**. Baseline,
+historical Evidence v1 and USA/final Vision single-image acceptance remain
+confirmed within their recorded scopes. Driving quality, unique causal
+mechanism and effective model repair remain unverified. No provider request
+was made during this repository cleanup.
+
+### Current validation
+
+- Agent discovery: **44/44 PASS**, 6 baseline + 3 model-selection + 35 v2,
+  executed with the existing isolated venv. Historical 55-test coverage
+  included 11 removed v1-only tests; the counts describe different scopes.
+- Existing canonical export: `prepare_v2.py --verify`, **26/26 PASS**. This
+  verifies saved bytes/provenance, not a new live run or model experiment.
+- Final reports: [reports/README](../reports/README.md) indexes Project 1
+  (26 pages) and Project 2 v5 (38 pages), with exact-byte copies of the existing
+  local delivery files and [SHA-256 inventory](../reports/manifest.json).
+- Root README and [document index](README.md) now direct readers to current
+  status, component usage and final reports. Course materials, external
+  professor source, datasets, weights, venv and ignored exports remain local.
+
+Project 1's authorized slide revision covered 12/18/22. Project 2 v5 clarifies
+the three loss protocols (10/11/32), the zero-baseline gate limit (26), and
+concrete concluding findings (38). Report dates/content are unchanged by this
+repository copy. Latest Project 2 PDF revised pages were visually checked;
+latest PPTX native PowerPoint/Canva compatibility remains unverified.
+
+The user explicitly requested cleanup, commit and push. No retraining,
+dependency change, Docker volume deletion or professor-source change is part
+of this work. Historical statements of “no commit/push” apply to their earlier
+tasks, not this authorized delivery.

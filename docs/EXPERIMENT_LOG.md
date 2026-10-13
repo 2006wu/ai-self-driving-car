@@ -672,3 +672,24 @@ The user reports Diagnosis and Taiwan/best Unified both returned **429** and
 will be retried after quota reset. Those additional v2 live acceptance checks
 remain pending; previous Evidence Agent and USA/final Vision live PASS results
 are unchanged. No further API calls were made during this status update.
+
+## Checkout cleanup and final report packaging (2026-10-14)
+
+Current branch `develop`, starting revision `e1a1bc5`. Existing removal of the
+superseded Evidence v1 source/export/tests is retained; historical v1 acceptance
+and source remain traceable in Git and audit §27. Baseline and v2 remain active
+components. The current offline suite passes **44/44** (6 baseline, 3 model
+selection, 35 v2); existing canonical export verification passes **26/26**.
+The historical 55-test count includes the 11 removed v1-only tests.
+
+Current status documents now distinguish the already-recorded 2026-10-13
+Diagnosis per-minute-token 429 and Unified 503 from older daily-quota results.
+Both complete live reports remain pending and retries are deferred. No API
+call, training or new scientific experiment was performed for this cleanup.
+
+Added document navigation and `reports/` with exact-byte copies of the latest
+student Project 1 PDF/PPTX (26 pages) and Project 2 v5 PDF/PPTX (38 pages), plus
+SHA-256 inventory. This does not change report dates/content. Professor course
+files, datasets, checkpoints and ignored private builds/exports stay local.
+The user requested that the cleanup be committed and pushed to the current
+branch; no `main` merge or force push is part of this task. See audit §33.

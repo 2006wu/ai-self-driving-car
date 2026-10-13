@@ -7,7 +7,9 @@ macOS Apple Silicon 上的 openpilot v0.9.1 Docker 編譯與顯示環境。兩�
 - [完整實作紀錄](docs/IMPLEMENTATION.md)
 - [InstallOP 最新需求、實測與清理稽核](docs/INSTALLOP_AUDIT.md)
 - [原始 JLL 安裝筆記](codex_command/README_OpenPilot_v0.9.1_Install_Replay.md)
-- [Project 2 最新完成狀態與證據](docs/PROJECT2_AUDIT.md#32-baseline-complete-diagnosis-and-unified-waiting-on-quota-2026-10-08)
+- [文件導覽與專案狀態](docs/README.md)
+- [Project 1／Project 2 最新簡報與 PDF](reports/README.md)
+- [Project 2 最新完成狀態與證據](docs/PROJECT2_AUDIT.md#33-current-checkout-cleanup-and-report-delivery-2026-10-14)
 - [Project 2 ModelB6 使用方式](projects/project2/modelb6/README.md)／[AI Agent 與離線展示](projects/project2/agent/README.md)
 
 ## 目前完成範圍
@@ -37,11 +39,14 @@ SCons source 在隔離 volume 編出，供目前 UI 使用。不要混用這兩�
 八個數值與完整回答已核對通過（解釋限制見 audit）；Baseline Agent 也已完成
 一次含 think/analyze 呼叫與完整回答的 live run。
 目前原始 Project 2 課程範圍為 22/22 項完成；額外的 Do New v2 Diagnosis
-與 Unified 線上驗收仍待 Gemini 配額重置後重試。這不代表駕駛品質通過。
+與 Unified 線上驗收仍未完成，目前擱置。這不代表駕駛品質通過。
 新增 [Do New v2](projects/project2/agent/DO_NEW_V2.md)：唯讀多實驗診斷、
 定性影像驗證與整合模式已通過離線測試；USA/final Vision live 已通過，
-Diagnosis 與 Unified 最新重試遇到 Gemini 429 每日配額耗盡，完整 live 驗證尚待完成。
-詳見上方連結。
+2026-10-13 已記錄的 Diagnosis 為 429 每分鐘 input-token 額度限制，
+Unified 為 503 高需求；目前停止重試，保留 live PENDING。這是既有紀錄，
+本次整理沒有重新呼叫 API。Evidence v1 已於先前清理移除，歷史 source 與驗收
+可由 Git `e1a1bc5` 追溯；目前保留 baseline／v2。Agent 離線測試 44/44、
+canonical export 26/26 驗證通過。詳見上方連結。
 
 ## 日常使用
 
@@ -233,6 +238,8 @@ docker compose -f docker/docker-compose.yaml down
 
 ```text
 README.md                  使用說明
+docs/README.md             文件導覽、狀態與歷史紀錄的區分
+reports/                   最新學生報告 PDF、可編輯 PPTX 與 SHA-256 清單
 docs/IMPLEMENTATION.md     實作、修正與驗證紀錄
 docs/INSTALLOP_ASSETS.md   InstallOP.docx 資產來源、hash 與驗證紀錄
 codex_command/             使用者提供的原始指示
@@ -251,7 +258,7 @@ scripts/build-jll-compatible.sh 隔離編譯 JLL 相容版
 
 重建 image 不會覆蓋既有 openpilot-repo volume。需要更新 source 時，
 先檢查 volume 裡的 Git 狀態；不要刪 volume 當作更新方法。
-Git remote 已設定，專案目前已推送到 `origin/main`；後續修改需重新 commit/push。
+Git remote 為 `origin`；本次整理在 `develop` 分支提交並推送，不自動合併至 `main`。
 
 ## 原始 README 對照結果
 

@@ -1,7 +1,8 @@
 # Do New v2 — Model B6 Diagnosis + Vision Verification Agent
 
 Implemented on `develop` at `33314cd`, 2026-10-06. This extends the existing
-student Do New; it preserves baseline_agent.py and evidence_agent.py.
+student Do New. The required baseline_agent.py remains; the superseded v1
+Evidence Agent was removed on 2026-10-12 and is available in Git at `e1a1bc5`.
 
 ## Course scope and current status
 
@@ -16,8 +17,11 @@ ModelB6 technical investigation remains closed. Original Evidence Agent live
 integration is verified (audit §27), and Baseline complete-answer acceptance
 passed on 2026-10-08 (§32). The original 22-group course scope is complete;
 v2 is an additional extension whose live status is recorded below: USA/final
-Vision PASS; Diagnosis and Taiwan/best Unified await Gemini quota reset after
-429 responses. No driving-quality status is promoted.
+Vision PASS; Diagnosis and Taiwan/best Unified remain live PENDING and are
+currently deferred. The latest recorded 2026-10-13 attempts identify Diagnosis
+429 input-token-per-minute limits and Unified 503 high demand. See
+[audit §33](../../../docs/PROJECT2_AUDIT.md#33-current-checkout-cleanup-and-report-delivery-2026-10-14).
+No new provider call or driving-quality status is promoted during cleanup.
 
 ## Architecture
 
@@ -165,7 +169,6 @@ projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py
 projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --image step6/usa/final/frame_00001.png --offline
 projects/project2/agent/.venv/bin/python -m unittest discover -s projects/project2/agent -p '*_tests.py' -v
 projects/project2/agent/.venv/bin/python projects/project2/agent/prepare_v2.py --verify
-projects/project2/agent/.venv/bin/python projects/project2/agent/prepare_demo.py --verify
 ```
 
 ## Live commands (fish, repository root)
@@ -211,7 +214,11 @@ For vision_agent.py, select an approved `--image` and optionally `--unified`:
 
 ## Validation and remaining work
 
-**55/55 offline tests PASS: 20 preserved + 35 v2 tests.** Synthetic fixtures
+At v2 implementation, **55/55 offline tests passed: 20 preserved + 35 v2 tests**.
+This is a historical count that includes the now-removed v1-only tests; use
+the discovery command above to validate the current suite. At the current
+cleanup, **44/44 tests pass: 6 baseline + 3 model selection + 35 v2**, and
+existing canonical exports verify **26/26**. Synthetic fixtures
 are explicitly test data; real saved exports were separately consumed through
 all seven report sections and all 12 image validators. Tests cover discovery,
 canonical provenance, missing/malformed evidence, absolute/traversal/symlink
@@ -246,7 +253,7 @@ with `GenerateRequestsPerDayPerProjectPerModel-FreeTier`, limit **20** for this
 project/model. Provider RetryInfo at request time was **55530 s / 55506 s**
 (about 15 h 25 min), not a delay measured from when this document is read.
 Exact request timestamps were not supplied, so an absolute reset time is not
-inferred. This is the current blocker; previous 503s remain historical.
+inferred. This records the 2026-10-06 blocker; subsequent status is summarized above.
 The corrected Diagnosis gate and existing Unified gate reject these runs.
 Neither retry produced a report. Stop immediate retries until quota reset.
 
@@ -257,11 +264,12 @@ model limit. Actual usage/limits can be checked in AI Studio. Changing a key
 in the same project does not change the documented project quota. No billing
 change or model/dependency change was performed or is needed for this review.
 
-Remaining: completed live Diagnosis and Unified responses; the original baseline
-still needs its complete answer. Vision acceptance covers this single USA/final
+Remaining: completed live Diagnosis and Unified responses. The original baseline
+completed live acceptance on 2026-10-08 (audit §32). Vision acceptance covers this single USA/final
 image and its qualitative report, not every checkpoint/domain or driving quality.
-Use existing commands after quota reset when provider availability permits;
-no model/version change, P2.11/retraining or new driving-quality claim is
+Live retries are currently deferred; a later user-requested retry can use the
+existing commands when provider availability permits.
+No model/version change, P2.11/retraining or new driving-quality claim is
 justified by these provider failures.
 
 ## Future Bonus — YOLO + OpenPilot Agent

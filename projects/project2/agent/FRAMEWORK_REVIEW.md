@@ -60,11 +60,14 @@ example agents and media support likewise do not establish Levels 4 or 5.
 This placement is an engineering inference from the inspected configuration,
 not an author-provided classification or a claim of successful live behavior.
 
-## Student Do New Mapping
+## Student Do New Mapping (historical v1)
 
 **Most defensible placement: primarily Level 1, with a specialized evidence tool.**
 
-[evidence_agent.py](evidence_agent.py) constructs one Gemini Agent with explicit
+The v1 source and tests were removed during cleanup on 2026-10-12; they remain
+available in Git at `e1a1bc5`. The following records the evaluated v1 design.
+
+`evidence_agent.py` constructs one Gemini Agent with explicit
 instructions, ReasoningTools and `summarize_p2_evidence`. The function reads
 a fixed completed P2.9 JSON summary, checks permitted directories and required
 finite metrics, then returns structured final/best facts. The registered tool
@@ -77,7 +80,7 @@ state. The feature therefore does not establish the article's Level 2
 knowledge/session-memory architecture. It also has no member agents,
 delegation, background job service or progress/state management.
 
-[do_new_tests.py](do_new_tests.py) verifies extraction, read-only behavior,
+`do_new_tests.py` verifies extraction, read-only behavior,
 failure boundaries and actual tool registration offline. Those tests support
 the architecture analysis. A subsequent live receipt verifies a Gemini-selected
 evidence-tool call, eight matching metrics and a complete answer. Integration

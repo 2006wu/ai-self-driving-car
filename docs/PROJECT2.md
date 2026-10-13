@@ -1,6 +1,6 @@
 # Project 2 — Model B6 Training, Verification, and AI Agent
 
-**Current status (2026-10-08):** the latest user-submitted Baseline Agent run
+**Current status (2026-10-14):** the accepted user-submitted Baseline Agent run
 completed with visible `think` and `analyze` calls and a full travel-planning
 answer; see [audit §32](PROJECT2_AUDIT.md#32-baseline-complete-diagnosis-and-unified-waiting-on-quota-2026-10-08).
 The original audited course scope is **22/22 grouped deliverables complete**.
@@ -15,9 +15,15 @@ guidance below does not authorize retraining.
 image verification and unified mode are implemented and tested offline.
 See [implementation and commands](../projects/project2/agent/DO_NEW_V2.md).
 Live v2 status: USA/final Vision PASS. Diagnosis and Taiwan/best Unified
-returned 429 daily quota exhaustion in the latest attempts and await quota
-reset before retry (audit §§31–32). These extra v2 acceptance runs are separate
-from the original 22-group course count.
+remain LIVE VERIFICATION PENDING and are currently deferred. The latest recorded
+attempts identify Diagnosis 429 input-token-per-minute limits and Unified 503
+high demand; no new provider call was made during this cleanup. See
+[current-checkout audit §33](PROJECT2_AUDIT.md#33-current-checkout-cleanup-and-report-delivery-2026-10-14).
+These extra v2 acceptance runs are separate from the original 22-group course count.
+The superseded Evidence v1 source was removed on 2026-10-12; Git `e1a1bc5`
+retains it and its historical acceptance. The current Agent suite passes 44/44
+tests; the historical 55-test suite included 11 v1-only tests.
+Final student reports are indexed in [reports](../reports/README.md).
 
 > This document summarizes the Project 2 requirements from professor-provided
 > course materials and defines how Project 2 should be developed in this repository.
