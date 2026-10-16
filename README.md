@@ -6,10 +6,11 @@ macOS Apple Silicon 上的 openpilot v0.9.1 Docker 編譯與顯示環境。兩�
 - display：Xvfb 1920×1080、Openbox、啟動器、VNC/noVNC。
 - [完整實作紀錄](docs/IMPLEMENTATION.md)
 - [InstallOP 最新需求、實測與清理稽核](docs/INSTALLOP_AUDIT.md)
-- [原始 JLL 安裝筆記](codex_command/README_OpenPilot_v0.9.1_Install_Replay.md)
+- [JLL 原始安裝流程整理（歷史參考）](docs/reference/JLL_INSTALL_REPLAY.md)
+- [Project 3 需求稽核](docs/PROJECT3.md)／[執行與測試](projects/project3/README.md)／[驗收狀態](projects/project3/evidence/STATUS.md)
 - [文件導覽與專案狀態](docs/README.md)
-- [Project 1／Project 2 最新簡報與 PDF](reports/README.md)
-- [Project 2 最新完成狀態與證據](docs/PROJECT2_AUDIT.md#33-current-checkout-cleanup-and-report-delivery-2026-10-14)
+- [Project 1／Project 2 正式簡報與 PDF](reports/README.md)（2609巫承志Report1／Report2）
+- [Project 2 最新完成狀態與證據](docs/PROJECT2_AUDIT.md)
 - [Project 2 ModelB6 使用方式](projects/project2/modelb6/README.md)／[AI Agent 與離線展示](projects/project2/agent/README.md)
 
 ## 目前完成範圍
@@ -39,13 +40,14 @@ SCons source 在隔離 volume 編出，供目前 UI 使用。不要混用這兩�
 八個數值與完整回答已核對通過（解釋限制見 audit）；Baseline Agent 也已完成
 一次含 think/analyze 呼叫與完整回答的 live run。
 目前原始 Project 2 課程範圍為 22/22 項完成；額外的 Do New v2 Diagnosis
-與 Unified 線上驗收仍未完成，目前擱置。這不代表駕駛品質通過。
+與 Unified 已完成指定工具 verify、完整回答及這兩次實測的內容核對；修正稿另存。這不代表駕駛品質通過。
 新增 [Do New v2](projects/project2/agent/DO_NEW_V2.md)：唯讀多實驗診斷、
 定性影像驗證與整合模式已通過離線測試；USA/final Vision live 已通過，
-2026-10-13 已記錄的 Diagnosis 為 429 每分鐘 input-token 額度限制，
-Unified 為 503 高需求；目前停止重試，保留 live PENDING。這是既有紀錄，
-本次整理沒有重新呼叫 API。Evidence v1 已於先前清理移除，歷史 source 與驗收
-可由 Git `e1a1bc5` 追溯；目前保留 baseline／v2。Agent 離線測試 44/44、
+2026-10-14 分階段查證已實測：Diagnosis 4／Unified 2 必要工具成功回傳，
+完整報告均完成；工具由程式指定。2026-10-16 已核對並另存來源／措辭修正，
+範圍限記錄中的兩次實測，詳見 [內容核對](reports/evidence/project2/Agent-Content-Review-20261016.md)及 audit §48。
+Evidence v1 已於先前清理移除，歷史 source 與驗收
+可由 Git `e1a1bc5` 追溯；目前保留 baseline／v2。Agent 離線測試 96/96（含 CLI、Unified trace／prompt 及 report context 測試）、
 canonical export 26/26 驗證通過。詳見上方連結。
 
 ## 日常使用
@@ -242,7 +244,7 @@ docs/README.md             文件導覽、狀態與歷史紀錄的區分
 reports/                   最新學生報告 PDF、可編輯 PPTX 與 SHA-256 清單
 docs/IMPLEMENTATION.md     實作、修正與驗證紀錄
 docs/INSTALLOP_ASSETS.md   InstallOP.docx 資產來源、hash 與驗證紀錄
-codex_command/             使用者提供的原始指示
+docs/reference/            原始流程與歷史操作參考
 docker/                    Compose、Dockerfiles、entrypoints、啟動器、健康 socket
 scripts/validate-docker.sh 非破壞性的執行環境檢查
 scripts/build-jll-compatible.sh 隔離編譯 JLL 相容版
@@ -285,3 +287,12 @@ display 對 Xvfb 啟動加入就緒檢查和重試；最初一次失敗的根因
 因此只能說目前冷啟動驗證通過，不能保證未來永不重啟。
 清理分類與候選大小見最新稽核；本次未刪教授資料、images、volumes 或 cache。
 驗證時曾重新建立本專案容器與 network，持久化資料保留。
+
+Project 2 最新補充（2026-10-16）：已核對 `gemini-3.5-flash-lite` 的 Diagnosis 與
+Taiwan/best Unified 指定工具成功實測，包括來源、數值與單張影像措辭，修正稿另存。
+原始回答保留；結果不代表跨樣本可靠度、自主選工具或駕駛品質驗證。見
+[內容核對](reports/evidence/project2/Agent-Content-Review-20261016.md)及 audit §48。
+
+Project 3：本機 YOLO 圖片／影片、追蹤評估與模擬跟隨已實作；107/107 測試通過。
+合成交錯與長遮擋會換 ID；Webcam Live 因未授權而 BLOCKED，真實追蹤準確度及實體 C2C
+仍未測試，詳見 [驗收狀態](projects/project3/evidence/STATUS.md)。

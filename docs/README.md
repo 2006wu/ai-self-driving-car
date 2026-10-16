@@ -8,8 +8,10 @@
 | --- | --- | --- |
 | Project 1 BUILD | [IMPLEMENTATION](IMPLEMENTATION.md) | Docker、UI、replay 的實作與修正 |
 | Project 1 驗證 | [INSTALLOP_AUDIT](INSTALLOP_AUDIT.md) | 實測、驗證範圍與清理分類 |
+| 原始流程參考 | [JLL 安裝與 Replay 歷史流程](reference/JLL_INSTALL_REPLAY.md) | 原始 Ubuntu 安裝、舊版排錯與 2026-10-04 快照；非目前操作手冊 |
 | 本機資產 | [INSTALLOP_ASSETS](INSTALLOP_ASSETS.md) | 原始下載來源、hash 與保存位置 |
 | 課程範圍 | [COURSE_PLAN](COURSE_PLAN.md) | 教授要求的專案摘要 |
+| Project 3 ACT | [PROJECT3](PROJECT3.md) | Run1–2 需求稽核、實作架構與驗收連結 |
 | Project 2 THINK | [PROJECT2](PROJECT2.md) | 課程要求、架構、目前狀態與歷史規劃 |
 | Project 2 驗證 | [PROJECT2_AUDIT](PROJECT2_AUDIT.md) | 依日期累積的調查與驗收證據 |
 | 實驗日誌 | [EXPERIMENT_LOG](EXPERIMENT_LOG.md) | 實驗、決策與結果的歷史紀錄 |
@@ -25,10 +27,13 @@
 - Project 2：原始課程範圍完成；模型調查及短訓練修復候選的結果已記錄。
   技術驗證不等於駕駛品質通過。
 - Agent：baseline、Evidence v1 歷史 live、USA/final Vision 單張 live 已驗收。
-  Diagnosis／Unified 已實作並離線驗證，完整 live 驗收仍擱置。
+  Diagnosis／Unified 的指定工具實測已完成；2026-10-16 已核對這兩次回答並另存來源／措辭修正，
+  詳見 [內容核對](../reports/evidence/project2/Agent-Content-Review-20261016.md)。未驗證跨樣本可靠度。
 - Evidence v1 source 可由 Git `e1a1bc5` 追溯；目前工作目錄保留 baseline／v2。
-  44 個目前測試與 55 個歷史測試的差異來自移除 11 個 v1-only tests。
-- Project 3 ACT：後續規劃，MR Projects 不計入 Project 2 成果。
+  清理時 44 個測試與歷史 55 個測試的差異來自移除 11 個 v1-only tests；
+  新增 CLI、Unified trace／prompt 與 report context 測試後，目前為 96/96；推送前再次通過。見 Project 2 audit §34–48。
+- Project 3 ACT：YOLO 圖片／影片、追蹤評估及模擬跟隨已實作，107/107 測試通過；
+  Webcam Live BLOCKED，真實追蹤準確度與實體 C2C 尚未測試。詳見 [Project 3](PROJECT3.md)。MR Projects 不計入 Project 2 成果。
 
 ## 版本控制與本機內容
 

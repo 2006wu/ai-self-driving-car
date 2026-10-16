@@ -1,4 +1,11 @@
-# openpilot v0.9.1 Installation & Replay Guide
+# openpilot v0.9.1 安裝與 Replay：JLL 歷史流程整理
+
+> **文件定位：歷史參考，不是目前專案的操作手冊。**
+> 本文保留原始 Ubuntu 安裝／排錯流程，以及 2026-10-04 的 Docker 驗證快照；
+> 用於追溯需求、版本差異和相容性問題。日常操作請看根目錄
+> [README](../../README.md)，最新實測與限制請看
+> [InstallOP 稽核](../INSTALLOP_AUDIT.md)，原始資產來源見
+> [INSTALLOP_ASSETS](../INSTALLOP_ASSETS.md)。
 
 > 整理自 JLL 筆記（2020-08-11 ~ 2026-09-29）
 >
@@ -7,9 +14,9 @@
 >
 > **重要**：原筆記包含不少針對舊版 openpilot 與較新 Ubuntu/系統函式庫的 workaround。它們不是標準 openpilot 安裝方式，不應一開始全部套用；應在遇到對應錯誤時才使用。
 >
-> **本專案現況**：目前實際環境是 macOS ARM64 + Docker linux/amd64。已驗證
-> 官方 Replay、JLL USA demo 與 Taiwan dataC 都能在 VNC 顯示畫面。最新逐項狀態
-> 請看本文件第 30 節；Docker 指令以根目錄 [README](../README.md) 為準。
+> **2026-10-04 專案紀錄**：目前實際環境是 macOS ARM64 + Docker linux/amd64。已驗證
+> 官方 Replay、JLL USA demo 與 Taiwan dataC 都能在 VNC 顯示畫面。該次逐項狀態
+> 請看本文件第 30 節；Docker 指令以根目錄 [README](../../README.md) 為準。
 
 ---
 
@@ -1463,7 +1470,7 @@ Docker 實測清單見第 30 節。尤其不要因這份 native Ubuntu 清單未
 
 ---
 
-# 30. 本專案 Docker 實作與最新驗證（2026-10-04）
+# 30. 本專案 Docker 實作與驗證快照（2026-10-04）
 
 本專案已把本文件能在 macOS ARM64 上重現的環境放入 Docker：
 
@@ -1487,7 +1494,7 @@ Docker 版本對應指令：
 `update_requirements.sh`、`dataC` 與 `dataB6`。來源 URL、SHA256、容器位置與
 驗證限制記錄在 `docs/INSTALLOP_ASSETS.md`。
 
-| 項目 | 最新狀態 | 證據／限制 |
+| 項目 | 當時狀態 | 證據／限制 |
 | --- | --- | --- |
 | openpilot v0.9.1 | PASS | 固定 commit `d891d3df476cdaca52dc350bcfdaaa137bbc3840`；submodules 已初始化 |
 | Python / Poetry / SCons | PASS（平台差異） | Python 3.8.10、Poetry 1.3.2、SCons 4.4.0；教授範例 Python 為 3.8.20，Docker 未另建 `sconsvenv` |
@@ -1506,5 +1513,5 @@ Docker 版本對應指令：
 
 長期原始下載檔放在 Git 忽略的 `external/installop-assets/`，不會隨 Git clone
 進入新環境。完整 archive hash、Docker 資產路徑與稽核細節見
-[`docs/INSTALLOP_ASSETS.md`](../docs/INSTALLOP_ASSETS.md) 和
-[`docs/INSTALLOP_AUDIT.md`](../docs/INSTALLOP_AUDIT.md)。
+[`docs/INSTALLOP_ASSETS.md`](../INSTALLOP_ASSETS.md) 和
+[`docs/INSTALLOP_AUDIT.md`](../INSTALLOP_AUDIT.md)。

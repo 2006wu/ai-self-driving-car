@@ -80,3 +80,6 @@ projects/project2/modelb6/derived-data/
 projects/project2/modelb6/artifacts/
 projects/project2/modelb6/logs/
 projects/project2/modelb6/wheelhouse/
+
+# Local presentation history, backups and private build evidence
+reports/.archive/

@@ -6,7 +6,7 @@
 > 為準。dataB6 沒有 Replay 要求，aJLL 現已保存於 host external/aJLL。
 
 此文件記錄目前專案從建置到顯示的變更；操作方式見根目錄 README.md。
-原始需求保留在 `codex_command/README_OpenPilot_v0.9.1_Install_Replay.md`。
+原始流程整理與舊版操作參考保留在 [JLL 安裝與 Replay 歷史流程](reference/JLL_INSTALL_REPLAY.md)。
 
 ## 1. 平台與來源
 
@@ -55,7 +55,7 @@ op-socket 保存健康檢查 socket。
 
 ## 5. 操作與檢查修正
 
-- Docker 檔案集中於 docker/；原始指示保留於 codex_command/。
+- Docker 檔案集中於 docker/；原始流程整理保留於 docs/reference/。
 - validate-docker.sh 改為不重建、不停止服務的檢查。
 - 修正先前「修改 entrypoint 不必 build」的說明：COPY 進 image 的檔案修改後必須 build。
 - 修正先前「官方完整編譯會產生 replayJLL」的說明：官方 target 名稱是 replay。

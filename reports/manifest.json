@@ -1,29 +1,36 @@
 {
-  "packaged_date": "2026-10-14",
+  "packaged_date": "2026-10-16",
   "files": [
     {
-      "path": "reports/project1/Project1-Final-Report.pptx",
-      "page_or_slide_count": 26,
-      "bytes": 2273514,
-      "sha256": "eb6004e33741d59df96bd9cd02b3f27dce6572300b6e230ef3b6e4d87411e5d3"
-    },
-    {
-      "path": "reports/project1/Project1-Final-Report.pdf",
+      "path": "reports/2609巫承志Report1.pdf",
       "page_or_slide_count": 26,
       "bytes": 860725,
-      "sha256": "16e1e12e36e3397282094734ca87107f2a29eccfe7e94b56050002d8329624a6"
+      "sha256": "16e1e12e36e3397282094734ca87107f2a29eccfe7e94b56050002d8329624a6",
+      "source_version": "Project1 revised final"
     },
     {
-      "path": "reports/project2/Project2-Final-Report-v5.pptx",
-      "page_or_slide_count": 38,
-      "bytes": 6798337,
-      "sha256": "0424f2a45b2ebcd73e88dfcc06b17b4894874b3451c826956883653b4a46f5eb"
+      "path": "reports/2609巫承志Report1.pptx",
+      "page_or_slide_count": 26,
+      "bytes": 2273514,
+      "sha256": "eb6004e33741d59df96bd9cd02b3f27dce6572300b6e230ef3b6e4d87411e5d3",
+      "source_version": "Project1 revised final"
     },
     {
-      "path": "reports/project2/Project2-Final-Report-v5.pdf",
+      "path": "reports/2609巫承志Report2.pdf",
       "page_or_slide_count": 38,
-      "bytes": 1851385,
-      "sha256": "62c20d736941d3e03be9723ff9cc62e1a14e5c148fcb7fd54db4dca282510e27"
+      "bytes": 1420107,
+      "sha256": "77458d35591c6434e520ad1c6ed43ed4d64b40c156e355f42f21dceb8e73b318",
+      "source_version": "user-approved latest Desktop v9"
+    },
+    {
+      "path": "reports/2609巫承志Report2.pptx",
+      "page_or_slide_count": 38,
+      "bytes": 1782054,
+      "sha256": "914b7717f43ce18433e326e129aa9eaae784f62be785274b91f8b01110cd6d82",
+      "source_version": "user-approved latest Desktop v9"
     }
-  ]
+  ],
+  "project2_evidence_directory": "reports/evidence/project2",
+  "local_history_archive": "reports/.archive/20261016-merged-reports",
+  "note": "Latest PDFs/PPTXs renamed/copied byte-identically; old files moved intact to ignored local archive. No commit/push."
 }

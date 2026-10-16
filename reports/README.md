@@ -1,28 +1,23 @@
-# 最終報告
+# 正式簡報與 PDF
 
-本目錄保存最新學生報告交付檔。PDF 適合直接閱讀／繳交，PPTX 保留可編輯內容。
-這些檔案從本機已完成的交付版本原樣複製，未因 Git 整理修改簡報日期或內容。
+兩份專案的正式交付檔統一放在此目錄。之後請開啟這裡的PPTX編輯，PDF用於閱讀或繳交。
 
 | 專案 | PDF | 可編輯 PPTX | 頁數 |
-| --- | --- | --- | --- |
-| Project 1 BUILD | [最終 PDF](project1/Project1-Final-Report.pdf) | [最終 PPTX](project1/Project1-Final-Report.pptx) | 26 |
-| Project 2 THINK | [v5 PDF](project2/Project2-Final-Report-v5.pdf) | [v5 PPTX](project2/Project2-Final-Report-v5.pptx) | 38 |
+|---|---|---|---:|
+| Project 1 BUILD | [2609巫承志Report1.pdf](2609巫承志Report1.pdf) | [2609巫承志Report1.pptx](2609巫承志Report1.pptx) | 26 |
+| Project 2 THINK | [2609巫承志Report2.pdf](2609巫承志Report2.pdf) | [2609巫承志Report2.pptx](2609巫承志Report2.pptx) | 38 |
 
-## 版本範圍
+Report1採用已修訂第12／18／22頁的最終版；Report2採用使用者最後儲存並確認的桌面v9（含背景配色）。本次只整理位置及檔名，沒有改寫簡報或重新匯出，因此檔案內容與選定來源完全一致。
 
-- Project 1：只修訂第 12、18、22 頁，加入實際 launcher／USA／Taiwan replay 圖片。
-- Project 2 v4：改善調查主線、原始曲線讀圖、指標、修復門檻、Agent 成果與驗證狀態。
-- Project 2 v5：進一步釐清第 10／11／32 頁三種 loss 評估；補上第 26 頁零基準
-  限制；第 38 頁呈現 checkpoint、image/state、修復決策三項具體發現。
-- 歷史交付版本與暫存 build 仍留在本機；本目錄只提供最新版本。
+## 佐證與歷史版本
 
-## 驗證與使用限制
+- [Project2內容核對](evidence/project2/Agent-Content-Review-20261016.md)
+- [Project2配色與QA](evidence/project2/Project2-Visual-Refinement.md)
+- [Project2先前逐頁修訂](evidence/project2/Professor-Review-Refinement.md)
+- [本機歷史封存](.archive/20261016-merged-reports/)：完整保存原桌面Project1-Final、Project2-Latest，以及原reports/project1、reports/project2資料夾，含舊版本、建置與備份。僅封存搬移，未刪除；此區可能包含私人資料與大型建置檔，已排除Git追蹤。
 
-Project 1 修訂頁曾在 PowerPoint 開啟／匯出後檢查；Project 2 修訂頁已完成
-內部 render、結構檢查與最終 PDF 視覺檢查。Project 2 最新 PPTX 的 PowerPoint
-實測未完成，Canva 未測試；跨應用程式風險為 MEDIUM。閱讀／繳交建議使用 PDF。
-這些版面檢查不構成模型駕駛品質或 Diagnosis／Unified live 驗收。
+佐證文件內的舊路徑及版本描述屬歷史紀錄；正式交付位置以本頁為準。更早的Documents/Project2-Archive維持原位。
 
-[manifest.json](manifest.json) 保存四個檔案的 bytes、頁數與 SHA-256；
-可在專案根目錄執行 `shasum -a 256 reports/project1/* reports/project2/*` 核對。
-原始教材、資料集、模型 checkpoints、API key 與私有 build 未收錄。
+[manifest.json](manifest.json)記錄四份正式檔案的頁數、bytes與SHA-256。封存內的before-inventory.json及cleanup-receipt.json記錄所有搬移檔案的指紋與位置。
+
+版面／相容性驗證範圍沿用各次QA：本次檔案整理不新增PowerPoint或Canva驗證，也不改變模型或Agent的技術結論。沒有commit或push。
