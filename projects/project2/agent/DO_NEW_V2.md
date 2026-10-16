@@ -279,3 +279,12 @@ with source/frame identity, confidence and provenance, then compare it with
 these reports. Nothing here installs ultralytics/PyTorch, downloads weights
 or performs YOLO inference. Qualitative lead observations remain distinct
 from independent detection and ground-truth evaluation.
+
+
+## Current execution controls (2026-10-14)
+
+See [RUNNING.md](RUNNING.md) for the optimized CLI, progress/deadlines/retries,
+readable output + local records, optional model-selected verification and current
+interpretation limits. Historical test counts above refer to their original
+checkouts; the latest recorded suite is 87/87 (audit §41). No new live acceptance
+is implied by runtime changes or these offline tests.

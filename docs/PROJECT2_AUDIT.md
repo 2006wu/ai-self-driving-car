@@ -1692,3 +1692,320 @@ The user explicitly requested cleanup, commit and push. No retraining,
 dependency change, Docker volume deletion or professor-source change is part
 of this work. Historical statements of “no commit/push” apply to their earlier
 tasks, not this authorized delivery.
+
+
+## 34. User-reported dual 503 and Unified CLI error handling (2026-10-14)
+
+The user supplied terminal output from Diagnosis and Taiwan/best Unified using
+`gemini-3.8-flash`. Both received Gemini **503 UNAVAILABLE / high demand**; neither
+produced a completed report. This is a provider availability error, not evidence
+of Docker/data failure or a confirmed quota reset requirement. The recorded
+429 limits remain historical; both additional live acceptances remain pending.
+No provider request or automatic retry was initiated while reviewing this receipt.
+
+Diagnosis already exited with a concise failure message. Unified correctly rejected
+the failed run but its CLI exposed an unhandled RuntimeError traceback. The Vision
+CLI now catches that RuntimeError and exits nonzero with its message, matching
+Diagnosis. Agent completion validation, model selection, inputs, tools, schemas
+and provider retry policy are unchanged. No successful report is fabricated.
+
+Three mocked CLI tests check failure without success JSON, successful JSON and
+argument forwarding, and missing-image rejection. Current Agent discovery passes
+**47/47**, zero failures/skips: 6 baseline + 3 model selection + 38 v2/CLI tests.
+The cleanup-era 44 tests and historical 55 tests describe earlier scopes; the
+current increase is three CLI tests. `git diff --check` passes. No API calls,
+training, dependency/model change, Docker operation, commit or push.
+
+## 35. Diagnosis 3.5 Flash-Lite execution succeeds; content corrections pending (2026-10-14)
+
+The user supplied a completed Diagnosis transcript using command-scoped
+`GEMINI_MODEL_ID=gemini-3.5-flash-lite`. JSON contains a full report and six tool
+entries with no error flags, followed by return to shell. Execution/response
+completion is PASS for this run; service-wide recovery and payload-level traces
+are not established by this receipt.
+
+Independent reads of existing checksum-verified exports found correct training
+facts and sensible causal limits, but mixed intervention conditions in gradient
+summary, an intermediate encoder RMS presented as final, and path coordinate
+magnitude/nonpositive lane-width counts described imprecisely. See
+[content review](../projects/project2/agent/LIVE_REVIEW_20261014.md).
+Report factual acceptance remains pending corrections. No successful new Unified
+receipt was provided. This review made no API call, model/prompt change, training,
+new experiment, commit or push. Delivered v5 remains unchanged.
+
+
+## 36. Unified 3.5 response completes; numerical integration remains pending (2026-10-14)
+
+The user's subsequent Taiwan/best Unified transcript returns completed structured
+JSON with `gemini-3.5-flash-lite` and returns to shell. Image hash/dimensions
+match the approved PNG. Execution PASS; the non-text function_call warning is
+a local SDK text-access warning, not a 503 or proof of tool success/failure.
+The receipt has no tool trace and both numerical fields are Not evaluated.
+Visual review supports a night scene and spatially jagged path, but not claimed
+model-lead correspondence or verified accurate/smooth lanes. Thus full Unified
+content/integration acceptance remains pending. See the [combined receipt review](../projects/project2/agent/LIVE_REVIEW_20261014.md).
+
+Vision/Unified now include tool names/error flags without arguments. The default
+Unified question requests numerical tools and source/metric/domain/checkpoint
+comparison, with clip-vs-frame limits. Lead instructions distinguish visible
+vehicles from model lead association. Two new mocked tests pass; the current
+Agent suite is **49/49** (6 baseline + 3 model selection + 40 v2/CLI).
+No live request, automated retry, training, dependency/model change, commit/push
+or delivered v5 report edit occurred. This change does not reclassify the user's
+prior report as correct or establish successful next-run integration.
+
+
+## 37. Both report paths receive authenticated scoped context (2026-10-14)
+
+User requested corrections to both Diagnosis and Unified before another manual
+live attempt. New student module `report_contract.py` builds compact local context
+using existing checksum-verified evidence readers, without Docker/model execution.
+Diagnosis context separates role/domain/median/original/mismatched_state, input
+vs parameter gradients, actual encoder endpoint activation/difference RMS, fresh
+gradient direction, predicted near-path coordinates and nonpositive lane widths.
+Instructions and default question preserve those identities. The output includes
+`verified_reference` for direct comparison with free-form generated prose.
+
+Unified context is selected from the authenticated image domain/checkpoint, with
+whole-clip scope, exact numerical metrics/source and missing frame-level ground
+truth stated. It is attached before any provider request and returned separately
+as `numerical_reference`; preflight readers are explicitly distinguished from
+model-selected tool traces. Missing/bad checksums prevent the API call. Runtime
+validation rejects both comparison fields as placeholders, and rejects comparison
+without the correct source path and a metric key. Visible vehicle/model-lead
+association and lane correctness remain bounded by existing visual instructions.
+These gates verify comparison structure/provenance, not arbitrary semantic or
+numerical correctness of all generated prose; human content review is still needed.
+
+Ten new regression tests cover distinct gradient conditions, encoder endpoint vs
+intermediate RMS, metric meanings, domain/checkpoint matching, checksum failure
+before API, placeholder/wrong-source rejection, returned context, unchanged
+Vision-only behavior and Diagnosis context injection/output. Current suite
+**59/59 PASS**, zero failures/skips (6 baseline + 3 model selection + 50 v2/CLI).
+Real existing exports were also read locally: Diagnosis context 7923 bytes;
+Taiwan/best context has near-path coordinate magnitude 1.4551631212234497 m
+from `/output/step6/taiwan/comparison.json`. No ground-truth error is inferred.
+No live API call, model/default/dependency change, new ModelB6 experiment, commit
+or push. Prior 3.5 receipts remain execution PASS / content partially supported;
+these corrections have not yet had a new live acceptance run.
+
+## 38. Diagnosis retry exposes generated table error and overclaims (2026-10-14)
+
+The new user receipt is Diagnosis only, completed with 3.5 and `tools=[]`. Its
+`verified_reference` matches current authenticated local data, but the generated
+Markdown table copies USA final count 1006 into Taiwan final (actual 941).
+Other prose overstates overfitting/saturation/generalized collapse and recommends
+deployment/early-stopping implementation outside read-only scope. Execution PASS;
+content REJECTED / corrections required. No new Unified run was submitted.
+
+Reference context now includes validated claim classifications, causal limits and
+allowed action. The application renders Step6 facts in code; the model is asked
+for concise bounded narrative rather than duplicate numerical transcription.
+Scoped Markdown numeric rows are checked by domain/checkpoint/metric/source;
+counts are exact and continuous rounded values use rel_tol=1e-5. The actual user
+receipt is rejected for the known mismatch. Output exposes HUMAN_CONTENT_REVIEW_REQUIRED;
+prose/causality/tool behavior are not automatically semantically validated.
+Five more regression tests pass; current suite **64/64** (6 baseline + 3 model
+selection + 55 v2/CLI), zero failures/skips. Canonical generated table has 12
+checked numeric rows. Full receipt/review is locally preserved and the combined
+[review](../projects/project2/agent/LIVE_REVIEW_20261014.md) explains limitations.
+No live API request, model/default/dependency change, new experiment/deployment,
+commit or push. Full additional v2 content acceptance remains pending.
+
+## 39. Unified retry demonstrates sourced clip-summary comparison (2026-10-14)
+
+The user's new Taiwan/best 3.5 Unified response completes. Image identity and
+entire numerical_reference match approved local evidence. The source-qualified
+path mean/max, frame count and nonpositive lane-width count are correct; model
+lead correspondence is appropriately unknown. Execution and numeric-reference
+comparison PASS in this scope. Model-selected tools remain empty; preflight
+readers are explicitly not counted as model-selected tool execution.
+
+Overall interpretation is PARTIALLY SUPPORTED: the claim that visible spatial
+jitter is "averaged out" over 1201 frames is not established by near-coordinate
+clip summaries. See `step6.py::summarize` positions `[:,4:40]` and the
+[combined review](../projects/project2/agent/LIVE_REVIEW_20261014.md). Near-coordinate
+summary magnitude, full-curve spatial jaggedness and temporal behavior are distinct.
+The receipt/result/review are locally saved. No fresh Diagnosis result, API call,
+software change, test execution, training, commit or push in this review. Current
+last-tested suite remains 64/64; full content acceptance is not inferred.
+
+## 40. Latest Diagnosis bounded summary passes content review (2026-10-14)
+
+The user's latest completed Diagnosis receipt on 3.5 exactly matches the local
+verified reference and code-generated fact table. All seven claim classifications
+match. The previous Taiwan count copy error, saturation/overfitting/generalized
+collapse overclaims and deployment/early-stopping recommendations are absent.
+Execution and bounded submitted-summary content review PASS. This does not pass
+driving quality or model-selected tool behavior; `tools=[]` documents preflight-
+context summarization. No new Unified receipt is included in this update.
+
+Zero model-written table rows is expected; the separate code table matches and
+has 12 numeric rows verified offline. Runtime HUMAN_CONTENT_REVIEW_REQUIRED is
+not a failure and is not rewritten to pretend arbitrary semantic automation.
+Receipt/hash/review are saved locally; see the combined live review. No API,
+software change, new test execution, training, commit or push. Last suite 64/64.
+
+## 41. Runtime, output, provenance and meaningful verification optimizations (2026-10-14)
+
+User requested all discussed optimizations for Diagnosis/Unified. New shared
+`live_runtime.py`, `live_worker.py` and `report_output.py` provide:
+
+- CLI progress/elapsed time with stage changes and 10-second heartbeats.
+- Dedicated process-group worker per attempt; default 120s attempt / 300s total
+  budget and 45s SDK HTTP timeout. Timeout/Ctrl+C terminates the local worker,
+  with at most ~1s additional force-kill cleanup. No overlapping retries.
+- Default one additional retry (max configurable 3), exponential backoff+jitter,
+  only identifiable transient HTTP codes or worker timeout. Unknown/content/source
+  errors are not retried. SDK/model/Agent retries are disabled to avoid stacking.
+- Concise Markdown stdout with verified data/model interpretation/unknowns;
+  `--json` preserves full-JSON stdout. Progress is stderr; SDK output stays in
+  redacted worker logs rather than flooding the console.
+- Unique ignored local run directories containing request/config, environment
+  versions, Git HEAD/source hashes, progress/stage timings, context/image provenance,
+  draft/response/error, result/report and SHA-256 manifest. Failed/cancelled attempts
+  retain records without fake success. No keys are saved; known keys are redacted.
+- Existing model environment override remains supported; `--model` is a temporary
+  higher-priority override. Default model and all installed dependencies unchanged.
+- Default preload mode explicitly distinguishes local readers from model-selected
+  tools. Optional verify mode requires task-relevant successful tool results;
+  Diagnosis additionally checks the actual overfitting claim argument. Missing
+  tool results or unrelated checks do not demonstrate verification. Result hashes
+  are recorded without tool arguments. No new autonomous live success is claimed.
+- Explicit spatial-vs-temporal metric definitions, bounded visual instructions,
+  and a targeted guard for the observed positive "averaged out/away" claim.
+  The actual prior submitted Unified overclaim is rejected offline. This is not
+  a universal semantic verifier; all generated interpretation still needs review.
+
+Final Agent suite **87/87 PASS**, zero failures/skips: 6 baseline + 3 model
+selection + 57 v2/CLI + 21 runtime. Twenty-three added/extended regressions cover
+hard attempt/total deadlines, bounded retries, cancellation cleanup, persistence,
+unique paths, redaction, SDK retry configuration, tool-result/claim requirements,
+readable output, progress ordering and spatial averaging interpretation. Tests
+use mocks or no-network subprocess fixtures. The actual worker was also run with
+no inherited key and correctly recorded a non-retryable pre-request failure.
+Installed SDK HttpOptions schema validates timeout/retry options; no API call.
+Canonical Taiwan/best offline input validation PASS. Project 3 verify.sh regression
+**50/50 PASS**, pip check PASS. `git diff --check` PASS.
+
+Test logs, source hash inventory and validation summary are preserved locally in
+`projects/project2/agent/artifacts/optimization-validation-20261014/`. The expected
+missing-key smoke is explicitly a synthetic validation case, not failed provider
+availability. The accidental first Project 3 discovery from repository root failed
+on import-path setup; rerunning the established verify.sh entry point passed all
+50 tests. This is not recorded as a product regression or hidden as a passing run.
+
+No live Gemini request, training, dependency change, Docker modification, professor
+source change, volume deletion, commit or push. Existing unrelated P3/doc changes
+are preserved. Prior bounded Diagnosis acceptance and qualified Unified receipt
+remain historical evidence; new runtime and verify-mode live acceptance remain
+pending a user-run request. See [RUNNING.md](../projects/project2/agent/RUNNING.md).
+
+## 42. Optimized CLI real success path verified; Step6 median label corrected (2026-10-14)
+
+User-run optimized 3.5 Diagnosis/Unified complete in 5.355s / 6.667s, each first
+attempt. Both actual local run records have 10/10 manifest file hashes matching;
+contexts' recorded numeric facts and sources match current local evidence.
+Progress/stage recording, persistence and concise output work on this live success
+path. Both are preload mode with tools=[]; no verify-mode, live retries or live
+cancellation proof is claimed. Original records remain immutable.
+
+Diagnosis summary classifications/limits are acceptable within existing bounded
+review scope. Unified no longer claims temporal averaging removes spatial jitter,
+but mistakenly says aggregation=median for Step6 counts. Values are correct;
+aggregation qualifier needs correction. Per-field metric_reductions are now supplied
+and the shared gradient-median instruction is explicitly restricted to gradient
+audits. The observed positive Step6 median qualifier is rejected. Two regression
+tests pass; latest suite **89/89** (6 baseline + 3 model selection + 57 v2/CLI +
+23 runtime), no failures/skips. No API request was initiated by this review/fix;
+new semantic context/guard has offline evidence only. See combined receipt review.
+
+## 43. 2026-10-14：必要工具 verify 失敗與分階段修正
+
+使用者 22:55 兩次 live 均有回答草稿，但完整工具驗收 FAILED。Diagnosis
+只有 training／overfitting 呼叫；Unified 無工具呼叫。原始紀錄各 8 個
+manifest hashes 均匹配，未改寫。詳見 agent/LIVE_REVIEW_20261014.md。
+verify 改成程式指定必要工具、模型發出 function calls，逐項驗證成功
+回傳後才產生報告；Unified structured output 與工具請求分開。這不是
+自主工具選擇的證據。新增 7 個離線測試，總計 96/96；未呼叫 Gemini，
+新流程 live 尚待驗收。v6 簡報更新回答／工具驗收的差異與 runtime 改善，
+不將 FAILED 或離線通過寫成 live 通過。未 commit/push。
+
+## 44. 2026-10-14：分階段 verify 真實成功與內容審閱
+
+使用者兩份 live receipt 均 COMPLETED：Diagnosis29.301s／4必要工具；
+Unified6.857s／2必要工具；各1attempt、12/12manifest項匹配。六個
+實際工具回傳均與 canonical readers 相等，目前Python來源匹配 run.json
+記錄。驗證的是程式指定工具的 model-issued function calls，非自主選擇。
+來源版本不變，沿用96/96離線測試；本輪沒有重跑或呼叫API。
+
+Diagnosis內容需修正fresh-gradient來源：P2.10summary，非P2.8reference_controls；
+image-invariance的主要證據為P2.7控制介入，不能只依loss gradient。
+Unified單張「moving」改為「visible」，不確認lane／model-lead對應。
+助理按來源審閱後，另存有標示的修正稿；原始回答／run資料保持不動。
+詳細核對與限制見 agent/LIVE_REVIEW_20261014.md 的23:06–23:07節，
+審閱資料夾 required-tools-success-20261014-01。工具流程確認完成，
+不等於使用者已人工簽核、駕駛品質或跨樣本可靠度通過。
+簡報v7更新2/33/36/37/38頁，保留歷代版本與原始模型實驗數據。
+
+## 45. 2026-10-15：教授審閱版精修（沿用 v7）
+
+依兩份使用者精修要求與最新狀態補充，先備份實際最新38頁v7
+（sourceSHA f35dc38d563d60a6a00617e65cde276ecd5137d980f497dd9f1036453c370126），
+原位更新2/10/11/17/22/33–38，共11頁；頁序與技術研究深度保留。
+Best25圖標記、fixed120loss比值6.481130956、image/state量級、state-policy
+研究連結、三模式DoNew、26檔工具鏈、真實VisionExcerpt、live成果與
+三層驗證／三項貢獻均按來源核對。Diagnosis/Unified執行CONFIRMED，
+報告最終內容覆核依使用者要求維持PENDING；助理修正稿不等於使用者簽核。
+
+所有chart/workbook/media/theme/master/layout bytes未改。27頁slideXML、
+PDFstreams/文字與備份相同，Poppler400px逐像素27/27一致。11修改頁
+內部與最終PDF逐頁檢查；修復17頁上標負號PDF缺字與22頁頁尾間距。
+官方finalizer零package/layout問題且第一方reimport通過；PowerPoint/
+Canva未測試，跨應用風險MEDIUM。原始live紀錄、教授教材、程式、模型
+與資料未更動；未重跑Agent/訓練/付費API/commit/push。
+
+正式v7PPTX/PDF與桌面Latest已同步，沒有新增v8。桌面v5/v6四份舊副本
+完整移入本輪backup封存。來源/備份/交付路徑、逐頁Before/After、完整
+數據/視覺/未改頁檢查與剩餘問題見 reports/evidence/project2/Professor-Review-Refinement.md。
+
+
+## 46. 2026-10-15：38頁逐頁審查精修（沿用v7）
+
+依最新逐頁審查原位修改29頁，頁序與38頁總數不變；備份位於whole-deck-review-refinement/backup。
+P0六頁與P1主要要求完成。第5頁依教授modelB6.py重畫真實分支與nextstate feedback；
+第14頁核對diagnose.py原圖已共用Y軸，修正舊文字／審查假設。第26頁主表簡化但stateRMS、
+零基準與原門檻保留；31頁逐層配置對照，Level1定位仍是工程推論；36頁兩欄真實raw回答節錄。
+26canonical檔本輪hash／bytes再次通過，兩段excerpt與raw JSON逐字一致。
+所有chart／workbook／media／theme／master／layout bytes保留；9未改頁slideXML／PDFstreams／
+PDF文字／400pxpixels一致。官方finalizer零package／layout問題，38頁11native tables5charts。
+29修改頁視覺檢視及PDF獨立render完成；PowerPoint／Canva未測，風險MEDIUM。
+Diagnosis4tools29.301s、Unified2tools6.857s，executionCONFIRMED，CONTENT REVIEW PENDING不變。
+未新增訓練／Agent／API實驗，未改程式或教授教材，沒有commit／push。正式及桌面Latest v7同步，
+詳見reports/evidence/project2/Professor-Review-Refinement.md。
+
+
+## 47. 2026-10-16：全份38頁口語化修訂（沿用v7）
+
+依使用者要求重新閱讀38頁，改寫284處原生文字、70個表格欄位，將介入、產物、
+升級、循環軌跡、canonical／claim catalogue等改為具體中文，保留必要技術名稱。
+補上loss、state、檔案指紋的說明；單筆與平均、執行與內容正確仍分開。
+所有chart/workbook/media/theme/master/layout/rels保留原bytes，純數值欄位逐格不變，
+4個原文quote shape XML不變。官方finalizer零package/layout問題，38頁11tables5charts。
+完整PDF逐頁檢視，修復中文斷詞；PowerPoint／Canva未實測，跨應用風險MEDIUM。
+Diagnosis／Unified execution完成、內容待審不變。沒有新Agent/API/訓練/commit/push。
+正式與桌面Latest沿用v7同步；修改前PPTX/PDF及舊報告備份在plain-language-refinement-20261016。
+
+
+## 48. 2026-10-16：Diagnosis／Unified 指定實測內容核對完成，簡報v8
+
+依使用者要求重新讀原始run、canonical exports及Taiwan Best圖片；24個
+manifest檔、6個實際工具payload、Python source hashes及兩份reference
+完整吻合。數值可保留；修正P210來源、P27主要依據，以及單張圖不支持的
+移動、同車道與model lead措辭。完整修正與限制在
+`reports/evidence/project2/Agent-Content-Review-20261016.md`。
+簡報第2／33／36／37／38頁改成「本次已核對並修正」，限兩次實測，
+不是原始回答完全正確或所有未來輸出可靠。另存v8，不覆蓋開啟中的v7。
+其他33頁、圖表、workbooks、media及4段原文節錄不變；官方finalizer
+零package/layout findings，PDF修訂頁已獨立render檢視。PowerPoint／Canva
+未實測，跨應用風險MEDIUM。無新API、訓練、runtime變更、commit或push。

@@ -1,6 +1,6 @@
 # Project 2 — Model B6 Training, Verification, and AI Agent
 
-**Current status (2026-10-14):** the accepted user-submitted Baseline Agent run
+**Current status (2026-10-16):** the accepted user-submitted Baseline Agent run
 completed with visible `think` and `analyze` calls and a full travel-planning
 answer; see [audit §32](PROJECT2_AUDIT.md#32-baseline-complete-diagnosis-and-unified-waiting-on-quota-2026-10-08).
 The original audited course scope is **22/22 grouped deliverables complete**.
@@ -11,18 +11,35 @@ Historical professor model: `gemini-2.5-flash`; student default:
 Percentages count deliverables, not grades or driving quality. Historical
 guidance below does not authorize retraining.
 
+**Latest live receipts (2026-10-14,23:06–23:07):** both staged verify runs
+COMPLETED on `gemini-3.5-flash-lite`: Diagnosis4requiredtools + fullreport
+in29.301s; Unified2requiredtools + fullreport in6.857s; oneattempt each. All
+12manifest entries perrun match, toolresults equal canonical readers, and
+saved Pythonhashes match current sources. Application chooses the tools; these
+are model-issued calls, not autonomous selection. Content review corrects
+fresh-gradient attribution and single-frame motion/lane wording in separately
+labelled reviewed reports; raw outputs preserved. This is not user signoff or
+proof of all natural-language claims. See audit §44 and
+[combined review](../projects/project2/agent/LIVE_REVIEW_20261014.md).
+
 **Additional Do New v2:** read-only multi-experiment diagnosis, qualitative
 image verification and unified mode are implemented and tested offline.
 See [implementation and commands](../projects/project2/agent/DO_NEW_V2.md).
-Live v2 status: USA/final Vision PASS. Diagnosis and Taiwan/best Unified
-remain LIVE VERIFICATION PENDING and are currently deferred. The latest recorded
-attempts identify Diagnosis 429 input-token-per-minute limits and Unified 503
-high demand; no new provider call was made during this cleanup. See
-[current-checkout audit §33](PROJECT2_AUDIT.md#33-current-checkout-cleanup-and-report-delivery-2026-10-14).
+Live v2 status: USA/final Vision PASS; Diagnosis/Taiwan-best Unified staged
+required-tool protocols COMPLETED. On 2026-10-16 the two recorded outputs were
+checked against canonical sources and the image, with source/wording corrections
+saved separately; see [content review](../reports/evidence/project2/Agent-Content-Review-20261016.md).
+Raw output is retained, and cross-sample reliability remains unverified. Earlier
+failed verify/provider-limit attempts remain historical.
+No code changes or new assistant APIcalls were needed for this review.
 These extra v2 acceptance runs are separate from the original 22-group course count.
 The superseded Evidence v1 source was removed on 2026-10-12; Git `e1a1bc5`
-retains it and its historical acceptance. The current Agent suite passes 44/44
-tests; the historical 55-test suite included 11 v1-only tests.
+retains it and its historical acceptance. The current Agent suite passes 96/96
+tests: the cleanup-era 44 plus three CLI tests, two Unified trace/prompt tests
+and fifteen report-context/table regression tests, followed by 23 runtime/progress/
+verification regressions (audit §41), plus two aggregation-label tests (audit §42) and seven required-tool protocol tests (audit §43)
+([audit §34](PROJECT2_AUDIT.md#34-user-reported-dual-503-and-unified-cli-error-handling-2026-10-14));
+the historical 55-test suite included 11 v1-only tests.
 Final student reports are indexed in [reports](../reports/README.md).
 
 > This document summarizes the Project 2 requirements from professor-provided
