@@ -1,0 +1,4 @@
+# Partial range downloads are retained locally for resuming; only the verified
+# TensorFlow wheel is needed in the ModelB6 build context.
+projects/project2/modelb6/wheelhouse/*.part
+projects/project2/modelb6/wheelhouse/*.assembling

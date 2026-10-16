@@ -76,8 +76,33 @@ services:
       retries: 3
       start_period: 30s
 
+  modelb6:
+    profiles: ["project2"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.modelb6
+    platform: linux/amd64
+    working_dir: /workspace/student
+    environment:
+      PYTHONPATH: "/workspace/professor:/opt/openpilot"
+      PYTHONDONTWRITEBYTECODE: "1"
+      TF_CPP_MIN_LOG_LEVEL: "2"
+      MPLCONFIGDIR: "/tmp/matplotlib"
+    volumes:
+      - ../external/aJLL/ModelB6:/workspace/professor:ro
+      - openpilot-repo:/opt/openpilot:ro
+      - replay-data:/data:ro
+      - modelb6-derived:/derived
+      - modelb6-output:/output
+    read_only: true
+    tmpfs:
+      - /tmp
+    command: ["python3.8", "/workspace/student/compatibility_check.py"]
+
 volumes:
   openpilot-repo:
   replay-data:
   op-socket:
   op-runtime:
+  modelb6-derived:
+  modelb6-output:

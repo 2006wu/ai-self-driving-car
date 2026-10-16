@@ -1,0 +1,46 @@
+FROM ai-self-driving-car-compute:latest
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    TF_CPP_MIN_LOG_LEVEL=2
+
+# The validated Project 1 compute image supplies Ubuntu 20.04, Python 3.8, and
+# OpenPilot system libraries. This Dockerfile adds Project 2 packages only to a
+# new image layer; it never changes the existing compute container or image.
+
+COPY projects/project2/modelb6/requirements.txt /tmp/requirements.txt
+# The wheelhouse is populated by fetch_tensorflow_wheel.py and remains ignored
+# by Git. Bind mounting avoids retaining the 186 MB wheel in an image layer.
+# The pip cache preserves completed smaller downloads between failed builds.
+RUN --mount=type=bind,source=projects/project2/modelb6/wheelhouse,target=/wheelhouse,ro \
+    --mount=type=cache,target=/root/.cache/pip \
+    python3.8 -m pip install --index-url https://pypi.org/simple --retries 8 --default-timeout 120 --progress-bar off --upgrade 'pip<24' \
+    && python3.8 -m pip install --no-deps /wheelhouse/tensorflow_cpu-2.13.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl \
+    && python3.8 -m pip install --index-url https://pypi.org/simple --retries 8 --default-timeout 120 --progress-bar off -r /tmp/requirements.txt
+
+COPY projects/project2/modelb6/compatibility_check.py /workspace/student/compatibility_check.py
+COPY projects/project2/modelb6/corrections.py /workspace/student/corrections.py
+COPY projects/project2/modelb6/fixture_tests.py /workspace/student/fixture_tests.py
+COPY projects/project2/modelb6/prepare_smoke.py /workspace/student/prepare_smoke.py
+COPY projects/project2/modelb6/server_corrected.py /workspace/student/server_corrected.py
+COPY projects/project2/modelb6/train_corrected.py /workspace/student/train_corrected.py
+COPY projects/project2/modelb6/verify_smoke_model.py /workspace/student/verify_smoke_model.py
+COPY projects/project2/modelb6/smoke_pipeline.py /workspace/student/smoke_pipeline.py
+COPY projects/project2/modelb6/step5_split.json /workspace/student/step5_split.json
+COPY projects/project2/modelb6/step5_preflight.py /workspace/student/step5_preflight.py
+COPY projects/project2/modelb6/step5_data.py /workspace/student/step5_data.py
+COPY projects/project2/modelb6/step5.py /workspace/student/step5.py
+COPY projects/project2/modelb6/step5_tests.py /workspace/student/step5_tests.py
+COPY projects/project2/modelb6/step6.py /workspace/student/step6.py
+COPY projects/project2/modelb6/step6_tests.py /workspace/student/step6_tests.py
+COPY projects/project2/modelb6/step6_integrity.py /workspace/student/step6_integrity.py
+COPY projects/project2/modelb6/step7_sensitivity.py /workspace/student/step7_sensitivity.py
+COPY projects/project2/modelb6/step7_sensitivity_tests.py /workspace/student/step7_sensitivity_tests.py
+COPY projects/project2/modelb6/step8_encoder_audit.py /workspace/student/step8_encoder_audit.py
+COPY projects/project2/modelb6/step8_encoder_tests.py /workspace/student/step8_encoder_tests.py
+COPY projects/project2/modelb6/step9_gradient_audit.py /workspace/student/step9_gradient_audit.py
+COPY projects/project2/modelb6/step9_gradient_tests.py /workspace/student/step9_gradient_tests.py
+COPY projects/project2/modelb6/step9_report.py /workspace/student/step9_report.py
+COPY projects/project2/modelb6/step10_gradient_controls.py /workspace/student/step10_gradient_controls.py
+COPY projects/project2/modelb6/step10_gradient_tests.py /workspace/student/step10_gradient_tests.py
+WORKDIR /workspace/student
