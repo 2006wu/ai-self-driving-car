@@ -710,26 +710,19 @@ This path is a repository design recommendation, not a professor-mandated path.
 
 # 16. Project 3 — AI Robot
 
-Professor's course plan describes Project 3 as:
+The Course Notes assign **AI Robot, Run1–2**. The subsequently available local
+`2603 MR Projects.docx` resolves the earlier missing details:
 
-> Do AI Robot (Run1-2)
+- Run1: PC YOLO using the professor's YoloPC implementation derived from FH.
+- Run2: C2C over Wi-Fi with the specified uiview script. Its retrieved source runs
+  camera/UI/model/calibration processes on C2C; PC SSH provides remote access.
+- Run3–5, PID and physical following are later work, outside assigned Run1–2.
 
-The course-plan document does not contain enough information to determine exactly what Run1 and Run2 require.
-
-Therefore:
-
-**Do not invent the AI Robot architecture yet.**
-
-Wait for the corresponding professor-provided instructions.
-
-When Project 3 begins, a possible repository location is:
-
-```text
-projects/project3/
-└── robot/
-```
-
-Again, this is a repository organization recommendation rather than an official course requirement.
+See [Project 3 requirements and source audit](PROJECT3.md) for evidence,
+classification, independent implementation and actual verification status.
+Student source lives in `projects/project3/`; professor references remain local.
+Real C2C hardware verification and camera access must be reported separately
+from file-input and API-double tests. Preserve the Project 1/2 environments.
 
 ---
 

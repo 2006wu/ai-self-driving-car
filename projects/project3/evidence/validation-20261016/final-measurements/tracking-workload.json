@@ -1,0 +1,91 @@
+{
+  "environment": {
+    "python": "3.11.4",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "providers": [
+      "CoreMLExecutionProvider",
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "packages": {
+      "numpy": "1.26.4",
+      "onnx": "1.17.0",
+      "onnxruntime": "1.20.1",
+      "opencv-python": "4.10.0.84",
+      "psutil": "6.1.1"
+    },
+    "camera": "NOT TESTED: opt-in AVFoundation on macOS",
+    "timing_clock": "time.perf_counter monotonic seconds",
+    "source_sha256": {
+      "p3/scenarios.py": "18e2681f7fe12375f9c32a906e02230cd3283eb7887a9085ee3d45557b12e514",
+      "p3/detection.py": "a217ae04c1be1773da62c0277932d8eda3579c1037e5ea2e9127ac8c1673ccf4",
+      "p3/follow.py": "be5b1e4a4446abb7f52acd8334ec7982f4ce1e11609e5ba6a67a9c94a9a22499",
+      "p3/evaluation.py": "2e7613f58c058d498d856cec7a3acdc4f081bf04df2a4594eb4a3e24e5818b12",
+      "p3/tracking_eval.py": "8507fa81dfe753e30b82594165986e8767f10dcc9000f81e829f832ab000c83a",
+      "p3/__init__.py": "23f5cc596048d5ec33be8f64cfafafb028c50abb2e37443e7209ce80b90a283e",
+      "p3/run2.py": "2110dfb93cbd25b4ab144c3f00226e0aa7090d83ccd216e0eea0533dd8555c06",
+      "p3/cli.py": "87ce8dbcb00bd52877e05249e67fd7eb880439f8cf5bb08d227576724e3ad117",
+      "p3/pipeline.py": "7c542a3cccdc75fb1150193de7f052e673ef59de1a9f12fb8af95fb948733ff7",
+      "p3/tracking.py": "abecd41a00bc5052de81bd3236271e36d6635dbaa3c806755c2c6554510ad19f"
+    }
+  },
+  "scope": "synthetic box-only tracker cost, not detector or camera FPS",
+  "workloads": [
+    {
+      "synthetic_person_boxes": 1,
+      "tracking_ms": {
+        "mean": 0.014542240067385137,
+        "median": 0.01425005029886961,
+        "p95": 0.016419054009020325,
+        "std": 0.00153213587092084,
+        "count": 1000
+      },
+      "max_sampled_rss_bytes": 408698880
+    },
+    {
+      "synthetic_person_boxes": 2,
+      "tracking_ms": {
+        "mean": 0.04919668415095657,
+        "median": 0.048291985876858234,
+        "p95": 0.05358399357646704,
+        "std": 0.003243898262248105,
+        "count": 1000
+      },
+      "max_sampled_rss_bytes": 408698880
+    },
+    {
+      "synthetic_person_boxes": 5,
+      "tracking_ms": {
+        "mean": 0.2875562642002478,
+        "median": 0.2863749396055937,
+        "p95": 0.3011744294781238,
+        "std": 0.00926704872269145,
+        "count": 1000
+      },
+      "max_sampled_rss_bytes": 408698880
+    },
+    {
+      "synthetic_person_boxes": 10,
+      "tracking_ms": {
+        "mean": 1.1407739875139669,
+        "median": 1.1310420231893659,
+        "p95": 1.1951749329455197,
+        "std": 0.060373049353341306,
+        "count": 1000
+      },
+      "max_sampled_rss_bytes": 408698880
+    },
+    {
+      "synthetic_person_boxes": 20,
+      "tracking_ms": {
+        "mean": 4.531695147743449,
+        "median": 4.510583006776869,
+        "p95": 4.721110081300139,
+        "std": 0.1453732733022392,
+        "count": 1000
+      },
+      "max_sampled_rss_bytes": 408698880
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "normal": {
+    "result": {
+      "scope": "injected process/cereal API only; no network/hardware",
+      "ticks": 3,
+      "events": []
+    },
+    "sent": 12,
+    "started": [
+      "camerad",
+      "ui",
+      "modeld",
+      "calibrationd"
+    ],
+    "stopped": [
+      "calibrationd",
+      "modeld",
+      "ui",
+      "camerad"
+    ],
+    "publishers": 1
+  },
+  "timeout": {
+    "result": {
+      "scope": "injected process/cereal API only; no network/hardware",
+      "ticks": 3,
+      "events": [
+        "TimeoutError",
+        "publisher_recreated"
+      ]
+    },
+    "sent": 12,
+    "started": [
+      "camerad",
+      "ui",
+      "modeld",
+      "calibrationd"
+    ],
+    "stopped": [
+      "calibrationd",
+      "modeld",
+      "ui",
+      "camerad"
+    ],
+    "publishers": 2
+  },
+  "disconnect": {
+    "result": {
+      "scope": "injected process/cereal API only; no network/hardware",
+      "ticks": 3,
+      "events": [
+        "ConnectionError",
+        "publisher_recreated"
+      ]
+    },
+    "sent": 12,
+    "started": [
+      "camerad",
+      "ui",
+      "modeld",
+      "calibrationd"
+    ],
+    "stopped": [
+      "calibrationd",
+      "modeld",
+      "ui",
+      "camerad"
+    ],
+    "publishers": 2
+  }
+}

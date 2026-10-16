@@ -1,0 +1,9 @@
+-e:1:191: warning: 'devices(for:)' was deprecated in macOS 10.15: Use AVCaptureDeviceDiscoverySession instead. [#DeprecatedDeclaration]
+1 | #sourceLocation(file: "-e", line: 1)
+2 | import AVFoundation; print("camera_authorization_notDetermined=", AVCaptureDevice.authorizationStatus(for: .video) == .notDetermined); print("available_video_device_count=", AVCaptureDevice.devices(for: .video).count)
+  |                                                                                                                                                                                               `- warning: 'devices(for:)' was deprecated in macOS 10.15: Use AVCaptureDeviceDiscoverySession instead. [#DeprecatedDeclaration]
+3 | 
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+camera_authorization_notDetermined= true
+available_video_device_count= 2

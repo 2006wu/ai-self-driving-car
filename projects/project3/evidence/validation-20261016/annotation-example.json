@@ -1,0 +1,56 @@
+{
+  "annotation_kind": "synthetic_ground_truth",
+  "target_gt_id": 1,
+  "frames": [
+    {
+      "frame": 0,
+      "ground_truth": [
+        {
+          "id": 1,
+          "box": [
+            10,
+            20,
+            50,
+            100
+          ]
+        }
+      ],
+      "predictions": [
+        {
+          "id": 7,
+          "box": [
+            10,
+            20,
+            50,
+            100
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 1,
+      "ground_truth": [
+        {
+          "id": 1,
+          "box": [
+            12,
+            20,
+            52,
+            100
+          ]
+        }
+      ],
+      "predictions": [
+        {
+          "id": 7,
+          "box": [
+            12,
+            20,
+            52,
+            100
+          ]
+        }
+      ]
+    }
+  ]
+}

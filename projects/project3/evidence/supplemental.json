@@ -1,0 +1,227 @@
+{
+  "environment": {
+    "python": "3.11.4",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "providers": [
+      "CoreMLExecutionProvider",
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "packages": {
+      "numpy": "1.26.4",
+      "onnx": "1.17.0",
+      "onnxruntime": "1.20.1",
+      "opencv-python": "4.10.0.84",
+      "psutil": "6.1.1"
+    },
+    "camera": "NOT TESTED: opt-in AVFoundation on macOS",
+    "timing_clock": "time.perf_counter monotonic seconds"
+  },
+  "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63",
+  "limitations": "Deterministic image perturbations, not real low-light/motion trials or accuracy/identity metrics.",
+  "variants": {
+    "original": {
+      "detections": 5,
+      "persons": 4,
+      "objectness": [
+        0.877126157283783,
+        0.7507166862487793,
+        0.648769736289978,
+        0.5504842400550842,
+        0.40287983417510986
+      ],
+      "timing": {
+        "preprocess_ms": 1.701291068457067,
+        "inference_ms": 41.89512494485825,
+        "postprocess_ms": 0.5407090066000819
+      }
+    },
+    "low_light_25pct": {
+      "detections": 4,
+      "persons": 4,
+      "objectness": [
+        0.8698907494544983,
+        0.7312557697296143,
+        0.7282581925392151,
+        0.605381965637207
+      ],
+      "timing": {
+        "preprocess_ms": 0.9093330008909106,
+        "inference_ms": 41.914917062968016,
+        "postprocess_ms": 0.566457980312407
+      }
+    },
+    "motion_blur_horizontal": {
+      "detections": 1,
+      "persons": 1,
+      "objectness": [
+        0.4066268503665924
+      ],
+      "timing": {
+        "preprocess_ms": 0.6664160173386335,
+        "inference_ms": 41.4114169543609,
+        "postprocess_ms": 0.5335420137271285
+      }
+    },
+    "partial_occlusion": {
+      "detections": 3,
+      "persons": 2,
+      "objectness": [
+        0.6306531429290771,
+        0.5529962778091431,
+        0.30111995339393616
+      ],
+      "timing": {
+        "preprocess_ms": 0.9199170162901282,
+        "inference_ms": 40.63462500926107,
+        "postprocess_ms": 0.4153329646214843
+      }
+    },
+    "all_black": {
+      "detections": 0,
+      "persons": 0,
+      "objectness": [],
+      "timing": {
+        "preprocess_ms": 0.8498750394210219,
+        "inference_ms": 40.35612498410046,
+        "postprocess_ms": 0.41324994526803493
+      }
+    }
+  },
+  "model_load_ms": {
+    "CPUExecutionProvider": {
+      "mean": 13.566999789327383,
+      "median": 13.04008299484849,
+      "p95": 14.629241381771863,
+      "std": 0.8077051887887691,
+      "count": 5
+    },
+    "CoreMLExecutionProvider": {
+      "mean": 932.0376249728724,
+      "median": 921.9614169560373,
+      "p95": 972.5049081956968,
+      "std": 26.615400338328445,
+      "count": 5
+    }
+  },
+  "provider_comparison": {
+    "raw_mean_abs": 0.004386383108794689,
+    "raw_max_abs": 18.611328125,
+    "cpu_detections": [
+      {
+        "box": [
+          52.57934546470642,
+          378.7414345374474,
+          216.2305133342743,
+          891.3678095890925
+        ],
+        "objectness": 0.877126157283783,
+        "class_id": 0,
+        "label": "person"
+      },
+      {
+        "box": [
+          223.4314591884613,
+          399.08429806049054,
+          346.67124938964844,
+          860.8156233567458
+        ],
+        "objectness": 0.7507166862487793,
+        "class_id": 0,
+        "label": "person"
+      },
+      {
+        "box": [
+          0.21240440011024475,
+          553.8999366760254,
+          76.3560082912445,
+          867.9317533052885
+        ],
+        "objectness": 0.648769736289978,
+        "class_id": 0,
+        "label": "person"
+      },
+      {
+        "box": [
+          699.282995223999,
+          428.49389296311597,
+          808.4740505218506,
+          867.6847986074595
+        ],
+        "objectness": 0.5504842400550842,
+        "class_id": 0,
+        "label": "person"
+      },
+      {
+        "box": [
+          18.615556240081787,
+          202.62619091914252,
+          768.3003444671631,
+          743.6614080575796
+        ],
+        "objectness": 0.40287983417510986,
+        "class_id": 4,
+        "label": "airplane"
+      }
+    ],
+    "coreml_detections": [
+      {
+        "box": [
+          52.681640625,
+          378.8762019230769,
+          216.263671875,
+          891.2920673076923
+        ],
+        "objectness": 0.87890625,
+        "class_id": 0,
+        "label": "person"
+      },
+      {
+        "box": [
+          223.3037109375,
+          398.9963942307692,
+          346.8603515625,
+          860.7872596153846
+        ],
+        "objectness": 0.75341796875,
+        "class_id": 0,
+        "label": "person"
+      },
+      {
+        "box": [
+          0.177978515625,
+          553.9543269230769,
+          76.313232421875,
+          867.4399038461538
+        ],
+        "objectness": 0.64990234375,
+        "class_id": 0,
+        "label": "person"
+      },
+      {
+        "box": [
+          699.099609375,
+          429.1766826923077,
+          808.259765625,
+          867.6021634615385
+        ],
+        "objectness": 0.55517578125,
+        "class_id": 0,
+        "label": "person"
+      },
+      {
+        "box": [
+          18.66796875,
+          202.5,
+          767.91796875,
+          743.7980769230769
+        ],
+        "objectness": 0.406982421875,
+        "class_id": 4,
+        "label": "airplane"
+      }
+    ],
+    "note": "CoreML uses CPU fallback partitions; hardware unit/GPU utilization not measured."
+  }
+}

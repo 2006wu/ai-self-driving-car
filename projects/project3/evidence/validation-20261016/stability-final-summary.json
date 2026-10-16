@@ -1,0 +1,158 @@
+{
+  "status": {
+    "status": "PASS",
+    "termination": "EOF",
+    "error": null,
+    "cleanup_errors": [],
+    "frames": 1200,
+    "camera": false,
+    "display": false,
+    "record": true,
+    "screenshots": 0,
+    "wall_seconds": 60.70778933400288,
+    "cpu_percent_one_core": 117.8381584715878,
+    "application_skipped_frames": 0,
+    "sensor_dropped_frames": null,
+    "frame_drop_scope": "No application frame skipping; camera sensor drops unavailable.",
+    "simulation_only": true,
+    "physical_control": false,
+    "timing_scope": "e2e excludes export IO; loop includes image/video export; wall also includes source opening/journal",
+    "deadline_scope": "checked between frames; does not interrupt blocked native capture"
+  },
+  "input_sha256": "98b2420f89426db2eaefd3b2fdbabcf4d2398d272b0874a973887d657875de3c",
+  "source_sha256": {
+    "p3/scenarios.py": "18e2681f7fe12375f9c32a906e02230cd3283eb7887a9085ee3d45557b12e514",
+    "p3/detection.py": "a217ae04c1be1773da62c0277932d8eda3579c1037e5ea2e9127ac8c1673ccf4",
+    "p3/follow.py": "be5b1e4a4446abb7f52acd8334ec7982f4ce1e11609e5ba6a67a9c94a9a22499",
+    "p3/evaluation.py": "2e7613f58c058d498d856cec7a3acdc4f081bf04df2a4594eb4a3e24e5818b12",
+    "p3/tracking_eval.py": "8507fa81dfe753e30b82594165986e8767f10dcc9000f81e829f832ab000c83a",
+    "p3/__init__.py": "23f5cc596048d5ec33be8f64cfafafb028c50abb2e37443e7209ce80b90a283e",
+    "p3/run2.py": "2110dfb93cbd25b4ab144c3f00226e0aa7090d83ccd216e0eea0533dd8555c06",
+    "p3/cli.py": "87ce8dbcb00bd52877e05249e67fd7eb880439f8cf5bb08d227576724e3ad117",
+    "p3/pipeline.py": "7c542a3cccdc75fb1150193de7f052e673ef59de1a9f12fb8af95fb948733ff7",
+    "p3/tracking.py": "abecd41a00bc5052de81bd3236271e36d6635dbaa3c806755c2c6554510ad19f"
+  },
+  "recording_decoded_frames": 1200,
+  "session_wall_fps": 19.76682091646963,
+  "metrics": {
+    "preprocess_ms": {
+      "mean": 0.7220149834756739,
+      "median": 0.7183544803410769,
+      "p95": 0.8197350893169641,
+      "std": 0.10375455140726374,
+      "count": 1200
+    },
+    "inference_ms": {
+      "mean": 40.9460155077007,
+      "median": 40.57545849354938,
+      "p95": 42.18193502747454,
+      "std": 4.122214831879025,
+      "count": 1200
+    },
+    "postprocess_ms": {
+      "mean": 0.47264499589800835,
+      "median": 0.4597085062414408,
+      "p95": 0.6398044002708048,
+      "std": 0.09269837427493714,
+      "count": 1200
+    },
+    "previous_frame_e2e_ms": {
+      "mean": 43.70557183661731,
+      "median": 43.36708353366703,
+      "p95": 45.08487314451486,
+      "std": 4.355235571553478,
+      "count": 1200
+    },
+    "capture_ms": {
+      "mean": 1.119362161650012,
+      "median": 1.118082960601896,
+      "p95": 1.2601153401192278,
+      "std": 0.27554046716956204,
+      "count": 1200
+    },
+    "tracking_ms": {
+      "mean": 0.008253649187584719,
+      "median": 0.0074999406933784485,
+      "p95": 0.009750016033649445,
+      "std": 0.012421494560258059,
+      "count": 1200
+    },
+    "decision_ms": {
+      "mean": 0.003622213456158837,
+      "median": 0.0034170225262641907,
+      "p95": 0.004793109837919472,
+      "std": 0.0013682701318139057,
+      "count": 1200
+    },
+    "render_gui_ms": {
+      "mean": 0.39656340445314225,
+      "median": 0.39108353666961193,
+      "p95": 0.5136312334798276,
+      "std": 0.0724540939110952,
+      "count": 1200
+    },
+    "e2e_ms": {
+      "mean": 43.741510448259454,
+      "median": 43.36708353366703,
+      "p95": 45.08487314451486,
+      "std": 4.168363074681447,
+      "count": 1200
+    },
+    "rss_bytes": {
+      "mean": 300699784.53333336,
+      "median": 301449216.0,
+      "p95": 306888704.0,
+      "std": 7390600.570359987,
+      "count": 1200
+    },
+    "export_ms": {
+      "mean": 6.776744655605095,
+      "median": 6.742666475474834,
+      "p95": 7.148416596464813,
+      "std": 0.4606578444838649,
+      "count": 1200
+    },
+    "loop_ms": {
+      "mean": 50.53708892296223,
+      "median": 50.146957975812256,
+      "p95": 52.07466309075244,
+      "std": 4.258803871397928,
+      "count": 1200
+    }
+  },
+  "rss_first_last_bytes": [
+    196247552,
+    307331072
+  ],
+  "rss_min_max_bytes": [
+    196247552,
+    307331072
+  ],
+  "proxies": {
+    "unique_predicted_track_ids": 8,
+    "frames_with_person_predictions": 10,
+    "target_state_counts": {
+      "none": 199,
+      "tracked": 1,
+      "missing": 5,
+      "lost": 995
+    },
+    "follow_state_counts": {
+      "IDLE": 1200
+    }
+  },
+  "last_simulated_control": {
+    "event": "simulated_control",
+    "time_seconds": 60.706346000079066,
+    "state": "STOP",
+    "reason": "EOF",
+    "target_id": null,
+    "action": "STOP",
+    "speed": 0.0,
+    "turn": 0.0,
+    "simulation_only": true
+  },
+  "error_events": 0,
+  "real_tracking_accuracy": "NOT TESTED: no annotated identities",
+  "media_scope": "local ignored recording, decode counted after timed run"
+}

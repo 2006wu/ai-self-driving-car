@@ -1,0 +1,150 @@
+{
+  "branch": "develop",
+  "head": "0098f886e078cacbe08eb2d1282922cd78b5b1dc",
+  "sources": {
+    "course-materials/2603 MR Projects.docx": {
+      "sha256": "51c0513bf8ef9e2b275246783c3f17e2e42a3b8978348ce4ab36eee0888474dd",
+      "bytes": 15338
+    },
+    "course-materials/2609 AI Course Notes.docx": {
+      "sha256": "a2c74e201dba023265df5b67f346495d02ba449c9cdfa2a2bc242c8b933e6ef0",
+      "bytes": 14213
+    },
+    "external/aJLL/bodyjim/YoloPC.py": {
+      "sha256": "7af52f3217fc08ec1cc3ccfd80536093663c04d3b2e8280130e7a01aef729dc4",
+      "bytes": 10252,
+      "imports": [
+        "import ast",
+        "import cv2",
+        "import onnx",
+        "import pygame",
+        "import time",
+        "import numpy as np",
+        "import onnxruntime as ort",
+        "from pathlib import Path",
+        "import matplotlib.pyplot as plt",
+        "from matplotlib.patches import Rectangle"
+      ],
+      "functions": [
+        "xywh2xyxy",
+        "compute_iou",
+        "non_max_suppression",
+        "nms",
+        "YoloRunner",
+        "runYolo1",
+        "runYolo",
+        "run1",
+        "run2",
+        "run3",
+        "make_action",
+        "run4"
+      ],
+      "literal_process_lists": []
+    },
+    "external/aJLL/bodyjim/follow_human.py": {
+      "sha256": "64e6b4c0c165b6762870029c7bac7baac6cbd493244609d3094c0647408c810b",
+      "bytes": 5661,
+      "imports": [
+        "import cv2",
+        "import numpy as np",
+        "import ast",
+        "import urllib.request",
+        "import argparse",
+        "import onnx",
+        "from pathlib import Path",
+        "import pygame",
+        "import onnxruntime as ort",
+        "from bodyjim import BodyEnv"
+      ],
+      "functions": [
+        "xywh2xyxy",
+        "non_max_suppression",
+        "compute_iou",
+        "nms",
+        "YoloRunner",
+        "run_follow_human"
+      ],
+      "literal_process_lists": []
+    },
+    "external/aJLL/bodyjim/data_stream.py": {
+      "sha256": "99cd9201ac57dcc8a5ba6120d936dc2a8dbc0f831eadd6ee74ac7a905d295e0e",
+      "bytes": 5934,
+      "imports": [
+        "import asyncio",
+        "import json",
+        "import time",
+        "import threading",
+        "from typing import Any, Awaitable, Dict, List, Tuple, Optional",
+        "import aiohttp",
+        "import aiortc",
+        "import numpy as np",
+        "from teleoprtc import WebRTCOfferBuilder"
+      ],
+      "functions": [
+        "WebrtcdClient",
+        "DataStreamSession"
+      ],
+      "literal_process_lists": []
+    },
+    "external/aJLL/UI/uiviewJLL.py": {
+      "sha256": "2c00e40b70cae21d10a3e0fc0cc13c62cb4f49f0b7c2d077963986065ed4b1b6",
+      "bytes": 1211,
+      "imports": [
+        "import time",
+        "from cereal import log, messaging",
+        "from selfdrive.manager.process_config import managed_processes"
+      ],
+      "functions": [],
+      "literal_process_lists": [
+        [
+          "ui"
+        ]
+      ]
+    },
+    "external/aJLL/UI/uiviewJLL1.py": {
+      "sha256": "ad80fc5f7354633bdfd106efa9d11c8fb9d8e11110d9b3ffc8ed65dbb58b0353",
+      "bytes": 1211,
+      "imports": [
+        "import time",
+        "from cereal import log, messaging",
+        "from selfdrive.manager.process_config import managed_processes"
+      ],
+      "functions": [],
+      "literal_process_lists": [
+        [
+          "ui"
+        ]
+      ]
+    },
+    "projects/project3/artifacts/reference/uiview.py": {
+      "sha256": "792f7f7d9fc5c52057b4b851c5405d1af965c6f9c1f4d94bc554e3f34bb399fa",
+      "bytes": 3307,
+      "imports": [
+        "import time",
+        "from cereal import car, log, messaging",
+        "from common.params import Params",
+        "from selfdrive.manager.process_config import managed_processes"
+      ],
+      "functions": [],
+      "literal_process_lists": [
+        [
+          "camerad",
+          "ui",
+          "modeld",
+          "calibrationd"
+        ]
+      ]
+    }
+  },
+  "model_sha256": "bf667e5041e89ffaf1faa17c1ecbcf2d87729a514486a46c1996682342386031",
+  "uiview_same_active_ast": false,
+  "uiview_download_url": "https://drive.usercontent.google.com/download?id=1Sf4PztfOjutOdgJz7CqQow5UUZlW9xl8&export=download&confirm=t",
+  "findings": {
+    "ui_location": "C2C per exact source instructions",
+    "network": "PC SSH over Wi-Fi for remote shell / source transfer. No PC video-stream API in this script.",
+    "IPC": "cereal local PubMaster: controlsState/deviceState/pandaStates/carParams",
+    "params": "exact script persistently writes CarParams(notCar=True); not executed against host/device",
+    "model": "exact script starts modeld using device model; not Run1 YOLO",
+    "mock_scope": "injected process/cereal API only; no Capnp serialization, msgq IPC, Wi-Fi or hardware verification"
+  }
+}

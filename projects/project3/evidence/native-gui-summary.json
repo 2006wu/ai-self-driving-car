@@ -1,0 +1,8 @@
+{
+  "display": true,
+  "frames": 1200,
+  "max_frames": 2000,
+  "exit": "EOF, command exit 0",
+  "scope": "actual cv2.imshow/waitKey/destroy calls; UI automation observation timed out; real n/q interaction not verified",
+  "run_json_sha256": "5e3152dd7939caa44c0f2e524bf9cdda49440f0ba1bbaf3d3d0e76eae00bb16b"
+}

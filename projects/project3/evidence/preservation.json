@@ -1,0 +1,17 @@
+{
+  "compared_files": 261,
+  "changed": [
+    "README.md",
+    "docs/COURSE_PLAN.md",
+    "docs/README.md"
+  ],
+  "missing": [],
+  "intended_existing_doc_changes": [
+    "README.md",
+    "docs/README.md",
+    "docs/COURSE_PLAN.md"
+  ],
+  "unexpected_changes": [],
+  "original_course_and_aJLL_preserved": true,
+  "existing_p1_p2_source_preserved": true
+}

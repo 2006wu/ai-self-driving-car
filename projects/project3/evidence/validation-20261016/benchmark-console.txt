@@ -1,0 +1,18 @@
+cpu-image 22.67 21.83
+cpu-track-follow 24.49 23.33
+cpu-source-small 24.42 23.3
+cpu-source-large 24.38 22.68
+cpu-conf50 24.52 23.38
+cpu-video 24.32 22.48
+[0;93m2026-10-16 03:20:07.396600 [W:onnxruntime:, coreml_execution_provider.cc:115 GetCapability] CoreMLExecutionProvider::GetCapability, number of partitions supported by CoreML: 4 number of nodes in the graph: 237 number of nodes supported by CoreML: 230[m
+[0;93m2026-10-16 03:20:08.382358 [W:onnxruntime:, session_state.cc:1168 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-16 03:20:08.382372 [W:onnxruntime:, session_state.cc:1170 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+coreml-image 164.17 130.58
+[0;93m2026-10-16 03:20:08.685207 [W:onnxruntime:, coreml_execution_provider.cc:115 GetCapability] CoreMLExecutionProvider::GetCapability, number of partitions supported by CoreML: 4 number of nodes in the graph: 237 number of nodes supported by CoreML: 230[m
+[0;93m2026-10-16 03:20:09.590716 [W:onnxruntime:, session_state.cc:1168 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-16 03:20:09.590730 [W:onnxruntime:, session_state.cc:1170 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+coreml-track-follow 162.03 124.83
+[0;93m2026-10-16 03:20:09.904394 [W:onnxruntime:, coreml_execution_provider.cc:115 GetCapability] CoreMLExecutionProvider::GetCapability, number of partitions supported by CoreML: 4 number of nodes in the graph: 237 number of nodes supported by CoreML: 230[m
+[0;93m2026-10-16 03:20:10.817784 [W:onnxruntime:, session_state.cc:1168 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-16 03:20:10.817800 [W:onnxruntime:, session_state.cc:1170 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+coreml-video 165.86 107.11

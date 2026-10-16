@@ -1,0 +1,17 @@
+{
+  "tests": 50,
+  "pass": 50,
+  "fail": 0,
+  "skip": 0,
+  "source_log": "tests-final.txt",
+  "categories": {
+    "test_baseline.GeometryTests": 12,
+    "test_baseline.InputTests": 9,
+    "test_baseline.ModelIntegrationTests": 7,
+    "test_baseline.Run2Tests": 8,
+    "test_extensions.BenchmarkIntegrationTests": 2,
+    "test_extensions.DashboardTests": 2,
+    "test_extensions.TrackingTests": 10
+  },
+  "hardware_and_camera": "NOT TESTED; not included as passed tests"
+}

@@ -1,0 +1,475 @@
+{
+  "environment": {
+    "python": "3.11.4",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "providers": [
+      "CoreMLExecutionProvider",
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "packages": {
+      "numpy": "1.26.4",
+      "onnx": "1.17.0",
+      "onnxruntime": "1.20.1",
+      "opencv-python": "4.10.0.84",
+      "psutil": "6.1.1"
+    },
+    "camera": "NOT TESTED: opt-in AVFoundation on macOS",
+    "timing_clock": "time.perf_counter monotonic seconds"
+  },
+  "model": {
+    "model_sha256": "bf667e5041e89ffaf1faa17c1ecbcf2d87729a514486a46c1996682342386031",
+    "input": [
+      1,
+      3,
+      416,
+      640
+    ],
+    "output": [
+      1,
+      1392300
+    ],
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "requested_provider": "CPUExecutionProvider",
+    "threads": 1,
+    "classes": {
+      "0": "person",
+      "1": "bicycle",
+      "2": "car",
+      "3": "motorcycle",
+      "4": "airplane",
+      "5": "bus",
+      "6": "train",
+      "7": "truck",
+      "8": "boat",
+      "9": "traffic light",
+      "10": "fire hydrant",
+      "11": "stop sign",
+      "12": "parking meter",
+      "13": "bench",
+      "14": "bird",
+      "15": "cat",
+      "16": "dog",
+      "17": "horse",
+      "18": "sheep",
+      "19": "cow",
+      "20": "elephant",
+      "21": "bear",
+      "22": "zebra",
+      "23": "giraffe",
+      "24": "backpack",
+      "25": "umbrella",
+      "26": "handbag",
+      "27": "tie",
+      "28": "suitcase",
+      "29": "frisbee",
+      "30": "skis",
+      "31": "snowboard",
+      "32": "sports ball",
+      "33": "kite",
+      "34": "baseball bat",
+      "35": "baseball glove",
+      "36": "skateboard",
+      "37": "surfboard",
+      "38": "tennis racket",
+      "39": "bottle",
+      "40": "wine glass",
+      "41": "cup",
+      "42": "fork",
+      "43": "knife",
+      "44": "spoon",
+      "45": "bowl",
+      "46": "banana",
+      "47": "apple",
+      "48": "sandwich",
+      "49": "orange",
+      "50": "broccoli",
+      "51": "carrot",
+      "52": "hot dog",
+      "53": "pizza",
+      "54": "donut",
+      "55": "cake",
+      "56": "chair",
+      "57": "couch",
+      "58": "potted plant",
+      "59": "bed",
+      "60": "dining table",
+      "61": "toilet",
+      "62": "tv",
+      "63": "laptop",
+      "64": "mouse",
+      "65": "remote",
+      "66": "keyboard",
+      "67": "cell phone",
+      "68": "microwave",
+      "69": "oven",
+      "70": "toaster",
+      "71": "sink",
+      "72": "refrigerator",
+      "73": "book",
+      "74": "clock",
+      "75": "vase",
+      "76": "scissors",
+      "77": "teddy bear",
+      "78": "hair drier",
+      "79": "toothbrush"
+    },
+    "load_ms": 30.13454203028232
+  },
+  "input": "/Users/2006wu/Desktop/ai-self-drive-car-ws/projects/project3/artifacts/bus.jpg",
+  "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63",
+  "requested_samples": 30,
+  "warmup": 5,
+  "confidence_threshold": 0.5,
+  "source_resolution_override": null,
+  "model_resolution": [
+    640,
+    416
+  ],
+  "metrics": {
+    "preprocess_ms": {
+      "mean": 0.7563194764467577,
+      "median": 0.7078330381773412,
+      "p95": 1.012581051327288,
+      "std": 0.15004720779206254,
+      "count": 30
+    },
+    "inference_ms": {
+      "mean": 42.259722164211176,
+      "median": 41.89095849869773,
+      "p95": 45.89036258403212,
+      "std": 1.6178612013894493,
+      "count": 30
+    },
+    "postprocess_ms": {
+      "mean": 0.5411639033506314,
+      "median": 0.5611460073851049,
+      "p95": 0.6577979889698327,
+      "std": 0.08916681083926557,
+      "count": 30
+    },
+    "capture_or_resize_ms": {
+      "mean": 0.0003389664925634861,
+      "median": 0.00033294782042503357,
+      "p95": 0.0005913083441555496,
+      "std": 0.00012888614376390785,
+      "count": 30
+    },
+    "render_ms": {
+      "mean": 0.42322355244929594,
+      "median": 0.4203125135973096,
+      "p95": 0.5102768715005368,
+      "std": 0.05744733107864649,
+      "count": 30
+    },
+    "e2e_ms": {
+      "mean": 44.060575073429696,
+      "median": 43.52216696133837,
+      "p95": 47.78157123364508,
+      "std": 1.7450656809877834,
+      "count": 30
+    },
+    "rss_bytes": {
+      "mean": 210440465.06666666,
+      "median": 213745664.0,
+      "p95": 213762048.0,
+      "std": 4887223.770721361,
+      "count": 30
+    }
+  },
+  "rss_before_measured_bytes": 134955008,
+  "inference_fps": 23.66319390634513,
+  "file_pipeline_fps": 22.696026965908583,
+  "detection_count": {
+    "mean": 4.0,
+    "median": 4.0,
+    "p95": 4.0,
+    "std": 0.0,
+    "count": 30
+  },
+  "objectness_distribution": {
+    "mean": 0.7067742049694061,
+    "median": 0.6997432112693787,
+    "p95": 0.877126157283783,
+    "std": 0.12118353935045233,
+    "count": 120
+  },
+  "scope": "Resident image retrieval + optional source resize + preprocess + inference + postprocess + overlay rendering. Excludes model load, source opening, export IO, GUI display, camera capture, tracking.",
+  "memory_scope": "Process RSS sampled after each measured frame; not device/GPU memory or continuous peak.",
+  "accuracy": "No labels: precision/recall/mAP NOT EVALUATED",
+  "observations": [
+    {
+      "preprocess_ms": 0.6495839916169643,
+      "inference_ms": 43.02887502126396,
+      "postprocess_ms": 0.6023329915478826,
+      "capture_or_resize_ms": 0.000250060111284256,
+      "render_ms": 0.472458079457283,
+      "e2e_ms": 44.81175006367266,
+      "rss_bytes": 201129984
+    },
+    {
+      "preprocess_ms": 0.6622079527005553,
+      "inference_ms": 42.26716700941324,
+      "postprocess_ms": 0.4072909941896796,
+      "capture_or_resize_ms": 0.0007499475032091141,
+      "render_ms": 0.4403329221531749,
+      "e2e_ms": 43.833832954987884,
+      "rss_bytes": 201277440
+    },
+    {
+      "preprocess_ms": 0.7042910438030958,
+      "inference_ms": 41.85399995185435,
+      "postprocess_ms": 0.4372920375317335,
+      "capture_or_resize_ms": 0.0006660120561718941,
+      "render_ms": 0.3311659675091505,
+      "e2e_ms": 43.449666001833975,
+      "rss_bytes": 201359360
+    },
+    {
+      "preprocess_ms": 0.6443749880418181,
+      "inference_ms": 40.910916053690016,
+      "postprocess_ms": 0.6332920165732503,
+      "capture_or_resize_ms": 0.0002080341801047325,
+      "render_ms": 0.3469169605523348,
+      "e2e_ms": 42.59166703559458,
+      "rss_bytes": 201392128
+    },
+    {
+      "preprocess_ms": 0.764459022320807,
+      "inference_ms": 41.583333048038185,
+      "postprocess_ms": 0.5190829979255795,
+      "capture_or_resize_ms": 0.00033294782042503357,
+      "render_ms": 0.4052920266985893,
+      "e2e_ms": 43.32354199141264,
+      "rss_bytes": 202833920
+    },
+    {
+      "preprocess_ms": 0.6182909710332751,
+      "inference_ms": 41.74983408302069,
+      "postprocess_ms": 0.41354098357260227,
+      "capture_or_resize_ms": 0.0002919696271419525,
+      "render_ms": 0.3610830754041672,
+      "e2e_ms": 43.22291701100767,
+      "rss_bytes": 202833920
+    },
+    {
+      "preprocess_ms": 0.6496250862255692,
+      "inference_ms": 44.381333980709314,
+      "postprocess_ms": 0.6067500216886401,
+      "capture_or_resize_ms": 0.0004169996827840805,
+      "render_ms": 0.41858304757624865,
+      "e2e_ms": 46.14762496203184,
+      "rss_bytes": 206913536
+    },
+    {
+      "preprocess_ms": 1.0483749210834503,
+      "inference_ms": 45.03787506837398,
+      "postprocess_ms": 0.553457997739315,
+      "capture_or_resize_ms": 0.00037497375160455704,
+      "render_ms": 0.4002500791102648,
+      "e2e_ms": 47.12837503757328,
+      "rss_bytes": 206946304
+    },
+    {
+      "preprocess_ms": 0.8232080144807696,
+      "inference_ms": 45.56829191278666,
+      "postprocess_ms": 0.6632920121774077,
+      "capture_or_resize_ms": 0.0004169996827840805,
+      "render_ms": 0.38412504363805056,
+      "e2e_ms": 47.49250004533678,
+      "rss_bytes": 206946304
+    },
+    {
+      "preprocess_ms": 0.7862499915063381,
+      "inference_ms": 42.314792051911354,
+      "postprocess_ms": 0.60374999884516,
+      "capture_or_resize_ms": 0.000250060111284256,
+      "render_ms": 0.4088750574737787,
+      "e2e_ms": 44.23279210459441,
+      "rss_bytes": 210157568
+    },
+    {
+      "preprocess_ms": 0.7860410260036588,
+      "inference_ms": 42.42416692432016,
+      "postprocess_ms": 0.522000016644597,
+      "capture_or_resize_ms": 0.0002919696271419525,
+      "render_ms": 0.510707963258028,
+      "e2e_ms": 44.304874958470464,
+      "rss_bytes": 210173952
+    },
+    {
+      "preprocess_ms": 0.8821670198813081,
+      "inference_ms": 41.97683301754296,
+      "postprocess_ms": 0.42504200246185064,
+      "capture_or_resize_ms": 0.00037497375160455704,
+      "render_ms": 0.371375004760921,
+      "e2e_ms": 43.77237497828901,
+      "rss_bytes": 210518016
+    },
+    {
+      "preprocess_ms": 0.7670840714126825,
+      "inference_ms": 41.478749946691096,
+      "postprocess_ms": 0.6510830717161298,
+      "capture_or_resize_ms": 0.0004169996827840805,
+      "render_ms": 0.5097499815747142,
+      "e2e_ms": 43.46529196482152,
+      "rss_bytes": 213729280
+    },
+    {
+      "preprocess_ms": 0.8577919797971845,
+      "inference_ms": 41.69370804447681,
+      "postprocess_ms": 0.43866701889783144,
+      "capture_or_resize_ms": 0.000333995558321476,
+      "render_ms": 0.46374998055398464,
+      "e2e_ms": 43.50995889399201,
+      "rss_bytes": 213745664
+    },
+    {
+      "preprocess_ms": 0.6785830482840538,
+      "inference_ms": 46.16549995262176,
+      "postprocess_ms": 0.6380419945344329,
+      "capture_or_resize_ms": 0.00016705598682165146,
+      "render_ms": 0.4367090296000242,
+      "e2e_ms": 48.018084024079144,
+      "rss_bytes": 213745664
+    },
+    {
+      "preprocess_ms": 1.3216660590842366,
+      "inference_ms": 46.153874951414764,
+      "postprocess_ms": 0.5688340170308948,
+      "capture_or_resize_ms": 0.00033294782042503357,
+      "render_ms": 0.42204197961837053,
+      "e2e_ms": 48.62312495242804,
+      "rss_bytes": 213745664
+    },
+    {
+      "preprocess_ms": 0.8528749458491802,
+      "inference_ms": 42.753207962960005,
+      "postprocess_ms": 0.624458072707057,
+      "capture_or_resize_ms": 0.000500003807246685,
+      "render_ms": 0.5896660732105374,
+      "e2e_ms": 44.90295797586441,
+      "rss_bytes": 213745664
+    },
+    {
+      "preprocess_ms": 0.9688329882919788,
+      "inference_ms": 41.372875100933015,
+      "postprocess_ms": 0.604082946665585,
+      "capture_or_resize_ms": 0.0004169996827840805,
+      "render_ms": 0.43729098979383707,
+      "e2e_ms": 43.43900003004819,
+      "rss_bytes": 213745664
+    },
+    {
+      "preprocess_ms": 0.7113750325515866,
+      "inference_ms": 41.385874967090786,
+      "postprocess_ms": 0.4623749991878867,
+      "capture_or_resize_ms": 0.00020908191800117493,
+      "render_ms": 0.42316701728850603,
+      "e2e_ms": 43.039292097091675,
+      "rss_bytes": 213745664
+    },
+    {
+      "preprocess_ms": 0.6264580879360437,
+      "inference_ms": 40.37437494844198,
+      "postprocess_ms": 0.44812506530433893,
+      "capture_or_resize_ms": 0.000208965502679348,
+      "render_ms": 0.4765830235555768,
+      "e2e_ms": 41.985917021520436,
+      "rss_bytes": 213745664
+    },
+    {
+      "preprocess_ms": 0.6005839677527547,
+      "inference_ms": 40.33033305313438,
+      "postprocess_ms": 0.5042499396950006,
+      "capture_or_resize_ms": 0.00024994369596242905,
+      "render_ms": 0.4812920233234763,
+      "e2e_ms": 41.973083978518844,
+      "rss_bytes": 213745664
+    },
+    {
+      "preprocess_ms": 0.6295000202953815,
+      "inference_ms": 42.409832938574255,
+      "postprocess_ms": 0.5093340296298265,
+      "capture_or_resize_ms": 0.000250060111284256,
+      "render_ms": 0.4408330423757434,
+      "e2e_ms": 44.083583052270114,
+      "rss_bytes": 213745664
+    },
+    {
+      "preprocess_ms": 0.8079999824985862,
+      "inference_ms": 40.499874972738326,
+      "postprocess_ms": 0.6198750343173742,
+      "capture_or_resize_ms": 0.0002080341801047325,
+      "render_ms": 0.4099579527974129,
+      "e2e_ms": 42.39258298184723,
+      "rss_bytes": 213762048
+    },
+    {
+      "preprocess_ms": 0.6118749734014273,
+      "inference_ms": 41.00570804439485,
+      "postprocess_ms": 0.6165419472381473,
+      "capture_or_resize_ms": 0.00029103830456733704,
+      "render_ms": 0.40374998934566975,
+      "e2e_ms": 42.76479105465114,
+      "rss_bytes": 213762048
+    },
+    {
+      "preprocess_ms": 0.6978340679779649,
+      "inference_ms": 40.49491591285914,
+      "postprocess_ms": 0.3849590430036187,
+      "capture_or_resize_ms": 0.00037497375160455704,
+      "render_ms": 0.3530409885570407,
+      "e2e_ms": 42.050582938827574,
+      "rss_bytes": 213762048
+    },
+    {
+      "preprocess_ms": 0.6820840062573552,
+      "inference_ms": 40.812999941408634,
+      "postprocess_ms": 0.5860410165041685,
+      "capture_or_resize_ms": 0.00024994369596242905,
+      "render_ms": 0.3717500949278474,
+      "e2e_ms": 42.5505000166595,
+      "rss_bytes": 213762048
+    },
+    {
+      "preprocess_ms": 0.6925420602783561,
+      "inference_ms": 41.11945803742856,
+      "postprocess_ms": 0.4887079121544957,
+      "capture_or_resize_ms": 0.000208965502679348,
+      "render_ms": 0.3411250654608011,
+      "e2e_ms": 42.70487499888986,
+      "rss_bytes": 213762048
+    },
+    {
+      "preprocess_ms": 0.6457500858232379,
+      "inference_ms": 42.03699994832277,
+      "postprocess_ms": 0.4064999520778656,
+      "capture_or_resize_ms": 0.0003330642357468605,
+      "render_ms": 0.3643749514594674,
+      "e2e_ms": 43.534375028684735,
+      "rss_bytes": 213762048
+    },
+    {
+      "preprocess_ms": 0.7171249017119408,
+      "inference_ms": 41.92791704554111,
+      "postprocess_ms": 0.6278749788179994,
+      "capture_or_resize_ms": 0.00037497375160455704,
+      "render_ms": 0.47379208263009787,
+      "e2e_ms": 43.81266701966524,
+      "rss_bytes": 213762048
+    },
+    {
+      "preprocess_ms": 0.8007499855011702,
+      "inference_ms": 42.67804103437811,
+      "postprocess_ms": 0.6680419901385903,
+      "capture_or_resize_ms": 0.0004169996827840805,
+      "render_ms": 0.4466670798137784,
+      "e2e_ms": 44.65466702822596,
+      "rss_bytes": 216956928
+    }
+  ]
+}

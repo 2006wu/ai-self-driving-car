@@ -1,0 +1,484 @@
+{
+  "environment": {
+    "python": "3.11.4",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "providers": [
+      "CoreMLExecutionProvider",
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "packages": {
+      "numpy": "1.26.4",
+      "onnx": "1.17.0",
+      "onnxruntime": "1.20.1",
+      "opencv-python": "4.10.0.84",
+      "psutil": "6.1.1"
+    },
+    "camera": "NOT TESTED: opt-in AVFoundation on macOS",
+    "timing_clock": "time.perf_counter monotonic seconds",
+    "source_sha256": {
+      "p3/detection.py": "a217ae04c1be1773da62c0277932d8eda3579c1037e5ea2e9127ac8c1673ccf4",
+      "p3/evaluation.py": "3f8989e8b8d04d273a68ee39f2e31841efb5b9d6057fee2ffdc5bd8f9f70de0c",
+      "p3/__init__.py": "23f5cc596048d5ec33be8f64cfafafb028c50abb2e37443e7209ce80b90a283e",
+      "p3/run2.py": "2110dfb93cbd25b4ab144c3f00226e0aa7090d83ccd216e0eea0533dd8555c06",
+      "p3/cli.py": "f46271273267a9f54bdbc25d640f5ac6da63267473c6436143e4eac1c7b89b49",
+      "p3/pipeline.py": "f0ced264277448a03f6df88b62dc2ad81d04b70f494c5fb902503a0af87251a5",
+      "p3/tracking.py": "e9cb9b29d21aa679fc8c5f2a74dd69dd26491a95029fe15a94d17a57a6f9a8fc"
+    }
+  },
+  "model": {
+    "model_sha256": "bf667e5041e89ffaf1faa17c1ecbcf2d87729a514486a46c1996682342386031",
+    "input": [
+      1,
+      3,
+      416,
+      640
+    ],
+    "output": [
+      1,
+      1392300
+    ],
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "requested_provider": "CPUExecutionProvider",
+    "threads": 1,
+    "classes": {
+      "0": "person",
+      "1": "bicycle",
+      "2": "car",
+      "3": "motorcycle",
+      "4": "airplane",
+      "5": "bus",
+      "6": "train",
+      "7": "truck",
+      "8": "boat",
+      "9": "traffic light",
+      "10": "fire hydrant",
+      "11": "stop sign",
+      "12": "parking meter",
+      "13": "bench",
+      "14": "bird",
+      "15": "cat",
+      "16": "dog",
+      "17": "horse",
+      "18": "sheep",
+      "19": "cow",
+      "20": "elephant",
+      "21": "bear",
+      "22": "zebra",
+      "23": "giraffe",
+      "24": "backpack",
+      "25": "umbrella",
+      "26": "handbag",
+      "27": "tie",
+      "28": "suitcase",
+      "29": "frisbee",
+      "30": "skis",
+      "31": "snowboard",
+      "32": "sports ball",
+      "33": "kite",
+      "34": "baseball bat",
+      "35": "baseball glove",
+      "36": "skateboard",
+      "37": "surfboard",
+      "38": "tennis racket",
+      "39": "bottle",
+      "40": "wine glass",
+      "41": "cup",
+      "42": "fork",
+      "43": "knife",
+      "44": "spoon",
+      "45": "bowl",
+      "46": "banana",
+      "47": "apple",
+      "48": "sandwich",
+      "49": "orange",
+      "50": "broccoli",
+      "51": "carrot",
+      "52": "hot dog",
+      "53": "pizza",
+      "54": "donut",
+      "55": "cake",
+      "56": "chair",
+      "57": "couch",
+      "58": "potted plant",
+      "59": "bed",
+      "60": "dining table",
+      "61": "toilet",
+      "62": "tv",
+      "63": "laptop",
+      "64": "mouse",
+      "65": "remote",
+      "66": "keyboard",
+      "67": "cell phone",
+      "68": "microwave",
+      "69": "oven",
+      "70": "toaster",
+      "71": "sink",
+      "72": "refrigerator",
+      "73": "book",
+      "74": "clock",
+      "75": "vase",
+      "76": "scissors",
+      "77": "teddy bear",
+      "78": "hair drier",
+      "79": "toothbrush"
+    },
+    "load_ms": 29.851707979105413
+  },
+  "input": "/Users/2006wu/Desktop/ai-self-drive-car-ws/projects/project3/artifacts/bus.jpg",
+  "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63",
+  "requested_samples": 30,
+  "warmup": 5,
+  "confidence_threshold": 0.5,
+  "source_resolution_override": null,
+  "model_resolution": [
+    640,
+    416
+  ],
+  "metrics": {
+    "preprocess_ms": {
+      "mean": 0.6844596626857916,
+      "median": 0.6757704541087151,
+      "p95": 0.8076273777987808,
+      "std": 0.0693117613481377,
+      "count": 30
+    },
+    "inference_ms": {
+      "mean": 40.72108067727337,
+      "median": 40.443500445690006,
+      "p95": 42.24491045461036,
+      "std": 0.6738015711634002,
+      "count": 30
+    },
+    "postprocess_ms": {
+      "mean": 0.49231802113354206,
+      "median": 0.4823124618269503,
+      "p95": 0.6373500043991952,
+      "std": 0.08355480325963636,
+      "count": 30
+    },
+    "capture_or_resize_ms": {
+      "mean": 0.00030419323593378067,
+      "median": 0.0002914457581937313,
+      "p95": 0.000500003807246685,
+      "std": 0.00011877295673734912,
+      "count": 30
+    },
+    "render_ms": {
+      "mean": 0.39679720454538864,
+      "median": 0.4096460179425776,
+      "p95": 0.4740560485515743,
+      "std": 0.05874477827545546,
+      "count": 30
+    },
+    "e2e_ms": {
+      "mean": 42.37960970106845,
+      "median": 42.08116652444005,
+      "p95": 44.20306442771107,
+      "std": 0.7311823653816815,
+      "count": 30
+    },
+    "rss_bytes": {
+      "mean": 230641390.93333334,
+      "median": 232357888.0,
+      "p95": 232620032.0,
+      "std": 3854227.4585826835,
+      "count": 30
+    }
+  },
+  "rss_before_measured_bytes": 161185792,
+  "inference_fps": 24.557305046133138,
+  "file_pipeline_fps": 23.59625317584717,
+  "detection_count": {
+    "mean": 4.0,
+    "median": 4.0,
+    "p95": 4.0,
+    "std": 0.0,
+    "count": 30
+  },
+  "objectness_distribution": {
+    "mean": 0.7067742049694061,
+    "median": 0.6997432112693787,
+    "p95": 0.877126157283783,
+    "std": 0.12118353935045233,
+    "count": 120
+  },
+  "scope": "Resident image retrieval + optional source resize + preprocess + inference + postprocess + overlay rendering. Excludes model load, source opening, export IO, GUI display, camera capture, tracking.",
+  "memory_scope": "Process RSS sampled after each measured frame; not device/GPU memory or continuous peak.",
+  "accuracy": "No labels: precision/recall/mAP NOT EVALUATED",
+  "observations": [
+    {
+      "preprocess_ms": 0.6847500335425138,
+      "inference_ms": 41.64470895193517,
+      "postprocess_ms": 0.39850000757724047,
+      "capture_or_resize_ms": 0.00016705598682165146,
+      "render_ms": 0.42099994607269764,
+      "e2e_ms": 43.27429202385247,
+      "rss_bytes": 218578944
+    },
+    {
+      "preprocess_ms": 0.6833749357610941,
+      "inference_ms": 40.6036670319736,
+      "postprocess_ms": 0.4611250478774309,
+      "capture_or_resize_ms": 0.000500003807246685,
+      "render_ms": 0.4803749034181237,
+      "e2e_ms": 42.32887492980808,
+      "rss_bytes": 218972160
+    },
+    {
+      "preprocess_ms": 0.6279170047491789,
+      "inference_ms": 40.17933295108378,
+      "postprocess_ms": 0.46074995771050453,
+      "capture_or_resize_ms": 0.0007079215720295906,
+      "render_ms": 0.4557500360533595,
+      "e2e_ms": 41.789041948504746,
+      "rss_bytes": 224935936
+    },
+    {
+      "preprocess_ms": 0.7884999504312873,
+      "inference_ms": 42.277291999198496,
+      "postprocess_ms": 0.6772920023649931,
+      "capture_or_resize_ms": 0.00045797787606716156,
+      "render_ms": 0.4509170539677143,
+      "e2e_ms": 44.283707975409925,
+      "rss_bytes": 224968704
+    },
+    {
+      "preprocess_ms": 0.8134589297696948,
+      "inference_ms": 40.87437503039837,
+      "postprocess_ms": 0.378625001758337,
+      "capture_or_resize_ms": 0.000500003807246685,
+      "render_ms": 0.44062500819563866,
+      "e2e_ms": 42.57462499663234,
+      "rss_bytes": 227622912
+    },
+    {
+      "preprocess_ms": 0.755125074647367,
+      "inference_ms": 40.424374979920685,
+      "postprocess_ms": 0.48699998296797276,
+      "capture_or_resize_ms": 0.0003330642357468605,
+      "render_ms": 0.3446670016273856,
+      "e2e_ms": 42.07333305384964,
+      "rss_bytes": 227688448
+    },
+    {
+      "preprocess_ms": 0.6367090390995145,
+      "inference_ms": 40.36374995484948,
+      "postprocess_ms": 0.4931250587105751,
+      "capture_or_resize_ms": 0.00033294782042503357,
+      "render_ms": 0.3371660131961107,
+      "e2e_ms": 41.88654094468802,
+      "rss_bytes": 229146624
+    },
+    {
+      "preprocess_ms": 0.6402499275282025,
+      "inference_ms": 40.8416660502553,
+      "postprocess_ms": 0.4533339524641633,
+      "capture_or_resize_ms": 0.00020791776478290558,
+      "render_ms": 0.375041039660573,
+      "e2e_ms": 42.373582953587174,
+      "rss_bytes": 232341504
+    },
+    {
+      "preprocess_ms": 0.5921670235693455,
+      "inference_ms": 40.65033292863518,
+      "postprocess_ms": 0.6630000425502658,
+      "capture_or_resize_ms": 0.00037497375160455704,
+      "render_ms": 0.4421250196173787,
+      "e2e_ms": 42.43799997493625,
+      "rss_bytes": 232341504
+    },
+    {
+      "preprocess_ms": 0.7470420096069574,
+      "inference_ms": 40.30850005801767,
+      "postprocess_ms": 0.5295829614624381,
+      "capture_or_resize_ms": 0.00020908191800117493,
+      "render_ms": 0.33245806116610765,
+      "e2e_ms": 41.96737508755177,
+      "rss_bytes": 232341504
+    },
+    {
+      "preprocess_ms": 0.668165972456336,
+      "inference_ms": 40.367000037804246,
+      "postprocess_ms": 0.3922500181943178,
+      "capture_or_resize_ms": 0.00045797787606716156,
+      "render_ms": 0.46633300371468067,
+      "e2e_ms": 41.995582985691726,
+      "rss_bytes": 232341504
+    },
+    {
+      "preprocess_ms": 0.7127909921109676,
+      "inference_ms": 40.25858407840133,
+      "postprocess_ms": 0.47762494068592787,
+      "capture_or_resize_ms": 0.000125030055642128,
+      "render_ms": 0.38950005546212196,
+      "e2e_ms": 41.89608304295689,
+      "rss_bytes": 232357888
+    },
+    {
+      "preprocess_ms": 0.6484169280156493,
+      "inference_ms": 40.16420803964138,
+      "postprocess_ms": 0.5271249683573842,
+      "capture_or_resize_ms": 0.00020791776478290558,
+      "render_ms": 0.5502079147845507,
+      "e2e_ms": 41.944957920350134,
+      "rss_bytes": 232357888
+    },
+    {
+      "preprocess_ms": 0.6894998950883746,
+      "inference_ms": 40.407042019069195,
+      "postprocess_ms": 0.4520830698311329,
+      "capture_or_resize_ms": 0.000250060111284256,
+      "render_ms": 0.320291961543262,
+      "e2e_ms": 41.935999994166195,
+      "rss_bytes": 232357888
+    },
+    {
+      "preprocess_ms": 0.745333032682538,
+      "inference_ms": 40.43383395764977,
+      "postprocess_ms": 0.4334159893915057,
+      "capture_or_resize_ms": 0.000250060111284256,
+      "render_ms": 0.42220798786729574,
+      "e2e_ms": 42.21574997063726,
+      "rss_bytes": 232357888
+    },
+    {
+      "preprocess_ms": 0.6671670125797391,
+      "inference_ms": 40.16979201696813,
+      "postprocess_ms": 0.4424159415066242,
+      "capture_or_resize_ms": 0.0002919696271419525,
+      "render_ms": 0.31154195312410593,
+      "e2e_ms": 41.65416699834168,
+      "rss_bytes": 232357888
+    },
+    {
+      "preprocess_ms": 0.6068750517442822,
+      "inference_ms": 40.47529201488942,
+      "postprocess_ms": 0.5855829222127795,
+      "capture_or_resize_ms": 0.0002919696271419525,
+      "render_ms": 0.3473750548437238,
+      "e2e_ms": 42.151042027398944,
+      "rss_bytes": 232357888
+    },
+    {
+      "preprocess_ms": 0.6064160261303186,
+      "inference_ms": 40.35766702145338,
+      "postprocess_ms": 0.3584999358281493,
+      "capture_or_resize_ms": 0.000250060111284256,
+      "render_ms": 0.43304101563990116,
+      "e2e_ms": 41.858250042423606,
+      "rss_bytes": 232488960
+    },
+    {
+      "preprocess_ms": 0.6916670827195048,
+      "inference_ms": 40.19650002010167,
+      "postprocess_ms": 0.4487499827519059,
+      "capture_or_resize_ms": 0.0002909218892455101,
+      "render_ms": 0.3436249680817127,
+      "e2e_ms": 41.821374907158315,
+      "rss_bytes": 232603648
+    },
+    {
+      "preprocess_ms": 0.6862080190330744,
+      "inference_ms": 40.27691704686731,
+      "postprocess_ms": 0.6059999577701092,
+      "capture_or_resize_ms": 0.0002919696271419525,
+      "render_ms": 0.3481250023469329,
+      "e2e_ms": 42.00675000902265,
+      "rss_bytes": 232603648
+    },
+    {
+      "preprocess_ms": 0.7581249810755253,
+      "inference_ms": 40.40437506046146,
+      "postprocess_ms": 0.42574992403388023,
+      "capture_or_resize_ms": 0.0002919696271419525,
+      "render_ms": 0.3509590169414878,
+      "e2e_ms": 41.99816705659032,
+      "rss_bytes": 232603648
+    },
+    {
+      "preprocess_ms": 0.5949159385636449,
+      "inference_ms": 40.36262503359467,
+      "postprocess_ms": 0.5704169161617756,
+      "capture_or_resize_ms": 0.00024994369596242905,
+      "render_ms": 0.42037502862513065,
+      "e2e_ms": 41.999332956038415,
+      "rss_bytes": 232603648
+    },
+    {
+      "preprocess_ms": 0.6325000431388617,
+      "inference_ms": 40.527959004975855,
+      "postprocess_ms": 0.33683294896036386,
+      "capture_or_resize_ms": 0.000250060111284256,
+      "render_ms": 0.4087090492248535,
+      "e2e_ms": 41.99804202653468,
+      "rss_bytes": 232603648
+    },
+    {
+      "preprocess_ms": 0.6217500194907188,
+      "inference_ms": 40.65020801499486,
+      "postprocess_ms": 0.5816249176859856,
+      "capture_or_resize_ms": 0.0002919696271419525,
+      "render_ms": 0.4136250354349613,
+      "e2e_ms": 42.32200002297759,
+      "rss_bytes": 232603648
+    },
+    {
+      "preprocess_ms": 0.6015830440446734,
+      "inference_ms": 41.31466697435826,
+      "postprocess_ms": 0.5697080632671714,
+      "capture_or_resize_ms": 0.000333995558321476,
+      "render_ms": 0.29437500052154064,
+      "e2e_ms": 42.830417049117386,
+      "rss_bytes": 232603648
+    },
+    {
+      "preprocess_ms": 0.8373330347239971,
+      "inference_ms": 42.205333011224866,
+      "postprocess_ms": 0.520500005222857,
+      "capture_or_resize_ms": 0.000250060111284256,
+      "render_ms": 0.44754205737262964,
+      "e2e_ms": 44.10450009163469,
+      "rss_bytes": 232620032
+    },
+    {
+      "preprocess_ms": 0.6453749956563115,
+      "inference_ms": 42.935083038173616,
+      "postprocess_ms": 0.5371669540181756,
+      "capture_or_resize_ms": 0.000250060111284256,
+      "render_ms": 0.406875042244792,
+      "e2e_ms": 44.58850005175918,
+      "rss_bytes": 232620032
+    },
+    {
+      "preprocess_ms": 0.8004999253898859,
+      "inference_ms": 40.814375039190054,
+      "postprocess_ms": 0.4314170219004154,
+      "capture_or_resize_ms": 0.00033294782042503357,
+      "render_ms": 0.31637493520975113,
+      "e2e_ms": 42.421207996085286,
+      "rss_bytes": 232620032
+    },
+    {
+      "preprocess_ms": 0.7371659157797694,
+      "inference_ms": 40.68979201838374,
+      "postprocess_ms": 0.544500071555376,
+      "capture_or_resize_ms": 0.00016693957149982452,
+      "render_ms": 0.42212498374283314,
+      "e2e_ms": 42.567791999317706,
+      "rss_bytes": 232620032
+    },
+    {
+      "preprocess_ms": 0.6127080414444208,
+      "inference_ms": 40.453166933730245,
+      "postprocess_ms": 0.5255420692265034,
+      "capture_or_resize_ms": 0.000208965502679348,
+      "render_ms": 0.4105829866603017,
+      "e2e_ms": 42.08899999503046,
+      "rss_bytes": 232620032
+    }
+  ]
+}

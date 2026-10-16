@@ -1,0 +1,11 @@
+{
+  "decoded_frames": 1200,
+  "frame_cap": 2000,
+  "termination": "EOF below frame cap",
+  "input_sha256": "98b2420f89426db2eaefd3b2fdbabcf4d2398d272b0874a973887d657875de3c",
+  "model_sha256": "bf667e5041e89ffaf1faa17c1ecbcf2d87729a514486a46c1996682342386031",
+  "frames_with_person_predictions": 10,
+  "unique_predicted_track_ids": 8,
+  "scope": "real road video decoding/tracking execution only, no tracking ground truth; final HUD revision not part of this full run",
+  "run_json_sha256": "2043f15b62af25f53490a542867e3528fbb8e2ddddeed4312dc51420ac55fe8d"
+}

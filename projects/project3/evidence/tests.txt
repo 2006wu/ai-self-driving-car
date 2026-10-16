@@ -1,0 +1,53 @@
+test_bad_output_shape (test_baseline.GeometryTests.test_bad_output_shape) ... ok
+test_bad_threshold (test_baseline.GeometryTests.test_bad_threshold) ... ok
+test_baseline_nms_equivalence (test_baseline.GeometryTests.test_baseline_nms_equivalence) ... ok
+test_clip (test_baseline.GeometryTests.test_clip) ... ok
+test_empty_detections (test_baseline.GeometryTests.test_empty_detections) ... ok
+test_invalid_image (test_baseline.GeometryTests.test_invalid_image) ... ok
+test_iou_overlap (test_baseline.GeometryTests.test_iou_overlap) ... ok
+test_map_empty (test_baseline.GeometryTests.test_map_empty) ... ok
+test_non_square_map (test_baseline.GeometryTests.test_non_square_map) ... ok
+test_nonfinite_output (test_baseline.GeometryTests.test_nonfinite_output) ... ok
+test_preprocess (test_baseline.GeometryTests.test_preprocess) ... ok
+test_zero_area_iou (test_baseline.GeometryTests.test_zero_area_iou) ... ok
+test_bad_benchmark_size (test_baseline.InputTests.test_bad_benchmark_size) ... ok
+test_bad_extension (test_baseline.InputTests.test_bad_extension) ... ok
+test_bad_stats (test_baseline.InputTests.test_bad_stats) ... ok
+test_camera_disconnect_cleanup (test_baseline.InputTests.test_camera_disconnect_cleanup) ... ok
+test_camera_failure_cleanup (test_baseline.InputTests.test_camera_failure_cleanup) ... ok
+test_corrupt_image (test_baseline.InputTests.test_corrupt_image) ... ok
+test_missing (test_baseline.InputTests.test_missing) ... ok
+test_stats (test_baseline.InputTests.test_stats) ... ok
+test_video_eof (test_baseline.InputTests.test_video_eof) ... ok
+test_deterministic_reuse (test_baseline.ModelIntegrationTests.test_deterministic_reuse) ... ok
+test_file_export (test_baseline.ModelIntegrationTests.test_file_export) ... ok
+test_model_io (test_baseline.ModelIntegrationTests.test_model_io) ... ok
+test_original_preprocessing_and_real_nms (test_baseline.ModelIntegrationTests.test_original_preprocessing_and_real_nms) ... ok
+test_output_overwrite_refused (test_baseline.ModelIntegrationTests.test_output_overwrite_refused) ... ok
+test_overlay_shape (test_baseline.ModelIntegrationTests.test_overlay_shape) ... ok
+test_real_image_detections (test_baseline.ModelIntegrationTests.test_real_image_detections) ... ok
+test_disconnect_recovery (test_baseline.Run2Tests.test_disconnect_recovery) ... ok
+test_error_cleanup (test_baseline.Run2Tests.test_error_cleanup) ... ok
+test_exact_reference_main (test_baseline.Run2Tests.test_exact_reference_main) ... ok
+test_invalid_data (test_baseline.Run2Tests.test_invalid_data) ... ok
+test_no_retry_cleanup (test_baseline.Run2Tests.test_no_retry_cleanup) ... ok
+test_normal (test_baseline.Run2Tests.test_normal) ... ok
+test_partial_start_cleanup (test_baseline.Run2Tests.test_partial_start_cleanup) ... ok
+test_timeout_recovery (test_baseline.Run2Tests.test_timeout_recovery) ... ok
+test_model_pipeline_short_video_eof_and_single_session (test_extensions.BenchmarkIntegrationTests.test_model_pipeline_short_video_eof_and_single_session) ... ok
+test_repeatable_input_configuration (test_extensions.BenchmarkIntegrationTests.test_repeatable_input_configuration) ... ok
+test_bounded_long_run (test_extensions.TrackingTests.test_bounded_long_run) ... ok
+test_explicit_selection (test_extensions.TrackingTests.test_explicit_selection) ... ok
+test_fast_motion_new_id (test_extensions.TrackingTests.test_fast_motion_new_id) ... ok
+test_lost_no_silent_switch (test_extensions.TrackingTests.test_lost_no_silent_switch) ... ok
+test_multiple_one_to_one (test_extensions.TrackingTests.test_multiple_one_to_one) ... ok
+test_new_id_after_long_loss (test_extensions.TrackingTests.test_new_id_after_long_loss) ... ok
+test_nonperson_ignored (test_extensions.TrackingTests.test_nonperson_ignored) ... ok
+test_occlusion_recovery (test_extensions.TrackingTests.test_occlusion_recovery) ... ok
+test_parameter_validation (test_extensions.TrackingTests.test_parameter_validation) ... ok
+test_persistent_id (test_extensions.TrackingTests.test_persistent_id) ... ok
+
+----------------------------------------------------------------------
+Ran 48 tests in 0.956s
+
+OK

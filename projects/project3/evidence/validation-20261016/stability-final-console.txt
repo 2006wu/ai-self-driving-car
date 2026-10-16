@@ -1,0 +1,1 @@
+processed 1200 frame(s); evidence: artifacts/validation-20261016/stability-video-final

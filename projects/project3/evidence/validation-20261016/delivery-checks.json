@@ -1,0 +1,14 @@
+{
+  "new_nonignored_p3_files": 110,
+  "large_over_5MB": [],
+  "media_or_models": [],
+  "trailing_whitespace": [],
+  "module_hashes_match_final_measurements": true,
+  "python_ast": "PASS",
+  "git_diff_check": "PASS",
+  "staging": "not performed",
+  "commit_push": "not performed",
+  "report_rebuild_byte_identical": true,
+  "evaluation_cli_smoke": "PASS",
+  "final_preservation_recheck": true
+}

@@ -1,0 +1,10 @@
+{
+  "protected_files": 273,
+  "changed": [],
+  "original_test_files_byte_identical": {
+    "test_baseline.py": true,
+    "test_extensions.py": true
+  },
+  "scope": "non-P3 source/doc/report files plus professor assets; docs/PROJECT3.md allowed to change",
+  "pass": true
+}

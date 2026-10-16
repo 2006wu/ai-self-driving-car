@@ -1,0 +1,46 @@
+{
+  "annotation_kind": "synthetic_ground_truth",
+  "scope": "synthetic evaluator logic only",
+  "iou_threshold": 0.5,
+  "IDTP": 2,
+  "IDFN": 0,
+  "IDFP": 0,
+  "IDF1": 1.0,
+  "ID_precision": 1.0,
+  "ID_recall": 1.0,
+  "ID_switches": 0,
+  "track_fragmentations": 0,
+  "detection_matches": 2,
+  "ground_truth_detections": 2,
+  "predicted_detections": 2,
+  "track_continuity": {
+    "1": {
+      "matched_visible_fraction": 1.0,
+      "longest_consecutive_match_fraction": 1.0
+    }
+  },
+  "target_recovery": {
+    "eligible_completed_gaps": 0,
+    "same_initial_id_recoveries": 0,
+    "rate": null
+  },
+  "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+  "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+  "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+  "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+  "per_frame": [
+    {
+      "frame": 0,
+      "matches": {
+        "1": 7
+      }
+    },
+    {
+      "frame": 1,
+      "matches": {
+        "1": 7
+      }
+    }
+  ],
+  "input_sha256": "4d78d0c685b7406936e9c700cbca122aa6a3382a6a02cc2b95bb983737955c80"
+}

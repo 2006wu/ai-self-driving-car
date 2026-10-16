@@ -1,0 +1,1 @@
+processed 1 frame(s); evidence: artifacts/validation-20261016/image-simulation
