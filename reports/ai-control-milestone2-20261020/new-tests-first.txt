@@ -1,0 +1,28 @@
+test_blank_template_does_not_copy_predictions (test_milestone2.AnnotationTests.test_blank_template_does_not_copy_predictions) ... ok
+test_extract_original_pixels_and_refuse_overwrite (test_milestone2.AnnotationTests.test_extract_original_pixels_and_refuse_overwrite) ... ok
+test_occlusion_persistent_identity_target (test_milestone2.AnnotationTests.test_occlusion_persistent_identity_target) ... ok
+test_reject_invalid_human_annotation_contracts (test_milestone2.AnnotationTests.test_reject_invalid_human_annotation_contracts) ... ok
+test_test_only_reviewed_contract_metrics_and_identical_inputs (test_milestone2.AnnotationTests.test_test_only_reviewed_contract_metrics_and_identical_inputs) ... ok
+test_unannotated_evaluation_is_blocked_latency_available (test_milestone2.AnnotationTests.test_unannotated_evaluation_is_blocked_latency_available) ... ok
+test_integrity_tamper_and_corrupt_records (test_milestone2.ContractTests.test_integrity_tamper_and_corrupt_records) ... ok
+test_missing_fields_media_provenance_geometry_units_metadata (test_milestone2.ContractTests.test_missing_fields_media_provenance_geometry_units_metadata) ... ok
+test_missing_implementation_or_detector_provenance (test_milestone2.ContractTests.test_missing_implementation_or_detector_provenance) ... ok
+test_missing_or_modified_original_media (test_milestone2.ContractTests.test_missing_or_modified_original_media) ... ok
+test_order_duplicates_missing_frames (test_milestone2.ContractTests.test_order_duplicates_missing_frames) ... ok
+test_pixel_integrity_even_when_record_hash_recomputed (test_milestone2.ContractTests.test_pixel_integrity_even_when_record_hash_recomputed) ... ok
+test_quality_report_counts_and_failed_marker (test_milestone2.ContractTests.test_quality_report_counts_and_failed_marker) ... ok
+test_v1_contract_not_silently_extended (test_milestone2.ContractTests.test_v1_contract_not_silently_extended) ... ok
+test_detector_mutating_image_rejected (test_milestone2.RecorderTests.test_detector_mutating_image_rejected) ... ok
+test_existing_output_and_source_refused (test_milestone2.RecorderTests.test_existing_output_and_source_refused) ... ok
+test_explicit_selection_cancel_and_numerical_parity (test_milestone2.RecorderTests.test_explicit_selection_cancel_and_numerical_parity) ... ok
+test_failure_partial_journal_final_stop_and_cleanup (test_milestone2.RecorderTests.test_failure_partial_journal_final_stop_and_cleanup) ... ok
+test_image_and_bounded_frame_limit (test_milestone2.RecorderTests.test_image_and_bounded_frame_limit) ... ok
+test_invalid_or_backward_clock_rejected (test_milestone2.RecorderTests.test_invalid_or_backward_clock_rejected) ... ok
+test_no_hardware_and_input_validation (test_milestone2.RecorderTests.test_no_hardware_and_input_validation) ... ok
+test_stable_identity_separate_run_clocks (test_milestone2.RecorderTests.test_stable_identity_separate_run_clocks) ... ok
+test_video_order_references_pixels_and_source_preservation (test_milestone2.RecorderTests.test_video_order_references_pixels_and_source_preservation) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.462s
+
+OK
