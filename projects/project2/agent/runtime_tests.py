@@ -16,6 +16,8 @@ from live_worker import RedactingLog
 from report_output import format_report
 from report_contract import validate_visual_boundaries, validate_unified_comparison
 from vision_agent import VisualVerificationReport
+from v2_evidence import ROOT as EVIDENCE_ROOT
+from test_file_helpers import requires_file
 
 
 def options(root,**kwargs):
@@ -73,6 +75,8 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(context['results'][0]['result'],{'value':3})
         self.assertIn('not autonomous',context['protocol'])
 
+    @requires_file(EVIDENCE_ROOT / 'export_manifest.json',
+                   'Run projects/project2/agent/prepare_v2.py with the existing Docker output volume available.')
     def test_unified_report_receives_checked_results_without_structured_tool_mix(self):
         import vision_agent
         from v2_tests import integrated_fixture_report
@@ -91,6 +95,8 @@ class RuntimeTests(unittest.TestCase):
         self.assertIn('required_tool_checks',builder.return_value.run.call_args.args[0])
         self.assertEqual(result['tool_verification']['selection'],'APPLICATION_REQUIRED_MODEL_CALLS')
 
+    @requires_file(EVIDENCE_ROOT / 'export_manifest.json',
+                   'Run projects/project2/agent/prepare_v2.py with the existing Docker output volume available.')
     def test_diagnosis_report_preserves_all_required_tool_receipts(self):
         import diagnosis_agent
         from agno.run.agent import RunStatus
