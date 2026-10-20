@@ -1,0 +1,33 @@
+{
+  "status": "PREPARED/BLOCKED",
+  "required_unique_human_reviewed_frames": 300,
+  "accepted_unique_human_reviewed_frames": 0,
+  "remaining_minimum_human_reviewed_frames": 300,
+  "existing_templates": [
+    {
+      "path": "reports/ai-control-milestone2-20261020/annotation-template.json",
+      "unique_draft_frames": 120,
+      "reviewed_frames": 0,
+      "person_annotations": 0,
+      "accepted_benchmark_frames": 0
+    },
+    {
+      "path": "reports/ai-control-milestone2-20261020/annotation-frames/annotation-template.json",
+      "draft_frames": 5,
+      "overlaps_first_template": true,
+      "reviewed_frames": 0,
+      "accepted_benchmark_frames": 0
+    }
+  ],
+  "synthetic_example": {
+    "path": "projects/project3/evidence/validation-20261016/annotation-example.json",
+    "accepted_real_frames": 0
+  },
+  "missing": [
+    "3 suitable real multi-person clips with event/context provenance",
+    "300 unique densely annotated frames",
+    "actual distinct human annotator/reviewer",
+    "human-verified crossing and short/long occlusion intervals"
+  ],
+  "coverage_warning": "Drafts are unreviewed, not empty-scene ground truth. Overlapping template frames must not be counted twice."
+}

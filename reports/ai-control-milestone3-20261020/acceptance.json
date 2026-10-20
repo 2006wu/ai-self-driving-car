@@ -1,0 +1,49 @@
+{
+  "status": "PREPARED/BLOCKED",
+  "benchmark_complete": false,
+  "requirements": {
+    "real_scenarios": 3,
+    "minimum_dense_frames_per_scenario": 100,
+    "minimum_unique_dense_frames_total": 300,
+    "required_events": [
+      "crossing",
+      "short_occlusion",
+      "long_occlusion"
+    ],
+    "independent_human_review": true,
+    "full_frame_coverage": true,
+    "same_detector_inputs": true,
+    "reproducible_identity_metrics": true
+  },
+  "observed": {
+    "accepted_real_scenarios": 0,
+    "independently_reviewed_dense_frames": 0,
+    "human_verified_event_intervals": 0
+  },
+  "gates": {
+    "media": "BLOCKED",
+    "annotation_density": "BLOCKED",
+    "human_provenance_and_independent_review": "BLOCKED",
+    "real_comparison": "NOT TESTED",
+    "reproducible_real_identity_metrics": "NOT TESTED",
+    "software_regressions": "PASS"
+  },
+  "real_benchmark_results": {
+    "greedy_iou": {
+      "IDF1": null,
+      "ID_switches": null,
+      "fragmentation": null,
+      "recovery": null,
+      "tracking_latency_ms": null
+    },
+    "hungarian": {
+      "IDF1": null,
+      "ID_switches": null,
+      "fragmentation": null,
+      "recovery": null,
+      "tracking_latency_ms": null
+    }
+  },
+  "reason": "No accepted real multi-person scenario suite or human-reviewed identity annotations. No real benchmark executed; null metrics mean unavailable, not zero.",
+  "synthetic_results": "Separate prior evidence only; not accepted as real benchmark evidence."
+}

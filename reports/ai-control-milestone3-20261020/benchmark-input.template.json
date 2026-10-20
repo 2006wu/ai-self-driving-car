@@ -1,0 +1,136 @@
+{
+  "contract_version": "milestone3_benchmark_inputs/1.0",
+  "status": "PREPARED_NOT_VALID_INPUT",
+  "note": "Suite checklist metadata only; NOT an annotations/1.0 document or input to existing CLI. Nulls mean unavailable; requested scenarios are not observed events.",
+  "scenarios": [
+    {
+      "scenario_id": "crossing",
+      "requested_event": "crossing",
+      "status": "AWAITING_REAL_INPUT",
+      "media": {
+        "path": null,
+        "sha256": null,
+        "bytes": null,
+        "source_description": null,
+        "parent_source_sha256": null,
+        "parent_start_decoded_index": null
+      },
+      "planned_minimum_dense_frames": 100,
+      "dataset_bundle": null,
+      "annotations_path": null,
+      "event": {
+        "human_verified": null,
+        "start_frame": null,
+        "end_frame": null,
+        "target_person_id": null,
+        "before_context_frames": null,
+        "after_context_frames": null
+      },
+      "independent_review": {
+        "annotator": null,
+        "reviewer": null,
+        "reference": null,
+        "reviewed_at": null,
+        "identity_disagreements": null,
+        "resolutions_reference": null
+      },
+      "coverage": {
+        "recorded_frames": null,
+        "annotated_frames": null,
+        "reviewed_frames": null,
+        "dense_fraction": null,
+        "unique_parent_frames": null,
+        "frames_with_multiple_human_box_annotations": null,
+        "fully_occluded_null_box_rows": null
+      },
+      "comparison_report": null,
+      "repeat_comparison_report": null
+    },
+    {
+      "scenario_id": "short_occlusion",
+      "requested_event": "short_occlusion",
+      "status": "AWAITING_REAL_INPUT",
+      "media": {
+        "path": null,
+        "sha256": null,
+        "bytes": null,
+        "source_description": null,
+        "parent_source_sha256": null,
+        "parent_start_decoded_index": null
+      },
+      "planned_minimum_dense_frames": 100,
+      "dataset_bundle": null,
+      "annotations_path": null,
+      "event": {
+        "human_verified": null,
+        "start_frame": null,
+        "end_frame": null,
+        "target_person_id": null,
+        "before_context_frames": null,
+        "after_context_frames": null
+      },
+      "independent_review": {
+        "annotator": null,
+        "reviewer": null,
+        "reference": null,
+        "reviewed_at": null,
+        "identity_disagreements": null,
+        "resolutions_reference": null
+      },
+      "coverage": {
+        "recorded_frames": null,
+        "annotated_frames": null,
+        "reviewed_frames": null,
+        "dense_fraction": null,
+        "unique_parent_frames": null,
+        "frames_with_multiple_human_box_annotations": null,
+        "fully_occluded_null_box_rows": null
+      },
+      "comparison_report": null,
+      "repeat_comparison_report": null
+    },
+    {
+      "scenario_id": "long_occlusion",
+      "requested_event": "long_occlusion",
+      "status": "AWAITING_REAL_INPUT",
+      "media": {
+        "path": null,
+        "sha256": null,
+        "bytes": null,
+        "source_description": null,
+        "parent_source_sha256": null,
+        "parent_start_decoded_index": null
+      },
+      "planned_minimum_dense_frames": 100,
+      "dataset_bundle": null,
+      "annotations_path": null,
+      "event": {
+        "human_verified": null,
+        "start_frame": null,
+        "end_frame": null,
+        "target_person_id": null,
+        "before_context_frames": null,
+        "after_context_frames": null
+      },
+      "independent_review": {
+        "annotator": null,
+        "reviewer": null,
+        "reference": null,
+        "reviewed_at": null,
+        "identity_disagreements": null,
+        "resolutions_reference": null
+      },
+      "coverage": {
+        "recorded_frames": null,
+        "annotated_frames": null,
+        "reviewed_frames": null,
+        "dense_fraction": null,
+        "unique_parent_frames": null,
+        "frames_with_multiple_human_box_annotations": null,
+        "fully_occluded_null_box_rows": null
+      },
+      "comparison_report": null,
+      "repeat_comparison_report": null
+    }
+  ]
+}
