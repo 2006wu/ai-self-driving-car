@@ -1,0 +1,31 @@
+{
+  "current_tracked_snapshot_count": 198,
+  "current_tracked_changed": [],
+  "historical_immutable_assets_count": 194,
+  "historical_immutable_assets_changed": [],
+  "historical_full_manifest_differences": [
+    ".gitignore",
+    "README.md",
+    "codex_command/README_OpenPilot_v0.9.1_Install_Replay.md",
+    "docs/IMPLEMENTATION.md",
+    "docs/PROJECT2.md",
+    "docs/PROJECT2_AUDIT.md",
+    "docs/README.md",
+    "projects/project2/agent/LIVE_REVIEW_20261014.md",
+    "reports/README.md",
+    "reports/manifest.json",
+    "reports/project1/Project1-Final-Report.pdf",
+    "reports/project1/Project1-Final-Report.pptx",
+    "reports/project2/Professor-Review-Refinement.md",
+    "reports/project2/Project2-Final-Report-v5.pdf",
+    "reports/project2/Project2-Final-Report-v5.pptx",
+    "reports/project2/Project2-Final-Report-v6.pdf",
+    "reports/project2/Project2-Final-Report-v6.pptx",
+    "reports/project2/Project2-Final-Report-v7.pdf",
+    "reports/project2/Project2-Final-Report-v7.pptx"
+  ],
+  "historical_manifest_note": "Older manifest is not this session baseline; tracked current files are separately compared to the initial snapshot. Old report locations do not establish current availability.",
+  "branch": "develop",
+  "head": "9a864c546f5121748079ad58df2879faf8ffb46c",
+  "pass": true
+}

@@ -1,0 +1,28 @@
+{
+  "tracked_files_checked": 198,
+  "changed": [],
+  "historic_protected_files_checked": 273,
+  "historic_changed": [
+    ".gitignore",
+    "README.md",
+    "codex_command/README_OpenPilot_v0.9.1_Install_Replay.md",
+    "docs/IMPLEMENTATION.md",
+    "docs/PROJECT2.md",
+    "docs/PROJECT2_AUDIT.md",
+    "docs/README.md",
+    "projects/project2/agent/LIVE_REVIEW_20261014.md",
+    "reports/README.md",
+    "reports/manifest.json",
+    "reports/project1/Project1-Final-Report.pdf",
+    "reports/project1/Project1-Final-Report.pptx",
+    "reports/project2/Professor-Review-Refinement.md",
+    "reports/project2/Project2-Final-Report-v5.pdf",
+    "reports/project2/Project2-Final-Report-v5.pptx",
+    "reports/project2/Project2-Final-Report-v6.pdf",
+    "reports/project2/Project2-Final-Report-v6.pptx",
+    "reports/project2/Project2-Final-Report-v7.pdf",
+    "reports/project2/Project2-Final-Report-v7.pptx"
+  ],
+  "scope": "Current tracked snapshot plus historical protected assets manifest; Docker volumes not accessed",
+  "pass": false
+}

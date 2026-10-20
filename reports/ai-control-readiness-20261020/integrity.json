@@ -1,0 +1,7 @@
+{
+  "export_frames": 1200,
+  "export_reproducible": true,
+  "baseline_fixture_metrics_identical": true,
+  "source_journal_sha256": "e089215b0fed197df5f88544556996551b1acb3c15b2b89dc8aee947adfab0ce",
+  "export_sha256": "846efc8ba74133b091fa64f6c7480c9a22a508d833f93816631be8f0e3407cfe"
+}
