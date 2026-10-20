@@ -95,7 +95,8 @@ def resolve_original_media(media, media_root=None):
     Relative paths resolve only against the media root, never the process cwd.
     An existing manifest path that differs in size or SHA256 fails immediately.
     A missing legacy absolute path may match a byte-identical file under the
-    media root (same path suffix or file name).
+    media root (same path suffix or file name). A candidate file that is present
+    there with a different size or SHA256 is a hash mismatch, not a missing file.
     """
     if not isinstance(media, dict):
         raise ValueError('invalid media reference')
@@ -136,6 +137,7 @@ def resolve_original_media(media, media_root=None):
             continue
         if candidate.stat().st_size == media['bytes'] and digest(candidate) == media['sha256']:
             return candidate.resolve()
+        raise ValueError('media found under media root but hash mismatch')
     return None
 
 
@@ -292,12 +294,13 @@ def load_bundle(directory, *, verify_pixels=False, media_root=None, require_medi
         raise ValueError('invalid/incomplete bundle: '+str(error)) from error
 
 
-def quality_report(directory, *, verify_pixels=False, media_root=None):
+def quality_report(directory, *, verify_pixels=False, media_root=None, require_media=False):
     """PASS when recorded data and original bytes check out.
 
     WARN when the journal and recorded hashes are intact but the original file
     is absent. FAIL on corruption, including a present file with the wrong size
-    or SHA256. WARN is not a pass of the media bytes.
+    or SHA256. verify_pixels or require_media also fails when that file is absent.
+    WARN is not a pass of the media bytes.
     """
     try:
         manifest, records = load_bundle(directory, verify_pixels=False, media_root=media_root, require_media=False)
@@ -306,9 +309,10 @@ def quality_report(directory, *, verify_pixels=False, media_root=None):
             load_bundle(directory, verify_pixels=verify_pixels, media_root=media_root, require_media=True)
             media_verified, pixels_verified = True, verify_pixels
         except OriginalMediaMissing as missing:
+            if verify_pixels or require_media:
+                reason = 'decoded pixel verification failed: ' if verify_pixels else 'original media required: '
+                raise ValueError(reason + str(missing)) from missing
             warnings.append(str(missing))
-            if verify_pixels:
-                warnings.append('decoded pixel verification skipped: original media is absent')
         counts = {'detections': sum(len(r['observations']['value']['detections']) for r in records),
                   'person_detections': sum(d['class_id'] == 0 for r in records for d in r['observations']['value']['detections']),
                   'visible_track_rows': sum(t['state'] == 'tracked' for r in records for t in r['observations']['value']['tracks']),

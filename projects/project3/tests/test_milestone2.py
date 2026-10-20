@@ -259,7 +259,9 @@ class ContractTests(OfflineFixture):
             load_bundle(self.bundle)
         self.assertIn('missing original media reference', str(caught.exception))
         (library/'source.avi').write_bytes(raw+b'not-the-original')
-        self.assertEqual(quality_report(self.bundle, media_root=library)['status'],'WARN')
+        mismatched=quality_report(self.bundle, media_root=library)
+        self.assertEqual(mismatched['status'],'FAIL')
+        self.assertIn('media found under media root but hash mismatch', mismatched['errors'][0])
         (library/'source.avi').write_bytes(raw)
         relocated=quality_report(self.bundle, media_root=library)
         self.assertEqual(relocated['status'],'PASS')
@@ -308,11 +310,16 @@ class ContractTests(OfflineFixture):
         pixels=self.root/'warn-pixels.json'
         result=subprocess.run([sys.executable,'-m','p3.research.offline','validate',str(self.bundle),'--output',str(pixels),'--verify-pixels'],
                               env=env,capture_output=True,text=True)
-        self.assertEqual(result.returncode,0,result.stderr)
-        skipped=loads(pixels.read_text())
-        self.assertEqual(skipped['status'],'WARN')
-        self.assertFalse(skipped['decoded_pixels_verified'])
-        self.assertTrue(any('pixel verification skipped' in item for item in skipped['warnings']))
+        self.assertEqual(result.returncode,2,result.stdout+result.stderr)
+        failed=loads(pixels.read_text())
+        self.assertEqual(failed['status'],'FAIL')
+        self.assertTrue(any('decoded pixel verification failed' in item for item in failed['errors']))
+        required=self.root/'require-media.json'
+        result=subprocess.run([sys.executable,'-m','p3.research.offline','validate',str(self.bundle),'--output',str(required),'--require-media'],
+                              env=env,capture_output=True,text=True)
+        self.assertEqual(result.returncode,2,result.stdout+result.stderr)
+        self.assertEqual(loads(required.read_text())['status'],'FAIL')
+        self.assertTrue(any('original media required' in item for item in loads(required.read_text())['errors']))
 
     def test_pixel_integrity_even_when_record_hash_recomputed(self):
         rows=copy.deepcopy(self.records); rows[0]['frame_reference']['decoded_bgr_sha256']='0'*64

@@ -2,6 +2,7 @@
 
 Original media may be an absolute path, or relative to --media-root / P3_MEDIA_ROOT.
 validate exits 0 with WARN when recorded data is intact but original media is absent.
+--require-media and --verify-pixels exit 2 when that file is absent.
 A present file whose size or SHA256 differs is still a failure.
 """
 import argparse
@@ -32,7 +33,10 @@ def main():
     add_media_root(record)
     quality = sub.add_parser('validate')
     quality.add_argument('dataset'); quality.add_argument('--output', required=True)
-    quality.add_argument('--verify-pixels', action='store_true')
+    quality.add_argument('--verify-pixels', action='store_true',
+                         help='Re-decode original frames and fail if the media file is absent or pixels differ.')
+    quality.add_argument('--require-media', action='store_true',
+                         help='Fail when the original media file is absent. Implied by --verify-pixels.')
     add_media_root(quality)
     annotate = sub.add_parser('template')
     annotate.add_argument('dataset'); annotate.add_argument('--output', required=True)
@@ -62,7 +66,8 @@ def main():
                                   method=args.tracker, selection_schedule=schedule, media_root=args.media_root)
             print(result['session_id'])
         elif args.command == 'validate':
-            report = quality_report(args.dataset, verify_pixels=args.verify_pixels, media_root=args.media_root)
+            report = quality_report(args.dataset, verify_pixels=args.verify_pixels, media_root=args.media_root,
+                                    require_media=args.require_media)
             json_write(args.output, report)
             if report['status'] == 'FAIL':
                 parser.exit(2, 'Dataset validation failed; see quality report.\n')

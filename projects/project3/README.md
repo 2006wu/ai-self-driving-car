@@ -293,11 +293,14 @@ including the samples under `reports/ai-control-milestone2-20261020/`, keep
 their original absolute paths and no `path_kind`. `validate` checks record
 order, the journal hash, and manifest identity either way. If the original file
 is absent, the command exits 0 with status `WARN` and names the missing media;
-that is not treated as a corrupt dataset. A file that is present but has a
-different size or SHA256 is still `FAIL`. `--verify-pixels` re-decodes when the
-file is available, and is reported as skipped when it is not. Point
-`--media-root` at a directory that contains a byte-identical copy to check
-those bytes on another machine. The contract is described in
+that is not treated as a corrupt dataset. `--require-media` makes that absence
+a `FAIL` (exit 2). A file that is present but has a different size or SHA256 is
+still `FAIL`, including a same-named file under the media root
+(`media found under media root but hash mismatch`). `--verify-pixels` re-decodes
+when the file is available. If the file is absent, pixel verification fails
+(exit 2) instead of skipping. Point `--media-root` at a directory that contains
+a byte-identical copy to check those bytes on another machine. The contract is
+described in
 [SCHEMA.md](../../reports/ai-control-milestone2-20261020/SCHEMA.md).
 
 `implementation_fingerprint()` hashes every `p3/**/*.py` file. That map is part
