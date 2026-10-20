@@ -7,7 +7,7 @@ from unittest.mock import patch
 import cv2
 import numpy as np
 
-from p3.detection import Detector, ROOT, decode, iou, map_boxes
+from p3.detection import Detector, MODEL, ROOT, decode, iou, map_boxes
 from p3.pipeline import Frames, run, render
 from p3.evaluation import stats, benchmark
 from p3.run2 import MockBindings, build_messages, run_ui, validate, PROCESSES
@@ -42,7 +42,10 @@ class GeometryTests(unittest.TestCase):
     def test_invalid_image(self):
         with self.assertRaises(ValueError): Detector.preprocess(np.zeros((3,3)))
     def test_baseline_nms_equivalence(self):
-        tree=ast.parse((ROOT/'external/aJLL/bodyjim/YoloPC.py').read_text())
+        path=ROOT/'external/aJLL/bodyjim/YoloPC.py'
+        if not path.is_file():
+            self.skipTest('YoloPC.py missing: external/aJLL/bodyjim/YoloPC.py (not in git)')
+        tree=ast.parse(path.read_text())
         functions=[n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name in
                    {'xywh2xyxy','compute_iou','non_max_suppression','nms'}]
         namespace={'np':np}
@@ -99,6 +102,8 @@ class InputTests(unittest.TestCase):
 class ModelIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        if not MODEL.is_file():
+            raise unittest.SkipTest('ONNX model missing: external/aJLL/bodyjim/yolov5n_flat.onnx (not in git; no automatic download)')
         cls.detector=Detector()
         cls.image=cv2.imread(str(ROOT/'projects/project3/artifacts/bus.jpg'))
         if cls.image is None: raise unittest.SkipTest('download bus fixture per README first')
@@ -115,7 +120,10 @@ class ModelIntegrationTests(unittest.TestCase):
         a,_=self.detector.predict(self.image);b,_=self.detector.predict(self.image)
         self.assertIs(session,self.detector.session);self.assertEqual(a,b)
     def test_original_preprocessing_and_real_nms(self):
-        tree=ast.parse((ROOT/'external/aJLL/bodyjim/YoloPC.py').read_text())
+        path=ROOT/'external/aJLL/bodyjim/YoloPC.py'
+        if not path.is_file():
+            self.skipTest('YoloPC.py missing: external/aJLL/bodyjim/YoloPC.py (not in git)')
+        tree=ast.parse(path.read_text())
         nodes=[n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name in
                {'xywh2xyxy','compute_iou','non_max_suppression','nms'}]
         runner=next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=='YoloRunner')

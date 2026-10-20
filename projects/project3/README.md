@@ -266,3 +266,42 @@ are retained. Runtime loop timing additionally includes export IO; session wall
 includes opening/journaling. CPU percent uses one core = 100% and may exceed 100%;
 RSS is sampled process memory, not continuous peak or GPU memory. Application
 skipped frames = 0 means no intentional skipping; sensor drops are N/A.
+
+## Opt-in offline research (`p3.research`)
+
+`p3.research` is not imported by `p3.cli` or the Run1/Run2 commands. Nothing in
+this package runs unless you start it. It records a local image or video into a
+v2 bundle (`manifest.json`, `records.jsonl`, `quality.json`) and can replay the
+existing greedy and Hungarian trackers on the stored detections. It does not
+open a camera, talk to hardware, or change follow/tracking defaults.
+
+From the repository root, with this component on `PYTHONPATH`:
+
+```sh
+PYTHONPATH=projects/project3 python -m p3.research.offline record path/to/clip.mp4 --output path/to/dataset --max-frames 120
+PYTHONPATH=projects/project3 python -m p3.research.offline validate path/to/dataset --output path/to/quality.json
+PYTHONPATH=projects/project3 python -m p3.research.offline template path/to/dataset --output path/to/annotations.json
+PYTHONPATH=projects/project3 python -m p3.research.offline extract path/to/dataset --output path/to/frames --frames 0,30
+PYTHONPATH=projects/project3 python -m p3.research.offline validate-annotations path/to/dataset path/to/annotations.json
+PYTHONPATH=projects/project3 python -m p3.research.offline evaluate path/to/dataset --output path/to/comparison.json
+```
+
+`--media-root` (or the `P3_MEDIA_ROOT` environment variable) stores and resolves
+the original media path relative to that directory. Recordings made without a
+media root still store an absolute path. Bundles written before this option,
+including the samples under `reports/ai-control-milestone2-20261020/`, keep
+their original absolute paths and no `path_kind`. `validate` checks record
+order, the journal hash, and manifest identity either way. If the original file
+is absent, the command exits 0 with status `WARN` and names the missing media;
+that is not treated as a corrupt dataset. A file that is present but has a
+different size or SHA256 is still `FAIL`. `--verify-pixels` re-decodes when the
+file is available, and is reported as skipped when it is not. Point
+`--media-root` at a directory that contains a byte-identical copy to check
+those bytes on another machine. The contract is described in
+[SCHEMA.md](../../reports/ai-control-milestone2-20261020/SCHEMA.md).
+
+`implementation_fingerprint()` hashes every `p3/**/*.py` file. That map is part
+of the manifest `identity`, and `session_id` is `offline-` plus the SHA256 of
+the canonical identity JSON. Any later change under `p3/` changes the session
+id of datasets recorded after that change. Manifests that are already written
+keep the fingerprints and session id they were saved with.

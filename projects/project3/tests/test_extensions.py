@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from p3.tracking import Tracker
 from p3.evaluation import benchmark
-from p3.detection import ROOT, Detector
+from p3.detection import ROOT, Detector, MODEL
 from p3.pipeline import run
 
 
@@ -64,6 +64,8 @@ class BenchmarkIntegrationTests(unittest.TestCase):
         self.assertEqual(a['metrics']['inference_ms']['count'],3)
         self.assertGreater(a['file_pipeline_fps'],0)
     def test_model_pipeline_short_video_eof_and_single_session(self):
+        if not MODEL.is_file():
+            self.skipTest('ONNX model missing: external/aJLL/bodyjim/yolov5n_flat.onnx (not in git; no automatic download)')
         with tempfile.TemporaryDirectory() as tmp:
             source=str(Path(tmp)/'test.avi')
             w=cv2.VideoWriter(source,cv2.VideoWriter_fourcc(*'MJPG'),10,(128,96))

@@ -2,6 +2,8 @@
 
 Date: 2026-10-20 (Asia/Taipei). Branch: **develop**. HEAD: **9a864c546f5121748079ad58df2879faf8ffb46c**. Initial working tree clean. No branch change, merge, commit or push.
 
+Clarification: the HEAD recorded above, and the "no commit" wording, are the inspection baseline from when this report was written, before these files were committed. They are not the commit that contains the report.
+
 Software preparation is implemented and tested in a separate opt-in package. Existing runtime behavior and every existing tracked file remain unchanged. This is not an AI driving model, physical robot control, hardware acceptance, real tracking accuracy evaluation or a closed-loop experiment.
 
 ## 1. Inspection and present architecture

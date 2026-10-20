@@ -13,7 +13,7 @@ from p3.pipeline import run, Frames
 from p3.tracking_eval import maximum_assignment, evaluate_sequence
 from p3.scenarios import scenario_suite
 from p3.evaluation import benchmark
-from p3.detection import ROOT
+from p3.detection import ROOT, MODEL
 
 
 def track(identity=1, x=140, state='tracked', width=40):
@@ -171,7 +171,12 @@ class PipelineSafetyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             with self.assertRaises(ValueError):run(FakeDetector(),'none',t,max_seconds=float('nan'))
     def test_benchmark_tracking_timings_real_model(self):
-        r=benchmark(ROOT/'projects/project3/artifacts/bus.jpg',samples=3,warmup=1,tracking=True,simulate_follow=True)
+        if not MODEL.is_file():
+            self.skipTest('ONNX model missing: external/aJLL/bodyjim/yolov5n_flat.onnx (not in git; no automatic download)')
+        image=ROOT/'projects/project3/artifacts/bus.jpg'
+        if not image.is_file():
+            self.skipTest('bus.jpg fixture missing')
+        r=benchmark(image,samples=3,warmup=1,tracking=True,simulate_follow=True)
         self.assertEqual(r['metrics']['tracking_ms']['count'],3);self.assertGreater(r['cpu_percent_one_core'],0)
         self.assertGreater(r['person_count']['mean'],0);self.assertEqual(r['application_skipped_frames'],0)
 
