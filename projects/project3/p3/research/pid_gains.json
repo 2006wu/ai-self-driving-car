@@ -1,0 +1,19 @@
+{
+  "derivative_tau": 0.15,
+  "integral_limit": 0.4,
+  "lateral_deadband": 0.015,
+  "lateral_kd": 0.12,
+  "lateral_ki": 0.06,
+  "lateral_kp": 0.85,
+  "longitudinal_deadband": 0.003,
+  "longitudinal_kd": 0.1,
+  "longitudinal_ki": 1.0,
+  "longitudinal_kp": 6.0,
+  "nominal_dt": 0.1,
+  "size_axis": "width",
+  "speed_limit": 0.3,
+  "speed_slew": 1.2,
+  "target_fraction": 0.2,
+  "turn_limit": 0.5,
+  "turn_slew": 1.5
+}
