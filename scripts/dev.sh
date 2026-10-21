@@ -32,6 +32,11 @@ case "$command" in
   up) "${compose[@]}" up -d compute display ;;
   status) "${compose[@]}" ps -a ;;
   p3) "${compose[@]}" run --rm --no-deps project3 python -m p3.cli "$@" ;;
+  p3-stream)
+    stream_url="http://host.docker.internal:8081/"
+    if [[ $# -gt 0 && "$1" != --* ]]; then stream_url="$1"; shift; fi
+    "${compose[@]}" run --rm --no-deps project3 python -m p3.cli run "stream:$stream_url" "$@"
+    ;;
   p3-display)
     "${compose[@]}" up -d compute display
     "${compose[@]}" run --rm --no-deps -e DISPLAY=:99 -e QT_QPA_PLATFORM=xcb \
@@ -71,6 +76,7 @@ Usage: ./scripts/dev.sh COMMAND [ARGS...]
   test-agent          Agent offline tests and canonical export verification
   test-p3             Project 3 unit and model integration tests in Docker
   p3 ARGS...          Project 3 CLI (check/run/benchmark/tracking-fixtures)
+  p3-stream [URL] ... Stream input (default http://host.docker.internal:8081/; host helper defaults to 30 fps)
   p3-display ARGS...  Project 3 CLI on existing VNC desktop (add --display)
   p3-python ARGS...   Python/module in Project 3 container
   agent ARGS...       Python/script in Agent container (keys forwarded by name)

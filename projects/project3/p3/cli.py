@@ -21,7 +21,7 @@ def main():
     check.add_argument('--output')
     for name in ['run','benchmark']:
         item = sub.add_parser(name)
-        item.add_argument('source')
+        item.add_argument('source', help='input file; run also accepts stream:URL (FFmpeg) or --camera INDEX')
         item.add_argument('--output', required=True)
         item.add_argument('--provider', default='CPUExecutionProvider')
         item.add_argument('--confidence', type=float, default=.3)
@@ -82,7 +82,7 @@ def main():
                           Tracker() if args.track else None,
                           FollowController() if args.simulate_follow else None,args.target_id,args.max_seconds,not args.no_record)
             save(Path(args.output)/'run.json',{'environment':environment(),'model':detector.info,
-                 'input':args.source,'input_sha256':None if args.camera else sha256(args.source),
+                 'input':args.source,'input_sha256':None if args.camera or args.source.startswith('stream:') else sha256(args.source),
                  'camera':args.camera,'display':args.display,'tracking':args.track,'max_frames':args.max_frames,
                  'scope':'acquisition + detector + optional tracking + overlay + optional GUI wait; export IO excluded',
                  'frames':records})
