@@ -865,3 +865,68 @@ only when you pass `--draft`.
 
 `summary.md` in that folder lists every figure and table with the source command
 and separates synthetic/simulated results from real-hardware results.
+
+## Body interface (simulation only)
+
+`p3.research.body_interface` is the Run4/Run5 software command boundary behind
+`SafetySupervisor`. It lives in `research` alongside the simulation contracts
+because this is an offline replay experiment, with no physical integration.
+**No real transport exists.** `MockTransport` and `DryRunTransport` record commands
+in memory only; `RealTransport` always raises `NotImplementedError`. Factory
+and interface defaults are `simulation_only=True`; `--transport real` is refused
+before creating output. No network, device discovery or hardware sends occur.
+
+From the Project 3 directory, using its Python 3.11 runtime (use
+`./scripts/dev.sh p3-python` from the repository root for the supported Docker
+path), choose a fresh output directory:
+
+```sh
+python -m p3.research.body_interface replay-sim --scenario straight_walk --controller pid --steps 100 --output artifacts/body-sim-001
+python -m p3.research.body_interface replay-log tests/fixtures/body-actions.jsonl --output artifacts/body-log-001
+```
+
+`replay-sim` consumes the existing simulator callback's supervisor-gated `safe`
+action. It observes that simulation; the body commands do not replace the
+simulator's dynamics input. `replay-log` accepts one JSON object per line:
+
+```json
+{"timestamp":0.1,"action":{"linear_velocity_command":0.3,"angular_velocity_command":0.2,"status":"TRACKING","source_controller":"pid","valid":true,"units":"normalized_simulation"}}
+```
+
+Timestamps are finite, nonnegative monotonic seconds in one replay clock.
+Actions use the existing `Action` constructor fields (`units` defaults to
+`normalized_simulation`). Log proposals pass through a fresh SafetySupervisor,
+rearmed once at replay start; STOP/invalid input latches it for the rest of the
+file. The tiny fixture demonstrates that subsequent motion cannot clear STOP.
+Programmatic callers must supply the supervisor's safe output to
+`BodyInterface.tick(action, now=...)`; `tick(now=...)` polls without a new action.
+The interface cannot prove an action's provenance or replace the supervisor.
+
+`BodyLimits` validates finite positive limits and acceleration budgets, with a
+0.25s watchdog. Speed [0, 0.3] maps to [0, max_linear], turn [-0.5, 0.5] maps to
+[-max_angular, max_angular]. Units are **body_normalized / uncalibrated**, not
+physical velocity or physical acceleration; defaults are 1 for each bound and
+acceleration. Defensive clamping handles finite out-of-range input; malformed,
+non-finite or invalid tracking input produces zero and a diagnostic fault flag.
+A supervisor STOP produces zero immediately. Fault flags persist for diagnosis.
+
+E-stop latch overrides watchdog, clamping and acceleration; `estop(reason)`
+emits zero immediately. Only explicit `reset_estop()` clears the latch, after a
+valid explicit zero action received since the latch was set, with no intervening
+nonzero input. No-command ticks never count as the required zero input.
+Watchdog emits zero on every tick more than 0.25s after the last received action.
+Callers must continue ticking; there is no background timer. Acceleration is
+limited by elapsed time, while magnitude reductions and stops are immediate.
+Angular reversals brake to zero then accelerate in the opposite direction.
+The first tick and any tick following a gap longer than the watchdog have zero
+acceleration budget, preventing an idle interval from accumulating a burst.
+Invalid/backwards clock readings are rejected before emission.
+
+Each emitted command has a sequence, timestamp, source and reason codes in the
+interface history. CLI output writes `commands.jsonl` with those records and
+`summary.json` with reason counts, per-axis maximum absolute change between
+consecutive ticks, `simulation_only: true`, transport name and uncalibrated units.
+Reasons are `ok`, `clamped`, `rate_limited`, `watchdog_zero`, `estop_latched`,
+`invalid_input`, and `supervisor_stop`; clamped acceleration can record both
+`clamped` and `rate_limited`. All results are synthetic/offline simulation,
+separate from real hardware acceptance, which remains untested.
