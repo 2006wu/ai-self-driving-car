@@ -634,3 +634,99 @@ Validation for this change: 18 new tests pass in approximately 0.13s; full suite
 The full suite took approximately 12s. Generated local comparison and test log
 are under the fresh `artifacts/pid-sim-tuned/` directory; initial exploratory
 results remain preserved under `artifacts/pid-sim/`.
+
+## Control training dataset (comma body / AI-control direction)
+
+`p3.research.control_dataset` builds versioned observation/action pairs without
+copying images or sending commands. These are **synthetic teacher datasets** or
+**offline recorded-run exports**, not real hardware acceptance or human driving.
+From the repository root (output paths are relative to Project 3 in Docker):
+
+```sh
+./scripts/dev.sh p3-python -m p3.research.control_dataset build-sim --output artifacts/control-training-v1 --controllers pid,rule --episodes-per-scenario 3 --seed 7 --steps 100
+./scripts/dev.sh p3-python -m p3.research.control_dataset build-recorded --events artifacts/my-run/events.jsonl artifacts/my-bundle/dataset --output artifacts/control-recorded-v1
+./scripts/dev.sh p3-python -m p3.research.control_dataset validate artifacts/control-training-v1
+./scripts/dev.sh p3-python -m p3.research.control_dataset stats artifacts/control-training-v1
+```
+
+`--scenarios` accepts comma-separated names: `straight_walk,turn,stop_go,lateral_step,occlusion,too_close`.
+Optional `--perturb` uses a private seeded `random.Random` to vary the simulated
+robot maximum linear speed by a factor in [0.8, 1.2]. Both teachers share each
+scenario's factor; episode metadata includes the factor, seed, index, steps,
+full simulator configuration and PID gains. It changes only this opt-in dataset
+experiment. Without perturbations, repeated episodes intentionally duplicate
+trajectories and are not independent experimental evidence.
+
+Schema **`p3_control_dataset/1.0`** stores each sample's content-derived sample ID,
+episode ID, split, step, timestamp, source kind and SHA256 reference; `frame_ref`
+is a `sha256:<media hash>#decoded_frame=<index>` URI when available, otherwise
+null. Simulation timestamps are seconds before action with clock
+`simulation_seconds`; event timestamps retain `session_elapsed_monotonic` /
+`journal_emission`, while v2 timestamps describe `processing_complete`. Neither
+recorded timestamp represents camera exposure time. Source references hash the
+event/record file or canonical simulator configuration/scenario/controller/gains.
+
+Observations contain frame height/width, selected-target visibility, normalized
+bbox corners (pixel x / width, pixel y / height), centre offset in [-1, 1], width
+and height fractions, track count, follow state/reason and measured age in seconds.
+A missing or invisible target has null geometry. A v2 tracker selection does not
+imply the follow controller has selected that target. Unknown fields remain null
+and are enumerated in `missing_fields`; no zero imputation occurs.
+
+`FEATURES` (also `FEATURE`) defines the fixed numeric input order:
+`frame_height, frame_width, target_visible, bbox_x1, bbox_y1, bbox_x2, bbox_y2,
+centre_offset, width_fraction, height_fraction, number_of_tracks, age_seconds`.
+`feature_vector` follows that order (boolean visibility, numbers, or null).
+Follow state/reason are retained as context outside the numeric vector. `ACTIONS`
+is `[linear, angular]`. Teacher actions include controller `pid` or `rule`, status,
+validity and units `normalized_simulation`. Safety stores supervisor latch/fault
+and the final gated command actually submitted to **CommandReplay** in simulation.
+Recorded runs do not log this independent gate, so those fields are null; teacher
+labels are never presented as physical actuator commands. Simulation distance
+and bearing are in `sim_ground_truth`, explicitly marked `privileged: true` and
+`for_model_input: false`, and excluded from the feature vector.
+
+Output directories must not exist. Each contains canonical JSON-lines files
+`samples-{train,val,test}.jsonl`, `stats.json`, and `manifest.json` with schema,
+version, creation configuration, feature/action names, episode metadata, excluded
+teacherless-row count, split counts and file SHA256s. Stats include population
+mean/std/min/max and missing counts for features/actions, zero-command STOP
+fraction, status counts and per-scenario/controller row counts. Empty splits have
+null distribution statistics. Both building and `stats` print the report;
+`validate` recomputes all hashes and statistics and checks sample structure,
+finite numbers, feature length, unique IDs and strictly increasing episode steps.
+
+Splits hash **episode IDs only**, with default train/val/test ratios 70/15/15;
+`--ratios 0.7,0.15,0.15` overrides them. An episode cannot appear in multiple
+splits, and validation checks this guarantee and the split hash assignment.
+Small datasets need not match the ratios exactly. Related scenarios, alternate
+teachers and repeated synthetic trajectories can still be correlated across
+episodes; episode separation alone does not establish generalization.
+
+The checked-in fixture at `p3/research/samples/control-dataset-sample/` has 48
+synthetic samples. Regenerate into a **new directory** and compare its five files;
+there are no build timestamps or output paths in their identity, so the same
+code/configuration gives a deterministic, byte-identical rebuild:
+
+```sh
+./scripts/dev.sh p3-python -m p3.research.control_dataset build-sim --output artifacts/control-sample-rebuilt --steps 4 --seed 7
+./scripts/dev.sh p3-python -m p3.research.control_dataset validate p3/research/samples/control-dataset-sample
+```
+
+Teachers are PID/rule heuristics, not human driving. Pinhole boxes and simple
+unicycle dynamics do not reproduce real perception, calibration or vehicle
+behavior. Recorded runs lack physical commands, measured emergency-stop state
+and camera exposure times; event journals also lack geometry. Bundle import
+reuses v2 integrity/media-root resolution (`--media-root` or `P3_MEDIA_ROOT`),
+permits missing original media, and never decodes or copies pixels. A present
+original with an incorrect hash still fails. No media-byte verification is
+claimed when it is absent.
+
+This is not real comma body data yet. A future real log adapter would need
+synchronized exposure/observation and actuator timestamps with documented clocks,
+calibrated units and coordinate frames, camera dimensions and hashed media
+references, target/tracking associations, human or controller action provenance,
+command validity plus requested versus actually gated actuator commands, measured
+robot motion/odometry and independent stop/fault state. Human review, real-world
+coverage and separate hardware acceptance would still be required before any
+physical-control claims. No model training or hardware adapter is included here.

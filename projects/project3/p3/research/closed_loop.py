@@ -80,7 +80,7 @@ def _rms(values):
 
 
 def run_scenario(controller, scenario, steps=200, config=None, seed=None,
-                 operator_reselect_steps=()):
+                 operator_reselect_steps=(), on_step=None):
     """Select once at start. Optional step numbers explicitly model operator r.
 
     Settled: both errors stay within .05 offset/.2m through end of run.
@@ -132,6 +132,11 @@ def run_scenario(controller, scenario, steps=200, config=None, seed=None,
         latched += gate.latched or controller.legacy.latched
         faults += gate.faulted
         rows.append([safe.linear_velocity_command, safe.angular_velocity_command])
+        if on_step is not None:
+            on_step(step, observation, proposed, safe, gate.latched, gate.faulted,
+                    {'distance_m': distance,
+                     'bearing_rad': math.atan2(left, math.cos(robot[2])*(person[0]-robot[0])
+                                               + math.sin(robot[2])*(person[1]-robot[1]))})
         angle = robot[2]
         if abs(omega) > 1e-12:
             robot[0] += v/omega*(math.sin(angle+omega*c.dt)-math.sin(angle))
