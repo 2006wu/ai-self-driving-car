@@ -27,13 +27,12 @@ The course baseline and its compatibility adapter remain required.
 
 ## Environment
 
-Use the isolated Python 3.11 environment, separate from ModelB6 Python 3.8
-and Project 1/OpenPilot. Existing locked dependencies are unchanged.
+Use the Python 3.11 Docker service, separate from ModelB6 Python 3.8
+and Project 1/OpenPilot. Dependencies are installed only in the image.
 
 ```sh
-/usr/local/bin/python3.11 -m venv projects/project2/agent/.venv
-projects/project2/agent/.venv/bin/python -m pip install -r projects/project2/agent/requirements.txt
-projects/project2/agent/.venv/bin/python -m pip check
+./scripts/dev.sh build agent
+./scripts/dev.sh test-agent
 ```
 
 `model_config.py` supplies the default runtime model (`gemini-3.8-flash`), with
@@ -44,11 +43,11 @@ Agno constructor arguments without executing professor top-level API calls.
 ## Offline commands (repository root)
 
 ```sh
-projects/project2/agent/.venv/bin/python projects/project2/agent/baseline_check.py
-projects/project2/agent/.venv/bin/python -m unittest discover -s projects/project2/agent -p '*_tests.py' -v
-projects/project2/agent/.venv/bin/python projects/project2/agent/prepare_v2.py --verify
-projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent.py --offline
-projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --list-images
+./scripts/dev.sh agent baseline_check.py
+./scripts/dev.sh test-agent
+./scripts/dev.sh agent prepare_v2.py --verify
+./scripts/dev.sh agent diagnosis_agent.py --offline
+./scripts/dev.sh agent vision_agent.py --list-images
 ```
 
 For a fresh evidence export, run `prepare_v2.py` without `--verify`; it reads
@@ -64,10 +63,10 @@ if not set -q GOOGLE_API_KEY
     read --silent --prompt-str 'GOOGLE_API_KEY: ' GOOGLE_API_KEY
     set -gx GOOGLE_API_KEY $GOOGLE_API_KEY
 end
-projects/project2/agent/.venv/bin/python projects/project2/agent/baseline_agent.py
-projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent.py
-projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --image step6/usa/final/frame_00001.png
-projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --image step6/taiwan/best/frame_00001.png --unified
+./scripts/dev.sh agent baseline_agent.py
+./scripts/dev.sh agent diagnosis_agent.py
+./scripts/dev.sh agent vision_agent.py --image step6/usa/final/frame_00001.png
+./scripts/dev.sh agent vision_agent.py --image step6/taiwan/best/frame_00001.png --unified
 ```
 
 ## Recorded acceptance status

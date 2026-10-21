@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import cv2
 import numpy as np
-from p3.follow import FollowController, valid_box
+from p3.follow import FollowController
 from p3.tracking import Tracker
 from p3.pipeline import run, Frames
 from p3.tracking_eval import maximum_assignment, evaluate_sequence

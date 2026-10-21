@@ -1,0 +1,10 @@
+NAME                          IMAGE                         COMMAND                  SERVICE   CREATED         STATUS                   PORTS
+ai-self-driving-car-compute   ai-self-driving-car-compute   "/usr/local/bin/comp…"   compute   8 minutes ago   Up 8 minutes (healthy)
+ai-self-driving-car-display   ai-self-driving-car-display   "/usr/local/bin/disp…"   display   8 minutes ago   Up 8 minutes (healthy)   127.0.0.1:6080->6080/tcp, 127.0.0.1:5910->5900/tcp
+Python 3.8.10
+{"ok": true, "service": "openpilot-compute", "request": {"op": "health", "client": "display"}, "repo": "/opt/openpilot", "data_dir": "/data"}
+29
+35
+36
+Connection to 127.0.0.1 port 5910 [tcp/*] succeeded!
+Containers, core assets, display ports, and health socket: PASS (does not certify replay video).

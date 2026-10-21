@@ -1,0 +1,3323 @@
+{
+  "annotation_kind": "synthetic_ground_truth",
+  "seed": 2026,
+  "scope": "Synthetic boxes only; no real identity or physical safety evidence.",
+  "parameters": {
+    "frames": 30,
+    "box_width": 40,
+    "box_height": 80,
+    "crossing_speed": 8,
+    "crossing_start": 284,
+    "fast_speed": 22,
+    "warmup_frames": 5,
+    "occlusion_frames": [
+      10,
+      11,
+      12
+    ],
+    "dropout_frames": [
+      8,
+      17
+    ],
+    "jitter_std": 2.0,
+    "tracker": {
+      "threshold": 0.3,
+      "max_missed": 5
+    },
+    "evaluation_iou": 0.5
+  },
+  "scenarios": {
+    "crossing": {
+      "seed": 2026,
+      "methods": {
+        "greedy_iou": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 34,
+          "IDFN": 26,
+          "IDFP": 26,
+          "IDF1": 0.5666666666666667,
+          "ID_precision": 0.5666666666666667,
+          "ID_recall": 0.5666666666666667,
+          "ID_switches": 2,
+          "track_fragmentations": 0,
+          "detection_matches": 60,
+          "ground_truth_detections": 60,
+          "predicted_detections": 60,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            },
+            "2": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 0,
+            "same_initial_id_recoveries": 0,
+            "rate": null
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            }
+          ]
+        },
+        "hungarian": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 34,
+          "IDFN": 26,
+          "IDFP": 26,
+          "IDF1": 0.5666666666666667,
+          "ID_precision": 0.5666666666666667,
+          "ID_recall": 0.5666666666666667,
+          "ID_switches": 2,
+          "track_fragmentations": 0,
+          "detection_matches": 60,
+          "ground_truth_detections": 60,
+          "predicted_detections": 60,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            },
+            "2": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 0,
+            "same_initial_id_recoveries": 0,
+            "rate": null
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 1,
+                "2": 2
+              }
+            }
+          ]
+        },
+        "kalman_iou": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 60,
+          "IDFN": 0,
+          "IDFP": 0,
+          "IDF1": 1.0,
+          "ID_precision": 1.0,
+          "ID_recall": 1.0,
+          "ID_switches": 0,
+          "track_fragmentations": 0,
+          "detection_matches": 60,
+          "ground_truth_detections": 60,
+          "predicted_detections": 60,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            },
+            "2": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 0,
+            "same_initial_id_recoveries": 0,
+            "rate": null
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "2": 1,
+                "1": 2
+              }
+            }
+          ]
+        }
+      }
+    },
+    "fast_lateral": {
+      "seed": 2027,
+      "methods": {
+        "greedy_iou": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 6,
+          "IDFN": 24,
+          "IDFP": 24,
+          "IDF1": 0.2,
+          "ID_precision": 0.2,
+          "ID_recall": 0.2,
+          "ID_switches": 24,
+          "track_fragmentations": 0,
+          "detection_matches": 30,
+          "ground_truth_detections": 30,
+          "predicted_detections": 30,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 0,
+            "same_initial_id_recoveries": 0,
+            "rate": null
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 3
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "1": 4
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 5
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "1": 6
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "1": 7
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "1": 8
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 9
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 10
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 11
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 12
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 13
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 14
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 15
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 16
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 17
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 18
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 19
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 20
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 21
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 22
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 23
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 24
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 25
+              }
+            }
+          ]
+        },
+        "hungarian": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 6,
+          "IDFN": 24,
+          "IDFP": 24,
+          "IDF1": 0.2,
+          "ID_precision": 0.2,
+          "ID_recall": 0.2,
+          "ID_switches": 24,
+          "track_fragmentations": 0,
+          "detection_matches": 30,
+          "ground_truth_detections": 30,
+          "predicted_detections": 30,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 0,
+            "same_initial_id_recoveries": 0,
+            "rate": null
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 3
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "1": 4
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 5
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "1": 6
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "1": 7
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "1": 8
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 9
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 10
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 11
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 12
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 13
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 14
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 15
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 16
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 17
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 18
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 19
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 20
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 21
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 22
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 23
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 24
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 25
+              }
+            }
+          ]
+        },
+        "kalman_iou": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 30,
+          "IDFN": 0,
+          "IDFP": 0,
+          "IDF1": 1.0,
+          "ID_precision": 1.0,
+          "ID_recall": 1.0,
+          "ID_switches": 0,
+          "track_fragmentations": 0,
+          "detection_matches": 30,
+          "ground_truth_detections": 30,
+          "predicted_detections": 30,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 0,
+            "same_initial_id_recoveries": 0,
+            "rate": null
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    "short_occlusion": {
+      "seed": 2028,
+      "methods": {
+        "greedy_iou": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 17,
+          "IDFN": 13,
+          "IDFP": 10,
+          "IDF1": 0.5964912280701754,
+          "ID_precision": 0.6296296296296297,
+          "ID_recall": 0.5666666666666667,
+          "ID_switches": 1,
+          "track_fragmentations": 1,
+          "detection_matches": 27,
+          "ground_truth_detections": 30,
+          "predicted_detections": 27,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 0.9,
+              "longest_consecutive_match_fraction": 0.5666666666666667
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 1,
+            "same_initial_id_recoveries": 0,
+            "rate": 0.0
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {}
+            },
+            {
+              "frame": 11,
+              "matches": {}
+            },
+            {
+              "frame": 12,
+              "matches": {}
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 2
+              }
+            }
+          ]
+        },
+        "hungarian": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 17,
+          "IDFN": 13,
+          "IDFP": 10,
+          "IDF1": 0.5964912280701754,
+          "ID_precision": 0.6296296296296297,
+          "ID_recall": 0.5666666666666667,
+          "ID_switches": 1,
+          "track_fragmentations": 1,
+          "detection_matches": 27,
+          "ground_truth_detections": 30,
+          "predicted_detections": 27,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 0.9,
+              "longest_consecutive_match_fraction": 0.5666666666666667
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 1,
+            "same_initial_id_recoveries": 0,
+            "rate": 0.0
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {}
+            },
+            {
+              "frame": 11,
+              "matches": {}
+            },
+            {
+              "frame": 12,
+              "matches": {}
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 2
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 2
+              }
+            }
+          ]
+        },
+        "kalman_iou": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 27,
+          "IDFN": 3,
+          "IDFP": 0,
+          "IDF1": 0.9473684210526315,
+          "ID_precision": 1.0,
+          "ID_recall": 0.9,
+          "ID_switches": 0,
+          "track_fragmentations": 1,
+          "detection_matches": 27,
+          "ground_truth_detections": 30,
+          "predicted_detections": 27,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 0.9,
+              "longest_consecutive_match_fraction": 0.5666666666666667
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 1,
+            "same_initial_id_recoveries": 1,
+            "rate": 1.0
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {}
+            },
+            {
+              "frame": 11,
+              "matches": {}
+            },
+            {
+              "frame": 12,
+              "matches": {}
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    "jitter": {
+      "seed": 2029,
+      "methods": {
+        "greedy_iou": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 30,
+          "IDFN": 0,
+          "IDFP": 0,
+          "IDF1": 1.0,
+          "ID_precision": 1.0,
+          "ID_recall": 1.0,
+          "ID_switches": 0,
+          "track_fragmentations": 0,
+          "detection_matches": 30,
+          "ground_truth_detections": 30,
+          "predicted_detections": 30,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 0,
+            "same_initial_id_recoveries": 0,
+            "rate": null
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 1
+              }
+            }
+          ]
+        },
+        "hungarian": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 30,
+          "IDFN": 0,
+          "IDFP": 0,
+          "IDF1": 1.0,
+          "ID_precision": 1.0,
+          "ID_recall": 1.0,
+          "ID_switches": 0,
+          "track_fragmentations": 0,
+          "detection_matches": 30,
+          "ground_truth_detections": 30,
+          "predicted_detections": 30,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 0,
+            "same_initial_id_recoveries": 0,
+            "rate": null
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 1
+              }
+            }
+          ]
+        },
+        "kalman_iou": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 30,
+          "IDFN": 0,
+          "IDFP": 0,
+          "IDF1": 1.0,
+          "ID_precision": 1.0,
+          "ID_recall": 1.0,
+          "ID_switches": 0,
+          "track_fragmentations": 0,
+          "detection_matches": 30,
+          "ground_truth_detections": 30,
+          "predicted_detections": 30,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 1.0,
+              "longest_consecutive_match_fraction": 1.0
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 0,
+            "same_initial_id_recoveries": 0,
+            "rate": null
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    "dropout": {
+      "seed": 2030,
+      "methods": {
+        "greedy_iou": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 28,
+          "IDFN": 2,
+          "IDFP": 0,
+          "IDF1": 0.9655172413793104,
+          "ID_precision": 1.0,
+          "ID_recall": 0.9333333333333333,
+          "ID_switches": 0,
+          "track_fragmentations": 2,
+          "detection_matches": 28,
+          "ground_truth_detections": 30,
+          "predicted_detections": 28,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 0.9333333333333333,
+              "longest_consecutive_match_fraction": 0.4
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 2,
+            "same_initial_id_recoveries": 2,
+            "rate": 1.0
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {}
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {}
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 1
+              }
+            }
+          ]
+        },
+        "hungarian": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 28,
+          "IDFN": 2,
+          "IDFP": 0,
+          "IDF1": 0.9655172413793104,
+          "ID_precision": 1.0,
+          "ID_recall": 0.9333333333333333,
+          "ID_switches": 0,
+          "track_fragmentations": 2,
+          "detection_matches": 28,
+          "ground_truth_detections": 30,
+          "predicted_detections": 28,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 0.9333333333333333,
+              "longest_consecutive_match_fraction": 0.4
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 2,
+            "same_initial_id_recoveries": 2,
+            "rate": 1.0
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {}
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {}
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 1
+              }
+            }
+          ]
+        },
+        "kalman_iou": {
+          "annotation_kind": "synthetic_ground_truth",
+          "scope": "synthetic evaluator logic only",
+          "iou_threshold": 0.5,
+          "IDTP": 28,
+          "IDFN": 2,
+          "IDFP": 0,
+          "IDF1": 0.9655172413793104,
+          "ID_precision": 1.0,
+          "ID_recall": 0.9333333333333333,
+          "ID_switches": 0,
+          "track_fragmentations": 2,
+          "detection_matches": 28,
+          "ground_truth_detections": 30,
+          "predicted_detections": 28,
+          "track_continuity": {
+            "1": {
+              "matched_visible_fraction": 0.9333333333333333,
+              "longest_consecutive_match_fraction": 0.4
+            }
+          },
+          "target_recovery": {
+            "eligible_completed_gaps": 2,
+            "same_initial_id_recoveries": 2,
+            "rate": 1.0
+          },
+          "matching": "global identity assignment counts all IoU-qualified pairs; local frame assignment maximizes match count then IoU",
+          "fragmentation_definition": "matched -> unmatched while GT present -> matched; absent GT alone is not an FN/fragment",
+          "switch_definition": "new prediction ID versus last matched ID for the same annotated GT, including across gaps",
+          "limitations": "No MOT ignore regions/classes/visibility preprocessing; target ID recovery is not person recognition or permission to resume follow.",
+          "per_frame": [
+            {
+              "frame": 0,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 1,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 2,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 3,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 4,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 5,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 6,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 7,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 8,
+              "matches": {}
+            },
+            {
+              "frame": 9,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 10,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 11,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 12,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 13,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 14,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 15,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 16,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 17,
+              "matches": {}
+            },
+            {
+              "frame": 18,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 19,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 20,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 21,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 22,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 23,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 24,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 25,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 26,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 27,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 28,
+              "matches": {
+                "1": 1
+              }
+            },
+            {
+              "frame": 29,
+              "matches": {
+                "1": 1
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

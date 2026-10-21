@@ -1,0 +1,5 @@
+ Container ai-self-driving-car-compute  Running
+ Container ai-self-driving-car-display  Running
+ Container ai-self-driving-car-compute  Waiting
+ Container ai-self-driving-car-compute  Healthy
+processed 120 frame(s); evidence: artifacts/docker-validation-20261021/gui

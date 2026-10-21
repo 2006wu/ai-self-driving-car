@@ -1,15 +1,16 @@
 # Diagnosis／Unified 執行、輸出與驗收
 
-本機讀取已匯出的證據，不需要 Docker。需要使用者終端機已設定
-`GOOGLE_API_KEY`。以下指令從 Repository 根目錄執行。
+統一在 Docker 的 Agent 容器內讀取已匯出的證據；macOS 不需要 Python 環境。
+Live 執行需要終端機已設定 `GOOGLE_API_KEY`，由入口按名稱轉交容器。
+以下指令從 Repository 根目錄執行，首次先跑 `./scripts/dev.sh build agent`。
 
 ## 日常執行
 
 先執行一個，結束後再執行另一個：
 
 ```sh
-projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent.py --model gemini-3.5-flash-lite
-projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --image step6/taiwan/best/frame_00001.png --unified --model gemini-3.5-flash-lite
+./scripts/dev.sh agent diagnosis_agent.py --model gemini-3.5-flash-lite
+./scripts/dev.sh agent vision_agent.py --image step6/taiwan/best/frame_00001.png --unified --model gemini-3.5-flash-lite
 ```
 
 原本 `GEMINI_MODEL_ID=gemini-3.5-flash-lite ...` 的寫法也可繼續使用。
@@ -44,7 +45,7 @@ SDK HTTP timeout 只是其中一層，不能替代整體逾時。
 想先不重試：
 
 ```sh
-projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent.py --model gemini-3.5-flash-lite --retries 0
+./scripts/dev.sh agent diagnosis_agent.py --model gemini-3.5-flash-lite --retries 0
 ```
 
 查證模式需要較長時間時，可明確調整，例如
@@ -59,8 +60,8 @@ projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent
 `--tool-mode verify`：用同一批唯讀工具，要求與任務相關的自主查證並檢查結果。
 
 ```sh
-projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent.py --model gemini-3.5-flash-lite --tool-mode verify
-projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --image step6/taiwan/best/frame_00001.png --unified --model gemini-3.5-flash-lite --tool-mode verify
+./scripts/dev.sh agent diagnosis_agent.py --model gemini-3.5-flash-lite --tool-mode verify
+./scripts/dev.sh agent vision_agent.py --image step6/taiwan/best/frame_00001.png --unified --model gemini-3.5-flash-lite --tool-mode verify
 ```
 
 Diagnosis 要求 training／gradient／encoder 工具及 overfitting claim 檢查；
@@ -101,7 +102,7 @@ projects/project2/agent/artifacts/live-runs/YYYYMMDD-HHMMSS-MODE-ID/
 需要舊版的完整 JSON stdout，附加 `--json`；進度仍寫到 stderr，便於分流：
 
 ```sh
-projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent.py --model gemini-3.5-flash-lite --json > /tmp/diagnosis-result.json
+./scripts/dev.sh agent diagnosis_agent.py --model gemini-3.5-flash-lite --json > /tmp/diagnosis-result.json
 ```
 
 沒有 API Key 時會在送出前停止；檔案解析／schema／來源驗證錯誤也不重試。
@@ -120,9 +121,9 @@ projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent
 ## 離線驗證
 
 ```sh
-projects/project2/agent/.venv/bin/python -m unittest discover -s projects/project2/agent -p '*_tests.py' -v
-projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent.py --offline
-projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --image step6/taiwan/best/frame_00001.png --unified --offline
+./scripts/dev.sh test-agent
+./scripts/dev.sh agent diagnosis_agent.py --offline
+./scripts/dev.sh agent vision_agent.py --image step6/taiwan/best/frame_00001.png --unified --offline
 ```
 
 本次新增測試使用假的回覆或不連網子程序，沒有呼叫 Gemini。

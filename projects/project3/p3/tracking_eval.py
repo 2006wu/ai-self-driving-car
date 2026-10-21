@@ -7,8 +7,7 @@ complete MOTChallenge preprocessing/ignore-region compatibility.
 """
 from collections import Counter, defaultdict
 import math
-from .detection import iou
-from .follow import valid_box
+from .geometry import iou, valid_box
 
 
 def maximum_assignment(weights):

@@ -2,3 +2,15 @@
 # TensorFlow wheel is needed in the ModelB6 build context.
 projects/project2/modelb6/wheelhouse/*.part
 projects/project2/modelb6/wheelhouse/*.assembling
+.git
+**/.venv
+**/__pycache__
+**/.env
+**/.env.*
+**/*.ppk
+course-materials
+reports
+projects/project2/agent/artifacts
+projects/project2/modelb6/artifacts
+projects/project2/modelb6/derived-data
+projects/project3/artifacts

@@ -1,7 +1,6 @@
 name: ai-self-driving-car
 
-# Both services use amd64 because openpilot v0.9.1 targets x86_64 Linux.
-# Docker Desktop runs these containers through Apple Silicon emulation.
+# OpenPilot/ModelB6 use amd64; Agent and Project 3 use the host's native Linux arch.
 services:
   compute:
     build:
@@ -77,7 +76,7 @@ services:
       start_period: 30s
 
   modelb6:
-    profiles: ["project2"]
+    profiles: ["project2", "all"]
     build:
       context: ..
       dockerfile: docker/Dockerfile.modelb6
@@ -89,6 +88,7 @@ services:
       TF_CPP_MIN_LOG_LEVEL: "2"
       MPLCONFIGDIR: "/tmp/matplotlib"
     volumes:
+      - ../projects/project2/modelb6:/workspace/student:ro
       - ../external/aJLL/ModelB6:/workspace/professor:ro
       - openpilot-repo:/opt/openpilot:ro
       - replay-data:/data:ro
@@ -98,6 +98,48 @@ services:
     tmpfs:
       - /tmp
     command: ["python3.8", "/workspace/student/compatibility_check.py"]
+
+  agent:
+    profiles: ["project2", "all"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.agent
+    working_dir: /workspace/projects/project2/agent
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      P2_OUTPUT_MOUNTED: "1"
+      HOME: /tmp
+      XDG_CACHE_HOME: /tmp/cache
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: safe.directory
+      GIT_CONFIG_VALUE_0: /workspace
+    volumes:
+      - ..:/workspace:ro
+      - ../projects/project2/agent/artifacts:/workspace/projects/project2/agent/artifacts
+      - modelb6-output:/output:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  project3:
+    profiles: ["project3", "all"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.project3
+    working_dir: /workspace/projects/project3
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      QT_QPA_PLATFORM: offscreen
+      PYTHONPATH: /workspace/projects/project3
+      HOME: /tmp
+      QT_X11_NO_MITSHM: "1"
+    volumes:
+      - ..:/workspace:ro
+      - ../projects/project3/artifacts:/workspace/projects/project3/artifacts
+      - replay-data:/data:ro
+    read_only: true
+    tmpfs:
+      - /tmp
 
 volumes:
   openpilot-repo:

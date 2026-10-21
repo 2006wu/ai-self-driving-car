@@ -1,7 +1,6 @@
-"""Optional assignment-only experiment; baseline/default tracker is unchanged."""
+"""Optional research trackers; baseline/default tracker is unchanged."""
 from ..tracking import Tracker
-from ..follow import valid_box
-from ..detection import iou
+from ..geometry import iou, valid_box
 from ..tracking_eval import maximum_assignment
 
 
@@ -48,4 +47,7 @@ def create_tracker(method='greedy_iou', **kwargs):
         return Tracker(**kwargs)
     if method == 'hungarian':
         return HungarianTracker(**kwargs)
+    if method == 'kalman_iou':
+        from .motion_tracking import KalmanIoUTracker
+        return KalmanIoUTracker(**kwargs)
     raise ValueError('unknown tracker method')
