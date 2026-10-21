@@ -39,6 +39,12 @@ not cereal compatibility, camera input, UI or inference.
 
 ## Isolated startup and observation
 
+For the software log checklist, run `python -m p3.research.run2_acceptance
+SESSION_DIR --report NEW_REPORT.md --json NEW_REPORT.json`. See README's
+Run2 session section for supported logs, measurement sidecars and thresholds.
+Missing measurements are NOT_MEASURED; synthetic fixture PASS is not hardware
+acceptance. This checker does not perform any device interaction.
+
 - [ ] Compare exact reference SHA against `evidence/source-audit.json`.
 - [ ] Agree on a version-compatible student adapter and process/parameter rollback.
 - [ ] Ensure no conflicting device processes publish the same services.

@@ -963,3 +963,99 @@ Reasons are `ok`, `clamped`, `rate_limited`, `watchdog_zero`, `estop_latched`,
 `invalid_input`, and `supervisor_stop`; clamped acceleration can record both
 `clamped` and `rate_limited`. All results are synthetic/offline simulation,
 separate from real hardware acceptance, which remains untested.
+
+## Run2 session export and measured checklist (software only)
+
+These read-only tools consume existing local logs. They never open a camera,
+connect to a stream, discover a device or send commands. Use a fresh output path:
+
+```sh
+./scripts/dev.sh p3-python -m p3.research.real_session to-control-dataset artifacts/my-session --output artifacts/real-control-001
+./scripts/dev.sh p3-python -m p3.research.run2_acceptance artifacts/my-session --report artifacts/run2-001.md --json artifacts/run2-001.json
+```
+
+Supported inputs are the actual `p3.cli run` output folder (`events.jsonl`,
+optionally `run.json` and `run-status.json`), and a complete
+`p3.research.recorder.record_media` v2 bundle (`records.jsonl` and
+`manifest.json`). V2 structure/hashes are checked with the existing bundle
+reader; missing original media is allowed, existing media integrity is checked,
+and no pixels are decoded. Bare records JSONL and arbitrary PID/controller
+logs are not supported. Both existing writers record rule-controller output;
+the converter does not rerun a teacher or invent PID labels. Missing teacher
+commands, invalid timestamps, mismatched frame decisions and invalid commands
+are refused before dataset output is opened. Geometry absent from an event
+journal remains null; `run.json` adds tracks, but does not record image dimensions.
+V2 provides dimensions and controller-selected target IDs.
+
+Recorded session observations default to `real`, including local video recordings,
+even though commands remain normalized software simulation commands. This is
+source classification, not proof of physical execution. V2 bundles whose detector
+kind contains `synthetic` are classified as simulated.
+Synthetic fixtures that mimic camera metadata must include
+`session-provenance.json` containing `{"kind":"simulated"}`; this marker can
+only downgrade evidence. Every new exported sample and episode has
+`provenance: {kind, source_session, source_sha256}`. The source hash covers a
+canonical mapping of the consumed file names to their SHA256s, including any
+measurement/provenance sidecar. Dataset hashes, features, splits and stats use
+the existing control-dataset helpers. Existing synthetic datasets remain
+byte-identical: their absent provenance is inferable as simulated from
+`closed_loop_simulation` and `synthetic_closed_loop`. Teacher labels are the
+recorded rule output, **never physical actuator feedback**; gated commands and
+independent supervisor state remain null.
+
+The pipeline journal records elapsed monotonic emission times, frame indices,
+software decisions and a final zero STOP. An error with type
+`KeyboardInterrupt` records observable SIGINT receipt. A STOP command alone
+does not establish when an operator requested it. `e2e_ms` includes acquisition
+wait and rendering; it is not acquisition-to-decision frame age.
+The recorder's processing age is likewise not camera exposure age.
+Consequently existing logs commonly produce **NOT_MEASURED**.
+
+For missing measurements, an optional local `run2-measurements.json` sidecar
+uses the same session origin and seconds as the journal. It is an explicit
+measurement/annotation contract, not output already supplied by the pipeline:
+
+```json
+{
+  "clock": "session_elapsed_monotonic",
+  "operator_stops": [{"time_seconds": 1.0}],
+  "frames": [
+    {"frame": 0, "age_seconds": 0.04, "too_close": false,
+     "target_identity": "reviewed-person-A"}
+  ]
+}
+```
+
+Supply acquisition-to-decision `age_seconds` for **every** processed frame,
+and `too_close` booleans for every journal frame (from reviewed geometry or
+independent annotation). At least one too-close event must be exercised.
+A zero forward command in its frame or the next processed frame satisfies the
+one-frame deadline. Supply `operator_stops` onset timestamps (STOP/SIGINT
+receipt, not zero-command timestamps); each is matched to the first subsequent
+journalled zero linear **and** angular software command. SIGINT error events
+also supply onsets. Never substitute the earlier unrelated 0.042s measurement.
+
+Continuity requires `run.json` tracks and a reviewed `target_identity` on
+each selected frame. ID switches count changes of selected tracker ID for the
+same annotated person; loss segments count entries into absent/non-tracked
+selected-target intervals. An intentional selection of another person is not
+an ID switch. These annotations are necessary because tracker IDs alone cannot
+prove physical identity continuity. No selected target means NOT_MEASURED.
+
+`run2_acceptance.Thresholds` is the single threshold definition:
+frame age nearest-rank p95 <= **0.5s** (the stream stale timeout/follow max age),
+maximum stop latency <= **0.2s**, latest-frame replacement fraction <= **0.05**,
+ID switches <= **0**, lost segments <= **0**. CLI overrides:
+`--max-frame-age-p95`, `--max-stop-latency`, `--max-drop-fraction`,
+`--max-id-switches`, `--max-lost-segments`.
+Drops use the final `run-status.json.stream_dropped_frames` divided by
+processed plus replaced frames. These are the stream reader's cumulative
+latest-frame replacements, not sensor/network packet drops; a missing final
+counter is NOT_MEASURED. Thresholds cannot recover missing measurements.
+
+Reports show provenance, source hashes, values, thresholds and per-item
+PASS/FAIL/NOT_MEASURED. Overall PASS requires every item PASS. Exit codes:
+0 overall PASS, 1 FAIL/incomplete measurements, 2 malformed input or I/O error.
+Report/dataset destinations must be new. **Synthetic fixture PASS is NOT a
+hardware acceptance**, and real-input software-log PASS still requires the
+separate physical checks in HARDWARE.md.
