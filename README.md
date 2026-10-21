@@ -307,6 +307,15 @@ Taiwan/best Unified 指定工具成功實測，包括來源、數值與單張影
 原始回答保留；結果不代表跨樣本可靠度、自主選工具或駕駛品質驗證。見
 [內容核對](reports/evidence/project2/Agent-Content-Review-20261016.md)及 audit §48。
 
-Project 3：本機 YOLO 圖片／影片、追蹤評估與模擬跟隨已實作；107/107 測試通過。
-合成交錯與長遮擋會換 ID；Webcam Live 因未授權而 BLOCKED，真實追蹤準確度及實體 C2C
-仍未測試，詳見 [驗收狀態](projects/project3/evidence/STATUS.md)。
+Project 3：YOLO 圖片／影片、kalman_iou／tracker benchmark、MOT/CVAT 匯入及
+`evaluate --trackers all`、latest-frame webcam/network stream、PID 模擬、
+`p3_control_dataset/1.0`、ridge/MLP BC、SafetySupervisor 1.0 m width-based too-close
+stop（不能倒車）、mock/dry-run body interface（watchdog、e-stop latch、rate/accel
+limits）、Run2 匯出／pipeline 量測 checklist、Report 3 圖表工具已完成。
+目前 286 tests，OK (skipped=8)；Mac `develop` 131faef 健檢通過 472 tests，
+當時 P3 為 283；Mac stream SIGINT 後軟體 STOP 約 0.05 s。這些不是實體致動器量測。
+仍待 Run2 真車 session／驗收、真人多目標 CVAT 標註與評估、`--display` q/c/n/r/s
+手動測試、需 API key 的 Gemini online call，及 2026-12-25 Report 3 文字／投影片。
+Run2 continuity 需人工 `target_identity`；實體 C2C/comma body 控制未實作且須另做安全審查。
+所有控制為 simulation_only，real transport 拒絕執行。詳見
+[操作指南](projects/project3/README.md)／[驗收狀態](projects/project3/evidence/STATUS.md)。

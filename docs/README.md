@@ -12,7 +12,7 @@
 | 原始流程參考 | [JLL 安裝與 Replay 歷史流程](reference/JLL_INSTALL_REPLAY.md) | 原始 Ubuntu 安裝、舊版排錯與 2026-10-04 快照；非目前操作手冊 |
 | 本機資產 | [INSTALLOP_ASSETS](INSTALLOP_ASSETS.md) | 原始下載來源、hash 與保存位置 |
 | 課程範圍 | [COURSE_PLAN](COURSE_PLAN.md) | 教授要求的專案摘要 |
-| Project 3 ACT | [PROJECT3](PROJECT3.md) | Run1–2 需求稽核、實作架構與驗收連結 |
+| Project 3 ACT | [PROJECT3](PROJECT3.md) | Run1–2 稽核、追蹤／控制離線工具與硬體驗收連結 |
 | Project 2 THINK | [PROJECT2](PROJECT2.md) | 課程要求、架構、目前狀態與歷史規劃 |
 | Project 2 驗證 | [PROJECT2_AUDIT](PROJECT2_AUDIT.md) | 依日期累積的調查與驗收證據 |
 | 實驗日誌 | [EXPERIMENT_LOG](EXPERIMENT_LOG.md) | 實驗、決策與結果的歷史紀錄 |
@@ -33,8 +33,16 @@
 - Evidence v1 source 可由 Git `e1a1bc5` 追溯；目前工作目錄保留 baseline／v2。
   清理時 44 個測試與歷史 55 個測試的差異來自移除 11 個 v1-only tests；
   新增 CLI、Unified trace／prompt 與 report context 測試後，目前為 96/96；推送前再次通過。見 Project 2 audit §34–48。
-- Project 3 ACT：YOLO 圖片／影片、追蹤評估及模擬跟隨已實作，107/107 測試通過；
-  Webcam Live BLOCKED，真實追蹤準確度與實體 C2C 尚未測試。詳見 [Project 3](PROJECT3.md)。MR Projects 不計入 Project 2 成果。
+- Project 3 ACT：YOLO、kalman_iou／benchmark、MOT/CVAT 匯入與三追蹤器評估、
+  latest-frame webcam/stream、PID 模擬、control dataset、ridge/MLP BC、1.0 m
+  too-close stop、mock/dry-run body interface、Run2 匯出／量測 checklist 及 Report 3
+  圖表工具已完成；目前 286 tests，OK (skipped=8)。Mac `develop` 131faef 全機健檢
+  為 472 tests（當時 P3 283），stream SIGINT 後軟體 STOP 約 0.05 s。
+  仍待 Run2 真車 session／驗收、真人 CVAT 標註評估、`--display` 的 q/c/n/r/s
+  手動測試、需 API key 的 Gemini online call，以及 2026-12-25 Report 3 文字／投影片。
+  Run2 identity continuity 需人工 `target_identity`；實體 C2C/comma body 控制未實作，
+  須另做安全審查。所有控制為 simulation_only，real transport 拒絕執行。
+  詳見 [Project 3](PROJECT3.md)。MR Projects 不計入 Project 2 成果。
 
 ## 版本控制與本機內容
 

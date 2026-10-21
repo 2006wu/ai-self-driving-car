@@ -1,9 +1,37 @@
 # Project 3 — AI Robot / Run1–2
 
-Audit started 2026-10-14 (Asia/Taipei). Repository root:
+Historical audit baseline (2026-10-14, Asia/Taipei). Repository root:
 `/Users/2006wu/Desktop/ai-self-drive-car-ws`; branch `develop`; starting HEAD
 `0098f886e078cacbe08eb2d1282922cd78b5b1dc`; initial tracked/untracked status clean.
-No commit/push authorized. Professor source and P1/P2 environments remain references.
+These identifiers describe the original audit, not the current checkout.
+Professor source and P1/P2 environments remain references.
+
+## Current software status (2026-10-21)
+
+Run1 image/video, tracking/overlay and benchmarks are implemented. Completed
+software/offline extensions: `kalman_iou` plus synthetic tracker benchmark;
+MOT/CVAT import and `evaluate --trackers all`; webcam/network `stream:` input
+with latest-frame reading; PID follow and `pid_sim`; `p3_control_dataset/1.0`;
+ridge/MLP BC; the SafetySupervisor 1.0 m width-based too-close hard stop (zero
+forward speed, no reverse); mock/dry-run body interface with watchdog, e-stop
+latch and rate/acceleration limits (real transport refused); `real_session`
+export, `run2_acceptance` and pipeline measurements; `report3_figures`.
+All control output is **simulation_only** and never sent to physical hardware.
+
+Current local verification: **286 tests, OK (skipped=8)**. The user reported a
+Mac `develop` **131faef** full health check passing **472 tests across projects**,
+including **283 Project 3 tests at that time**, and stream software STOP about
+**0.05 s after SIGINT**. Historical evidence counts are revision-specific.
+Docker via `./scripts/dev.sh` is the supported runtime; this documentation check
+used the user-authorized existing Linux venv because Docker is unavailable.
+
+Remaining user/hardware-only work: Run2 real-car session and acceptance; real
+multi-person CVAT annotation/evaluation; manual `q/c/n/r/s` with `--display`;
+online Gemini call (API key); Report 3 write-up/slides due **2026-12-25**.
+Run2 continuity needs reviewed `target_identity` annotation. Physical C2C/comma
+body control is unimplemented by design and needs a separate safety review.
+See [current status](../projects/project3/evidence/STATUS.md) and the
+[ordered command guide](../projects/project3/README.md).
 
 ## Professor requirements and scope
 
@@ -86,10 +114,12 @@ must target a confirmed existing interface, not invent a TCP/UDP service.
 
 ## Dependencies / hardware / risks
 
-Use dedicated Python 3.11 arm64 venv on macOS, CPU ORT baseline. Inspect actual
-Execution Providers; availability is not speed or evidence of GPU offload. Camera
-access is opt-in through native OpenCV AVFoundation, subject to macOS permission.
-P1 Linux amd64 compute/display and P2 TF/Agno remain untouched.
+Use the dedicated Python 3.11 Project 3 Docker service via `./scripts/dev.sh`,
+with CPU ORT as the baseline. Inspect actual execution providers; availability
+is not speed or GPU-offload evidence. CoreML is unavailable in Linux Docker.
+The opt-in Mac ffmpeg/AVFoundation bridge supplies `stream:` input, subject to
+macOS camera permission; inference and tests stay in Docker. Keep Python 3.8
+ModelB6/OpenPilot separate from Python 3.11 Agent/Project 3 and preserve volumes.
 
 Risks: absent preview image; model preprocessing convention; confidence semantics;
 ONNX fixed shape; camera permission; hardware/firmware unknown; local cereal ABI
@@ -100,7 +130,7 @@ no precision/recall/mAP claim. Original restricted course assets are never publi
 ## Acceptance and development roadmap
 
 1. P3.0: verify scope/source and retrieve exact uiview; log unknowns.
-2. P3.1: native venv, pinned full dependency snapshot, environment validation.
+2. P3.1: isolated Python 3.11 Docker runtime, pinned dependencies, environment validation.
 3. P3.2: image → video → opt-in camera; preserve model preprocessing/NMS baseline;
    verify IO, coordinate mapping, single-session use, EOF/error cleanup.
 4. P3.3: bounded warm-up benchmark over fixed image/video/resolution/threshold/provider
@@ -141,8 +171,10 @@ Compared a minimal IoU association baseline, [SORT](https://github.com/abewley/s
 association for the first measurable extension; preserves the existing detector
 and avoids adding a training/embedding framework. This is **not** SORT/ByteTrack.
 It preserves IDs over short overlapping-box gaps, reports missing/lost targets,
-and permits explicit target cycling. It has no motion prediction or appearance
-features: crossings, fast motion and longer occlusion can switch IDs. Synthetic
+and permits explicit target cycling. The production baseline has no motion
+prediction or appearance features: crossings, fast motion and longer occlusion can switch IDs. Offline
+research now also offers Hungarian assignment and `kalman_iou` motion prediction,
+with a synthetic benchmark and opt-in three-tracker annotated comparison. Synthetic
 association tests pass; real human tracking accuracy is not measured. Track ID
 is not person identity, and there is no physical human-following control.
 
@@ -166,18 +198,18 @@ to finish software first. Continue independent software work; defer device
 Wi-Fi/SSH/UI verification. API-double success does not complete Run2 Level C.
 
 
-## Software validation update — 2026-10-16
+## Evidence snapshots and Run2 measurements
 
-See the [current acceptance matrix](../projects/project3/evidence/STATUS.md) and
-[implementation, tracking and performance report](../projects/project3/evidence/validation-20261016/REPORT.md).
-The existing detector and greedy IoU tracker were reused. Added an annotated
-tracking evaluator, twelve authored box scenarios, explicit-selection simulated
-follow state machine, failure event journals, bounded runs and stage timing.
-The original 50 tests remain unchanged; 57 additional tests bring the suite to
-107 PASS, 0 FAIL, 0 SKIP. Project 2 offline regression: 96 PASS.
-Synthetic crossings and long occlusion expose ID switches; real ID accuracy is
-NOT TESTED without annotated clips. Webcam Live is BLOCKED by ungranted camera
-authorization. Run2 physical C2C is NOT TESTED, deferred by the user. This phase
-performs no device control, SSH, network setting changes, retraining or downloads.
-The software evidence supports a presentation of measured progress and limits;
-a completed physical integration or real tracking-accuracy claim is not supported.
+The [2026-10-16 report](../projects/project3/evidence/validation-20261016/REPORT.md)
+records 107 tests at that revision; it remains immutable historical evidence.
+The [Docker report](../projects/project3/evidence/docker-20261021/RESULTS.md)
+likewise retains its original test count. Use the current status above for the
+present code, and keep synthetic results separate from real acceptance.
+
+New pipeline journals log acquisition/decision age, `too_close`, `safety_stop`
+episodes, `operator_stop` and cumulative latest-frame replacement counters.
+`run2_acceptance` consumes these automatically; old logs may need a measurement
+sidecar. Stop latency needs an actual operator-stop onset and final zero command;
+tracker continuity always needs reviewed human `target_identity` annotations.
+These are software timings and identity annotations, never actuator feedback.
+The full [hardware checklist](../projects/project3/HARDWARE.md) remains pending.
