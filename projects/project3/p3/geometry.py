@@ -3,6 +3,25 @@ import math
 import numpy as np
 
 
+def target_distance(tracks, target_id, width, hfov_degrees=70., person_width_m=.5):
+    """Width-based camera depth; missing or side-clipped targets yield zero.
+
+    With no selection, conservatively consider all visible tracks (replay policy).
+    """
+    distances = []
+    for track in tracks:
+        if track.get('state') != 'tracked' or (target_id is not None and track.get('id') != target_id):
+            continue
+        x1, y1, x2, y2 = track['box']
+        if (not all(math.isfinite(v) for v in (x1, y1, x2, y2))
+                or x2 <= x1 or y2 <= y1 or x1 <= 0 or x2 >= width):
+            distances.append(0.)
+        else:
+            focal = width/(2*math.tan(math.radians(hfov_degrees)/2))
+            distances.append(person_width_m*focal/(x2-x1))
+    return min(distances) if distances else 0.
+
+
 def iou(box, boxes):
     boxes = np.asarray(boxes, dtype=float).reshape(-1, 4)
     intersection = np.maximum(0, np.minimum(box[2:], boxes[:, 2:]) - np.maximum(box[:2], boxes[:, :2])).prod(axis=1)

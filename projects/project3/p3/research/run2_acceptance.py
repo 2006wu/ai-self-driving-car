@@ -61,8 +61,9 @@ def evaluate(directory, thresholds=Thresholds()):
     stops = m.get('operator_stops', [])
     v1.require(isinstance(stops, list), 'operator_stops must be a list')
     # KeyboardInterrupt is the existing journal's observable SIGINT receipt time.
-    stops = stops + [{'time_seconds': e['time_seconds']} for e in s['events']
-                     if e['event'] == 'error' and e.get('type') == 'KeyboardInterrupt']
+    if not any(e['event'] == 'operator_stop' for e in s['events']):
+        stops = stops + [{'time_seconds': e['time_seconds']} for e in s['events']
+                         if e['event'] == 'error' and e.get('type') == 'KeyboardInterrupt']
     commands = [e for e in s['events'] if e['event'] == 'simulated_control']
     latencies, unanswered, overdue = [], 0, False
     for stop in stops:
@@ -85,6 +86,7 @@ def evaluate(directory, thresholds=Thresholds()):
              or 'too_close' in (r.get('decision') or {}).get('reason', '')]
     violations, unknown = 0, 0
     close_coverage = all('too_close' in by_frame.get(r['frame'], {}) for r in frames)
+    logged_coverage = bool(frames) and s['summary'].get('run2_logging', {}).get('version') == 1
     for i in close:
         window = frames[i:i+2]
         if any((r.get('decision') or {}).get('speed') == 0 for r in window): continue
@@ -92,8 +94,9 @@ def evaluate(directory, thresholds=Thresholds()):
         else: violations += 1
     item('too_close_stops', {'events': len(close), 'violations': violations, 'unmeasured': unknown},
          'zero forward command by next processed frame',
-         False if violations else None if unknown or not close or not close_coverage else True,
-         'Requires per-frame too-close annotations; no exercised event is NOT_MEASURED.')
+         False if violations else None if unknown or not close_coverage or (not close and not logged_coverage) else True,
+         'Full per-frame coverage required. Version 1 journals with zero events pass coverage only; '
+         'no exercised stop is claimed. Legacy unexercised logs remain NOT_MEASURED.')
 
     drops = s['summary'].get('stream_dropped_frames')
     counters = [e['stream_dropped_frames'] for e in frames if 'stream_dropped_frames' in e]

@@ -30,6 +30,7 @@ class StreamFrames:
         self.error = None
         self.latest = None
         self.last_read = None
+        self.acquired_monotonic = None
         self.dropped_frames = 0
         self.thread = None
         self.stopped = False
@@ -64,6 +65,7 @@ class StreamFrames:
                     if self.latest is not None:
                         self.dropped_frames += 1
                     self.latest = frame
+                    # Local receipt time travels with this slot, sampled under the same lock.
                     self.last_read = time.monotonic()
                     self.condition.notify_all()
         except BaseException as error:
@@ -113,6 +115,7 @@ class StreamFrames:
                         raise TimeoutError('stale stream: frame acquisition timeout')
                     if self.latest is not None:
                         frame, self.latest = self.latest, None
+                        self.acquired_monotonic = self.last_read
                         return frame
                     self.condition.wait(remaining)
         except BaseException:
