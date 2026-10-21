@@ -163,12 +163,12 @@ bounded explanation, not established cause of every visible mismatch.
 ## Offline commands (repository root)
 
 ```sh
-projects/project2/agent/.venv/bin/python projects/project2/agent/prepare_v2.py
-projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent.py --offline
-projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --list-images
-projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --image step6/usa/final/frame_00001.png --offline
-projects/project2/agent/.venv/bin/python -m unittest discover -s projects/project2/agent -p '*_tests.py' -v
-projects/project2/agent/.venv/bin/python projects/project2/agent/prepare_v2.py --verify
+./scripts/dev.sh agent prepare_v2.py
+./scripts/dev.sh agent diagnosis_agent.py --offline
+./scripts/dev.sh agent vision_agent.py --list-images
+./scripts/dev.sh agent vision_agent.py --image step6/usa/final/frame_00001.png --offline
+./scripts/dev.sh test-agent
+./scripts/dev.sh agent prepare_v2.py --verify
 ```
 
 ## Live commands (fish, repository root)
@@ -183,9 +183,9 @@ if not set -q GOOGLE_API_KEY
 end
 # Optional model override; otherwise shared default is used.
 set -gx GEMINI_MODEL_ID gemini-3.8-flash
-projects/project2/agent/.venv/bin/python projects/project2/agent/diagnosis_agent.py
-projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --image step6/usa/final/frame_00001.png
-projects/project2/agent/.venv/bin/python projects/project2/agent/vision_agent.py --image step6/taiwan/best/frame_00001.png --unified --question 'Combine this image with existing P2.7–P2.10 evidence and give a bounded engineering diagnosis.'
+./scripts/dev.sh agent diagnosis_agent.py
+./scripts/dev.sh agent vision_agent.py --image step6/usa/final/frame_00001.png
+./scripts/dev.sh agent vision_agent.py --image step6/taiwan/best/frame_00001.png --unified --question 'Combine this image with existing P2.7–P2.10 evidence and give a bounded engineering diagnosis.'
 ```
 
 At implementation time no key was inherited, so no live call was made by the

@@ -9,6 +9,8 @@ import numpy as np
 import onnx
 import onnxruntime as ort
 
+from .geometry import iou
+
 ROOT = Path(__file__).resolve().parents[3]
 MODEL = ROOT / 'external/aJLL/bodyjim/yolov5n_flat.onnx'
 
@@ -19,15 +21,6 @@ def sha256(path):
         for block in iter(lambda: stream.read(1024 * 1024), b''):
             digest.update(block)
     return digest.hexdigest()
-
-
-def iou(box, boxes):
-    boxes = np.asarray(boxes, dtype=float).reshape(-1, 4)
-    intersection = np.maximum(0, np.minimum(box[2:], boxes[:, 2:]) - np.maximum(box[:2], boxes[:, :2])).prod(axis=1)
-    area = np.maximum(0, np.asarray(box)[2:] - np.asarray(box)[:2]).prod()
-    areas = np.maximum(0, boxes[:, 2:] - boxes[:, :2]).prod(axis=1)
-    union = area + areas - intersection
-    return np.divide(intersection, union, out=np.zeros_like(intersection), where=union > 0)
 
 
 def decode(raw, conf=0.3, threshold=0.45):

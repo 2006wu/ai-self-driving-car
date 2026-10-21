@@ -1,4 +1,3 @@
 #!/bin/sh
 set -eu
-cd "$(dirname "$0")"
-exec .venv/bin/python -m p3.cli "$@"
+exec "$(dirname "$0")/../../scripts/dev.sh" p3 "$@"

@@ -1,0 +1,6 @@
+Synthetic benchmark: PASS
+greedy_iou-image {'frames': 1, 'detections': 5, 'person_detections': 4, 'mean_inference_ms': 48.07499999992615, 'final_stop': 'PASS', 'decision_reasons': {'explicit_selection': 1}}
+greedy_iou-video {'frames': 300, 'detections': 1627, 'person_detections': 1, 'mean_inference_ms': 46.947019589999854, 'final_stop': 'PASS', 'decision_reasons': {'not_selected': 300}}
+kalman_iou-image {'frames': 1, 'detections': 5, 'person_detections': 4, 'mean_inference_ms': 45.35475000011502, 'final_stop': 'PASS', 'decision_reasons': {'explicit_selection': 1}}
+kalman_iou-video {'frames': 300, 'detections': 1627, 'person_detections': 1, 'mean_inference_ms': 43.38109225331588, 'final_stop': 'PASS', 'decision_reasons': {'not_selected': 300}}
+Docker integration smoke: PASS

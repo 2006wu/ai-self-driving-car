@@ -1,7 +1,7 @@
 """Fetch the exact Python 3.8 amd64 TF wheel with resumable verified ranges.
 
 Run from the repository root with:
-  python3 projects/project2/modelb6/fetch_tensorflow_wheel.py
+  ./scripts/dev.sh prepare-modelb6
 
 The wheel and partial chunks live in a Git-ignored wheelhouse. The PyPI URL is
 looked up at runtime; only the expected filename, size and SHA-256 are pinned.

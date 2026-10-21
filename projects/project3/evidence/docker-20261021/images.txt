@@ -1,0 +1,5 @@
+ai-self-driving-car-compute:latest amd64 sha256:6e97f548041ddf1f24b38b700bcc81aad111f1cc4e59306f1aab014f300fac10
+ai-self-driving-car-display:latest amd64 sha256:ea5e17374cdc82be4ba1ac0d3ac6e6e0d9cef541db3f2ad94a486c375777c0e9
+ai-self-driving-car-modelb6:latest amd64 sha256:37c284e6eae14165bf98e6fc3a695b7286c6bcb8c95bf47de46d416f5840077f
+ai-self-driving-car-agent:latest arm64 sha256:3314a34977a7f095e45ac07869426ee5257bc529c9294942afef21ba87ace34e
+ai-self-driving-car-project3:latest arm64 sha256:dabe813fd3fdad43e5db23ead7214f1305868d4e3266b5204c37d5785c9ec879
