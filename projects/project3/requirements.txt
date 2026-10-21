@@ -10,3 +10,15 @@ packaging==26.3
 protobuf==7.36.2
 psutil==6.1.1
 sympy==1.14.0
+# Report figures (p3.research.report3_figures). Transitive wheels are pinned
+# because docker/install_requirements.py downloads each line with --no-deps.
+# matplotlib stays on numpy==1.26.4 (contourpy 1.3.x, not 1.4 which needs numpy 2).
+contourpy==1.3.2
+cycler==0.12.1
+fonttools==4.67.0
+kiwisolver==1.5.1
+matplotlib==3.9.4
+pillow==11.3.0
+pyparsing==3.3.3
+python-dateutil==2.9.0.post0
+six==1.17.0
