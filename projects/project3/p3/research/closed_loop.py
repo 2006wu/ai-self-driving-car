@@ -96,7 +96,8 @@ def run_scenario(controller, scenario, steps=200, config=None, seed=None,
         raise ValueError('invalid operator reselect step')
     c = config or SimConfig()
     robot = [0., 0., 0.]
-    gate, replay = SafetySupervisor(), CommandReplay()
+    gate = SafetySupervisor(hfov_degrees=c.hfov_degrees, person_width_m=c.person_width)
+    replay = CommandReplay()
     controller.select(1, render_person(robot, person_position(scenario, 0.), c))
     gate.rearm()  # UI r uses select(current_id, tracks); no weakened legacy latch.
     offsets, errors, distances, cross_track, settled, rows = [], [], [], [], [], []
@@ -110,10 +111,11 @@ def run_scenario(controller, scenario, steps=200, config=None, seed=None,
         if step in operator_reselect_steps:
             controller.select(1, tracks)
             gate.rearm()
-        observation = Observation(t, tracks, (c.image_height, c.image_width), 0.)
+        observation = Observation(t, tracks, (c.image_height, c.image_width), 0., target_id=1)
         proposed = controller.predict(observation)
         # Mirror the authoritative legacy STOP into the independent replay latch.
-        safe = gate.apply(proposed, emergency_stop=proposed.status != 'TRACKING', age_seconds=0.)
+        safe = gate.apply(proposed, emergency_stop=proposed.status != 'TRACKING',
+                          age_seconds=0., observation=observation)
         replay.submit(safe)
         v = safe.linear_velocity_command/.3*c.max_linear
         omega = safe.angular_velocity_command/.5*c.max_angular
@@ -159,6 +161,7 @@ def run_scenario(controller, scenario, steps=200, config=None, seed=None,
             'mean_jerk': sum(jerk)/len(jerk) if jerk else 0.,
             'safety_stop_steps': stops, 'latched_steps': latched,
             'supervisor_fault_steps': faults, 'min_distance_m': min(distances),
+            'too_close_stop_steps': gate.too_close_stop_steps,
             'safety_pass': min(distances) >= c.safety_distance and faults == 0,
             'tracking_steps': tracking, 'lost_steps': lost,
             'visible_steps': len(offsets), 'steps': steps, 'seed': seed,
