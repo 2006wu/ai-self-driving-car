@@ -8,9 +8,11 @@ from pathlib import Path
 import cv2
 import numpy as np
 from .stream import StreamFrames
+from .geometry import target_distance
 
 IMAGE_SUFFIXES = {'.png', '.jpg', '.jpeg', '.bmp', '.webp', '.tif', '.tiff'}
 VIDEO_SUFFIXES = {'.mp4', '.mov', '.avi', '.mkv', '.hevc', '.m4v', '.webm'}
+TOO_CLOSE_DISTANCE_M = 1.0  # Mirrors SafetySupervisor's default distance threshold.
 
 
 class Frames:
@@ -20,6 +22,8 @@ class Frames:
         self.fps = 0.0
         self.expected_frames = 0
         self.decoded = 0
+        self.acquired_monotonic = None
+        self.dropped_frames = 0  # No application replacement for sequential file/camera reads.
 
     def __enter__(self):
         try:
@@ -58,6 +62,7 @@ class Frames:
 
     def __iter__(self):
         if self.image is not None:
+            self.acquired_monotonic = time.monotonic()
             yield self.image
             return
         while True:
@@ -71,6 +76,7 @@ class Frames:
             if frame is None or not isinstance(frame, np.ndarray) or not frame.size:
                 raise RuntimeError('empty camera/video frame')
             self.decoded += 1
+            self.acquired_monotonic = time.monotonic()
             yield frame
 
     def __exit__(self, *_):
@@ -130,14 +136,17 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
         raise FileExistsError(f'output directory must be empty: {output}')
     records, writer, failure = [], None, None
     capture = None
+    operator_stop_time = stop_recorded_time = None
+    close_episode = False
     status, reason, screenshot_count = 'PASS', 'frame_limit', 0
-    session_start, cpu_start = time.perf_counter(), time.process_time()
+    session_start, cpu_start = time.monotonic(), time.process_time()
     process = psutil.Process()
     journal = (output/'events.jsonl').open('x')
     def emit(kind, value):
-        journal.write(json.dumps({'event': kind, 'time_seconds': time.perf_counter()-session_start,
-                                  **value}, allow_nan=False)+'\n')
+        event = {'event': kind, 'time_seconds': time.monotonic()-session_start, **value}
+        journal.write(json.dumps(event, allow_nan=False)+'\n')
         journal.flush()
+        return event['time_seconds']
     try:
         if controller:
             emit('simulated_control', controller.output())
@@ -147,25 +156,26 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
         with capture as frames:
             iterator = iter(frames)
             for index in range(max_frames):
-                if max_seconds is not None and time.perf_counter()-session_start >= max_seconds:
+                if max_seconds is not None and time.monotonic()-session_start >= max_seconds:
                     reason = 'time_limit'
                     break
-                start = time.perf_counter()
+                start = time.monotonic()
                 try:
                     image = next(iterator)
                 except StopIteration:
                     reason = 'EOF'
                     break
-                acquired = time.perf_counter()
+                acquired = time.monotonic()
+                receipt = frames.acquired_monotonic
                 detections, timing = detector.predict(image)
                 from .follow import valid_box
                 if any(not valid_box(d.get('box'), image.shape[1], image.shape[0]) or
                        not math.isfinite(d.get('objectness', float('nan'))) or
                        not 0 <= d.get('objectness', -1) <= 1 for d in detections):
                     raise ValueError('invalid detector output')
-                before_tracking = time.perf_counter()
+                before_tracking = time.monotonic()
                 tracks = tracker.update(detections) if tracker else []
-                after_tracking = time.perf_counter()
+                after_tracking = time.monotonic()
                 selected_now = controller is not None and target_id is not None and index == 0
                 decision = None
                 if controller:
@@ -173,9 +183,9 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
                         tracker.select(target_id)
                         decision = controller.select(target_id, tracks)
                     else:
-                        decision = controller.update(tracks, image.shape, time.perf_counter()-start)
+                        decision = controller.update(tracks, image.shape, time.monotonic()-start)
                     timing['follow'] = decision
-                after_decision = time.perf_counter()
+                after_decision = time.monotonic()
                 timing['target_state'] = tracker.target_state if tracker else 'disabled'
                 timing['previous_frame_e2e_ms'] = records[-1]['timing']['e2e_ms'] if records else 0
                 frame = render(image, detections, timing, tracks, tracker.target if tracker else None)
@@ -184,6 +194,8 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
                     cv2.imshow('Project3 | perception only', frame)
                     key = cv2.waitKey(1) & 0xff
                 if key == ord('q'):
+                    operator_stop_time = time.monotonic()-session_start
+                    emit('operator_stop', {'time_seconds': operator_stop_time, 'source': 'keyboard'})
                     reason = 'user_quit'
                     if controller: decision = controller.stop(reason)
                 elif key == ord('c'):
@@ -194,19 +206,33 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
                     if controller: decision = controller.select(chosen, tracks)
                 elif key == ord('r') and controller:
                     decision = controller.select(controller.target, tracks)
+                selected = controller.target if controller else tracker.target if tracker else None
+                too_close = (selected is not None and
+                             any(t['id'] == selected and t['state'] == 'tracked' for t in tracks) and
+                             target_distance(tracks, selected, image.shape[1]) < TOO_CLOSE_DISTANCE_M)
+                if controller and too_close:
+                    # Gate the output copy; preserve FollowController's selection/latch semantics.
+                    decision = dict(decision, speed=0., safety_stop='too_close',
+                                    action='STOP' if decision['turn'] == 0 else 'FOLLOW')
+                decision_time = time.monotonic()
                 if controller:
                     timing['follow'] = decision
-                    emit('simulated_control', dict(decision, frame=index))
+                    command_time = emit('simulated_control', dict(decision, frame=index))
+                    if too_close and not close_episode:
+                        emit('safety_stop', {'time_seconds': command_time, 'frame': index, 'reason': 'too_close'})
                     if key in [ord('q'), ord('c'), ord('n'), ord('r')]:
                         frame = render(image, detections, timing, tracks, tracker.target)
-                rendered = time.perf_counter()
+                    elif too_close:
+                        frame = render(image, detections, timing, tracks, tracker.target)
+                close_episode = too_close
+                rendered = time.monotonic()
                 timing.update({'capture_ms': (acquired-start)*1000,
                                'tracking_ms': (after_tracking-before_tracking)*1000,
                                'decision_ms': (after_decision-after_tracking)*1000,
                                'render_gui_ms': (rendered-after_decision)*1000,
                                'e2e_ms': (rendered-start)*1000,
                                'rss_bytes': process.memory_info().rss})
-                export_start = time.perf_counter()
+                export_start = time.monotonic()
                 if index == 0:
                     if not cv2.imwrite(str(output/'preview.png'), frame):
                         raise RuntimeError('preview write failed')
@@ -222,22 +248,26 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
                                                  (frame.shape[1], frame.shape[0]))
                         if not writer.isOpened(): raise RuntimeError('video output could not open')
                     writer.write(frame)
-                timing['export_ms'] = (time.perf_counter()-export_start)*1000
-                timing['loop_ms'] = (time.perf_counter()-start)*1000
+                timing['export_ms'] = (time.monotonic()-export_start)*1000
+                timing['loop_ms'] = (time.monotonic()-start)*1000
                 row = {'frame': index, 'detections': detections, 'tracks': tracks,
-                       'target': tracker.target if tracker else None, 'decision': decision, 'timing': timing}
-                if str(source).startswith('stream:'):
-                    row['stream_dropped_frames'] = frames.dropped_frames
+                       'target': tracker.target if tracker else None, 'decision': decision, 'timing': timing,
+                       'acquisition_time_seconds': receipt-session_start,
+                       'age_at_decision_seconds': decision_time-receipt, 'too_close': too_close,
+                       'stream_dropped_frames': frames.dropped_frames}
                 records.append(row)
                 emit('frame', {'frame': index, 'target': row['target'], 'target_state': timing['target_state'],
                                'decision': decision, 'timing': timing,
-                               **({'stream_dropped_frames': frames.dropped_frames}
-                                  if str(source).startswith('stream:') else {})})
+                               **{k: row[k] for k in ('acquisition_time_seconds', 'age_at_decision_seconds',
+                                                     'too_close', 'stream_dropped_frames')}})
                 if key == ord('q'): break
         if not records:
             raise ValueError('input yielded zero frames (empty/corrupt video)')
         return records
     except BaseException as error:
+        if isinstance(error, KeyboardInterrupt):
+            operator_stop_time = time.monotonic()-session_start
+            emit('operator_stop', {'time_seconds': operator_stop_time, 'source': 'sigint'})
         status = 'INTERRUPTED' if isinstance(error, KeyboardInterrupt) else 'FAIL'
         reason = 'user_interrupt' if isinstance(error, KeyboardInterrupt) else type(error).__name__
         failure = str(error)
@@ -248,7 +278,8 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
         cleanup_errors = []
         if controller:
             final_stop = controller.stop(reason, fault=status=='FAIL')
-            try: emit('simulated_control', final_stop)
+            try:
+                stop_recorded_time = emit('simulated_control', final_stop)
             except Exception as error: cleanup_errors.append('stop journal: '+str(error))
         if writer is not None:
             try: writer.release()
@@ -256,12 +287,16 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
         if display:
             try: cv2.destroyAllWindows()
             except Exception as error: cleanup_errors.append(str(error))
-        elapsed = time.perf_counter()-session_start
+        elapsed = time.monotonic()-session_start
         summary = {'status': status if not cleanup_errors else 'FAIL', 'termination': reason,
                    'error': failure, 'cleanup_errors': cleanup_errors, 'frames': len(records),
                    'camera': camera, 'display': display, 'record': record, 'screenshots': screenshot_count,
                    'wall_seconds': elapsed, 'cpu_percent_one_core': 100*(time.process_time()-cpu_start)/elapsed,
                    'application_skipped_frames': 0, 'sensor_dropped_frames': None,
+                   'stream_dropped_frames': 0,
+                   'run2_logging': {'version': 1, 'clock': 'session_elapsed_monotonic'},
+                   'operator_stop_time_seconds': operator_stop_time,
+                   'stop_recorded_time_seconds': stop_recorded_time,
                    'frame_drop_scope': 'No application frame skipping; camera sensor drops unavailable.',
                    'simulation_only': controller is not None, 'physical_control': False,
                    'timing_scope': 'e2e excludes export IO; loop includes image/video export; wall also includes source opening/journal',

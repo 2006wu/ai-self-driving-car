@@ -1003,17 +1003,41 @@ byte-identical: their absent provenance is inferable as simulated from
 recorded rule output, **never physical actuator feedback**; gated commands and
 independent supervisor state remain null.
 
-The pipeline journal records elapsed monotonic emission times, frame indices,
-software decisions and a final zero STOP. An error with type
-`KeyboardInterrupt` records observable SIGINT receipt. A STOP command alone
-does not establish when an operator requested it. `e2e_ms` includes acquisition
-wait and rendering; it is not acquisition-to-decision frame age.
-The recorder's processing age is likewise not camera exposure age.
-Consequently existing logs commonly produce **NOT_MEASURED**.
+New pipeline runs automatically log `acquisition_time_seconds`,
+`age_at_decision_seconds`, `too_close`, and cumulative `stream_dropped_frames`
+in each frame event. All timestamps use the session elapsed monotonic clock.
+Stream acquisition means local reader-thread receipt, not camera exposure;
+sequential file/camera inputs explicitly count zero application replacements.
+The selected target uses replay's width-based depth estimate (70 degree FOV,
+0.5 m person width), with a conservative zero distance for side-clipped
+boxes and a strict 1.0 m too-close threshold. No selection, or a selected target
+that is not currently `tracked` (lost/missing), means `too_close=false`.
+The simulated output is gated to zero forward speed without changing controller
+latches; `safety_stop` marks the decision and an event marks each episode onset.
+`operator_stop` records SIGINT/KeyboardInterrupt or keyboard `q` receipt;
+the final zero software command supplies STOP timing. `run-status.json` and
+`session_end` include `run2_logging` version/clock, the final drop counter,
+`operator_stop_time_seconds` (null without a request), and
+`stop_recorded_time_seconds`. No operator stop means stop latency remains
+**NOT_MEASURED**. These software timings are **not actuator measurements**.
+`e2e_ms` is not frame age, and recorder processing age is not exposure age.
+Old logs without these fields retain their previous measurement behavior.
+
+For example, from `projects/project3` in the Project 3 runtime, use a fresh
+output directory for an offline local video run (add `--display` to quit with `q`,
+or interrupt with Ctrl-C to exercise stop latency):
+
+```sh
+python -m p3.cli run /path/to/local-video.mp4 --output artifacts/run2-offline-001 --track --simulate-follow --target-id 1
+python -m p3.research.run2_acceptance artifacts/run2-offline-001
+```
 
 For missing measurements, an optional local `run2-measurements.json` sidecar
 uses the same session origin and seconds as the journal. It is an explicit
-measurement/annotation contract, not output already supplied by the pipeline:
+measurement/annotation contract. Journal fields are loaded automatically;
+explicit sidecar frame fields override matching journal fields, preserving
+other journal measurements. An explicit `operator_stops` list replaces the
+journal-derived list. No duplicate SIGINT error onset is added to new journals:
 
 ```json
 {
@@ -1028,7 +1052,10 @@ measurement/annotation contract, not output already supplied by the pipeline:
 
 Supply acquisition-to-decision `age_seconds` for **every** processed frame,
 and `too_close` booleans for every journal frame (from reviewed geometry or
-independent annotation). At least one too-close event must be exercised.
+independent annotation). New version 1 journals with complete too-close
+coverage and zero events report PASS for coverage only, with `events: 0`;
+this does not demonstrate an exercised safety stop. Older unexercised logs
+remain NOT_MEASURED.
 A zero forward command in its frame or the next processed frame satisfies the
 one-frame deadline. Supply `operator_stops` onset timestamps (STOP/SIGINT
 receipt, not zero-command timestamps); each is matched to the first subsequent
@@ -1040,7 +1067,9 @@ each selected frame. ID switches count changes of selected tracker ID for the
 same annotated person; loss segments count entries into absent/non-tracked
 selected-target intervals. An intentional selection of another person is not
 an ID switch. These annotations are necessary because tracker IDs alone cannot
-prove physical identity continuity. No selected target means NOT_MEASURED.
+prove physical identity continuity. The pipeline never supplies `target_identity`;
+tracker continuity remains NOT_MEASURED until human annotation is provided.
+No selected target means NOT_MEASURED.
 
 `run2_acceptance.Thresholds` is the single threshold definition:
 frame age nearest-rank p95 <= **0.5s** (the stream stale timeout/follow max age),

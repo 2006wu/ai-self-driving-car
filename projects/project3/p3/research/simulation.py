@@ -2,6 +2,7 @@
 import math
 from dataclasses import replace
 from .controllers import Action
+from ..geometry import target_distance
 
 
 class SafetySupervisor:
@@ -36,21 +37,8 @@ class SafetySupervisor:
         if observation is None:
             return None  # Compatibility with command-only replay callers.
         _, width = observation.frame_dimensions
-        # Target identity comes from the observation, never action metadata.
-        tracks = [t for t in observation.tracks if t.get('state') == 'tracked'
-                  and (observation.target_id is None or t.get('id') == observation.target_id)]
-        # With no explicit selection, conservatively gate on every visible track.
-        distances = []
-        for track in tracks:
-            x1, y1, x2, y2 = track['box']
-            if (not all(math.isfinite(v) for v in (x1, y1, x2, y2))
-                    or x2 <= x1 or y2 <= y1
-                    or x1 <= 0 or x2 >= width):
-                distances.append(0.)
-            else:
-                focal = width/(2*math.tan(math.radians(self.hfov_degrees)/2))
-                distances.append(self.person_width_m*focal/(x2-x1))
-        return min(distances) if distances else 0.
+        return target_distance(observation.tracks, observation.target_id, width,
+                               self.hfov_degrees, self.person_width_m)
 
     def rearm(self):
         if not self.faulted: self.latched = False

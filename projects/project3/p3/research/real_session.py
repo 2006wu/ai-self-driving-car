@@ -33,6 +33,10 @@ def load_session(directory):
         events = read_lines(root/'events.jsonl')
         files = ['events.jsonl']
         summary, run = {}, {}
+        for event in events:
+            if (event['event'] == 'session_end'
+                    and event.get('run2_logging', {}).get('version') == 1):
+                summary.update({k: v for k, v in event.items() if k not in {'event', 'time_seconds'}})
         for name, dest in [('run-status.json', summary), ('run.json', run)]:
             if (root/name).exists():
                 dest.update(read_json(root/name)); files.append(name)
@@ -51,10 +55,32 @@ def load_session(directory):
         cd.require(read_json(root/'session-provenance.json') == {'kind': 'simulated'},
                    'only explicit simulated provenance override is supported')
         kind = 'simulated'; files.append('session-provenance.json')
-    measurements = {}
+    # Journal measurements are defaults; explicit sidecar fields take precedence.
+    measured_frames = {}
+    for event in events:
+        if event['event'] != 'frame': continue
+        row = {'frame': event['frame']}
+        if 'age_at_decision_seconds' in event:
+            row['age_seconds'] = event['age_at_decision_seconds']
+        if 'too_close' in event: row['too_close'] = event['too_close']
+        if len(row) > 1: measured_frames[row['frame']] = row
+    measurements = {'frames': list(measured_frames.values())}
+    operator_stops = [{'time_seconds': e['time_seconds'], 'source': e['source']}
+                      for e in events if e['event'] == 'operator_stop']
+    if operator_stops: measurements['operator_stops'] = operator_stops
     if (root/'run2-measurements.json').exists():
-        measurements = read_json(root/'run2-measurements.json')
-        cd.require(measurements.get('clock') == 'session_elapsed_monotonic', 'measurement clock must match journal')
+        explicit = read_json(root/'run2-measurements.json')
+        cd.require(explicit.get('clock') == 'session_elapsed_monotonic', 'measurement clock must match journal')
+        rows = explicit.get('frames', [])
+        cd.require(isinstance(rows, list), 'measurement frames must be a list')
+        seen = set()
+        for row in rows:
+            index = row['frame']
+            cd.require(v1.integer(index) and index not in seen, 'unknown/duplicate measurement frame')
+            seen.add(index)
+            measured_frames[index] = {**measured_frames.get(index, {}), **row}
+        measurements.update(explicit)
+        measurements['frames'] = list(measured_frames.values())
         files.append('run2-measurements.json')
     reference = cd.hash_value({name: v2.digest(root/name) for name in sorted(files)})
     return {'records': records, 'events': events, 'summary': summary, 'run': run,
