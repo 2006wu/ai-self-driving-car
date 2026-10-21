@@ -266,3 +266,26 @@ are retained. Runtime loop timing additionally includes export IO; session wall
 includes opening/journaling. CPU percent uses one core = 100% and may exceed 100%;
 RSS is sampled process memory, not continuous peak or GPU memory. Application
 skipped frames = 0 means no intentional skipping; sensor drops are N/A.
+
+### Opt-in motion tracker and synthetic tracker benchmark
+
+Research callers can use `p3.research.tracking.create_tracker('kalman_iou')`
+for constant-velocity Kalman prediction and optimal IoU assignment. The default
+remains `greedy_iou`; `hungarian` remains available. Unmatched tracks coast as
+`missing` for up to `max_missed` frames, then expire. Optional
+`center_distance_gate` (default 1.5 predicted-box diagonals; `None` disables it)
+allows missed tracks to associate with nearby detections. Prediction never
+marks an unmatched target as tracked or grants permission to resume following.
+
+From the repository root, with NumPy installed, choose a new output path:
+
+```sh
+PYTHONPATH=projects/project3 python -m p3.research.tracker_benchmark --output /tmp/new-synthetic-tracker-benchmark.json
+```
+
+The command refuses overwrite and records seeds, parameters and evaluator metrics
+for crossing, fast lateral motion, a three-frame target occlusion, jitter and
+detection dropout. Only matched detections are scored as predictions; synthetic
+boxes remain in ground truth during detection gaps. All annotations and results
+are explicitly `synthetic_ground_truth`. These results do not establish real
+person identity, real-world tracking accuracy or physical safety.

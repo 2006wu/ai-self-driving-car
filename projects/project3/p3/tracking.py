@@ -1,6 +1,5 @@
 """Small IoU association baseline; track IDs are not person identities."""
-from .detection import iou
-from .follow import valid_box
+from .geometry import iou, valid_box
 
 
 class Tracker:

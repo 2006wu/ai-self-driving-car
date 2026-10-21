@@ -1,18 +1,6 @@
 """Fail-closed *simulation only*. Commands are dimensionless, never sent to hardware."""
 import math
-from .detection import iou
-
-
-def valid_box(box, width=None, height=None):
-    try:
-        x1, y1, x2, y2 = box
-        if not all(math.isfinite(float(v)) for v in box) or x2 <= x1 or y2 <= y1:
-            return False
-        if width is not None and not (0 <= x1 < x2 <= width and 0 <= y1 < y2 <= height):
-            return False
-        return True
-    except (TypeError, ValueError, OverflowError):
-        return False
+from .geometry import iou, valid_box
 
 
 class FollowController:
