@@ -2,6 +2,7 @@
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 
 from . import dataset as v1
@@ -38,6 +39,106 @@ def session_id(identity):
 
 def frame_uri(media_hash, index):
     return f'sha256:{media_hash}#decoded_frame={index}'
+
+
+class OriginalMediaMissing(ValueError):
+    """Recorded media path is absent. Distinct from a hash or size mismatch."""
+
+
+def resolve_root(media_root):
+    """Explicit root wins. None falls back to P3_MEDIA_ROOT. Blank disables it."""
+    if media_root is not None:
+        text = str(media_root).strip()
+        return Path(text).expanduser().resolve() if text else None
+    text = os.environ.get('P3_MEDIA_ROOT', '').strip()
+    return Path(text).expanduser().resolve() if text else None
+
+
+def stored_media_path(source, media_root=None):
+    """Absolute path, or a POSIX path relative to the configured media root."""
+    source = Path(source).resolve()
+    root = resolve_root(media_root)
+    if root is None:
+        return str(source), 'absolute'
+    try:
+        relative = source.relative_to(root)
+    except ValueError as error:
+        raise ValueError('source media is outside the configured media root') from error
+    text = relative.as_posix()
+    if text in ('', '.'):
+        raise ValueError('source media is outside the configured media root')
+    return text, 'relative'
+
+
+def _lexical_within(root, candidate):
+    root_norm = os.path.normpath(str(Path(root).resolve()))
+    cand_norm = os.path.normpath(str(candidate))
+    try:
+        return os.path.commonpath([root_norm, cand_norm]) == root_norm
+    except ValueError:
+        return False
+
+
+def _match_media_file(candidate, media):
+    """Return the file when size and SHA256 match. Absent is None; a mismatch raises."""
+    if not candidate.exists():
+        return None
+    if (not candidate.is_file() or candidate.stat().st_size != media['bytes']
+            or digest(candidate) != media['sha256']):
+        raise ValueError('media integrity failure')
+    return candidate.resolve()
+
+
+def resolve_original_media(media, media_root=None):
+    """Locate original bytes without treating a missing file as corruption.
+
+    Relative paths resolve only against the media root, never the process cwd.
+    An existing manifest path that differs in size or SHA256 fails immediately.
+    A missing legacy absolute path may match a byte-identical file under the
+    media root (same path suffix or file name). A candidate file that is present
+    there with a different size or SHA256 is a hash mismatch, not a missing file.
+    """
+    if not isinstance(media, dict):
+        raise ValueError('invalid media reference')
+    raw = media.get('path')
+    v1.require(isinstance(raw, str) and bool(raw) and raw == raw.strip() and '\x00' not in raw, 'invalid media path')
+    kind = media.get('path_kind')
+    if kind is None:
+        kind = 'absolute' if Path(raw).is_absolute() else 'relative'
+    v1.require(kind in {'absolute', 'relative'}, 'invalid media path_kind')
+    v1.require(is_hash(media.get('sha256')) and type(media.get('bytes')) is int and media['bytes'] >= 0,
+               'media size/hash required')
+    root = resolve_root(media_root)
+    if kind == 'relative':
+        v1.require(not Path(raw).is_absolute(), 'relative media path must not be absolute')
+        if root is None:
+            return None
+        candidate = root / raw
+        v1.require(_lexical_within(root, candidate), 'media path escapes media root')
+        return _match_media_file(candidate, media)
+    primary = Path(raw)
+    v1.require(primary.is_absolute(), 'absolute media path required')
+    if primary.exists():
+        return _match_media_file(primary, media)
+    if root is None:
+        return None
+    parts = primary.parts
+    start = 1 if primary.is_absolute() else 0
+    seen = set()
+    for index in range(start, len(parts)):
+        candidate = root.joinpath(*parts[index:])
+        if not _lexical_within(root, candidate):
+            continue
+        key = os.path.normpath(str(candidate))
+        if key in seen:
+            continue
+        seen.add(key)
+        if not candidate.is_file():
+            continue
+        if candidate.stat().st_size == media['bytes'] and digest(candidate) == media['sha256']:
+            return candidate.resolve()
+        raise ValueError('media found under media root but hash mismatch')
+    return None
 
 
 def validate_record(record):
@@ -131,8 +232,13 @@ def validate_records(records):
     return records
 
 
-def load_bundle(directory, *, verify_pixels=False):
-    """Validate completed bundle, original media bytes and optional decoded frames."""
+def load_bundle(directory, *, verify_pixels=False, media_root=None, require_media=True):
+    """Validate a completed bundle, and original media bytes when they are required.
+
+    Journal hash, order and manifest identity are always checked. Direct callers
+    still require the original file. quality_report passes require_media=False so
+    a missing file can be reported separately from corruption.
+    """
     try:
         directory = Path(directory)
         v1.require(not (directory/'failure.json').exists(), 'failed recording is not a completed dataset')
@@ -145,10 +251,11 @@ def load_bundle(directory, *, verify_pixels=False):
         v1.require(digest(path) == manifest['records']['sha256'], 'record integrity failure')
         records = validate_records([v1.loads(line) for line in path.read_text().splitlines()])
         v1.require(len(records) == manifest['records']['count'], 'record count mismatch')
-        source = Path(media['path'])
-        v1.require(source.is_absolute() and source.is_file(), 'missing original media reference')
-        v1.require(source.stat().st_size == media['bytes'] and digest(source) == media['sha256']
-                   == identity['media_sha256'] == records[0]['frame_reference']['media_sha256'], 'media integrity failure')
+        source = resolve_original_media(media, media_root=media_root)
+        v1.require(media['sha256'] == identity['media_sha256'] == records[0]['frame_reference']['media_sha256'],
+                   'media reference mismatch')
+        if source is None and (require_media or verify_pixels):
+            raise OriginalMediaMissing('missing original media reference: '+media['path'])
         v1.require(all(r['session_id'] == manifest['session_id'] for r in records), 'session mismatch')
         config = identity['configuration']
         v1.require(config['tracker_method'] in {'greedy_iou', 'hungarian'} and config['controller'] == 'rule_based'
@@ -187,19 +294,37 @@ def load_bundle(directory, *, verify_pixels=False):
         raise ValueError('invalid/incomplete bundle: '+str(error)) from error
 
 
-def quality_report(directory, *, verify_pixels=False):
+def quality_report(directory, *, verify_pixels=False, media_root=None, require_media=False):
+    """PASS when recorded data and original bytes check out.
+
+    WARN when the journal and recorded hashes are intact but the original file
+    is absent. FAIL on corruption, including a present file with the wrong size
+    or SHA256. verify_pixels or require_media also fails when that file is absent.
+    WARN is not a pass of the media bytes.
+    """
     try:
-        manifest, records = load_bundle(directory, verify_pixels=verify_pixels)
-        return {'status': 'PASS', 'schema_version': VERSION, 'session_id': manifest['session_id'],
-                'frames': len(records), 'ordered_contiguous_frames': True, 'media_hash_verified': True,
-                'record_hash_verified': True, 'decoded_pixels_verified': verify_pixels,
-                'detections': sum(len(r['observations']['value']['detections']) for r in records),
-                'person_detections': sum(d['class_id'] == 0 for r in records for d in r['observations']['value']['detections']),
-                'visible_track_rows': sum(t['state'] == 'tracked' for r in records for t in r['observations']['value']['tracks']),
-                'selection_events': sum(r['selection']['event'] != 'none' for r in records),
-                'simulated_follow_rows': sum(r['legacy_decision']['action'] == 'FOLLOW' for r in records),
+        manifest, records = load_bundle(directory, verify_pixels=False, media_root=media_root, require_media=False)
+        warnings, media_verified, pixels_verified = [], False, False
+        try:
+            load_bundle(directory, verify_pixels=verify_pixels, media_root=media_root, require_media=True)
+            media_verified, pixels_verified = True, verify_pixels
+        except OriginalMediaMissing as missing:
+            if verify_pixels or require_media:
+                reason = 'decoded pixel verification failed: ' if verify_pixels else 'original media required: '
+                raise ValueError(reason + str(missing)) from missing
+            warnings.append(str(missing))
+        counts = {'detections': sum(len(r['observations']['value']['detections']) for r in records),
+                  'person_detections': sum(d['class_id'] == 0 for r in records for d in r['observations']['value']['detections']),
+                  'visible_track_rows': sum(t['state'] == 'tracked' for r in records for t in r['observations']['value']['tracks']),
+                  'selection_events': sum(r['selection']['event'] != 'none' for r in records),
+                  'simulated_follow_rows': sum(r['legacy_decision']['action'] == 'FOLLOW' for r in records)}
+        return {'status': 'WARN' if warnings else 'PASS', 'schema_version': VERSION, 'session_id': manifest['session_id'],
+                'frames': len(records), 'ordered_contiguous_frames': True, 'media_hash_verified': media_verified,
+                'original_media': 'missing' if warnings else 'present', 'warnings': warnings,
+                'record_hash_verified': True, 'decoded_pixels_verified': pixels_verified, **counts,
                 'capture_timestamps_available': 0, 'human_annotation_status': 'BLOCKED: no human labels in recorder',
                 'missing_categories': ['capture_timestamp', 'human_demonstrations', 'robot_measurements', 'ground_truth', 'emergency_stop'],
-                'scope': 'structural/media integrity; no physical safety or truth certification'}
+                'scope': 'structural integrity and recorded hashes; original media bytes were not present'
+                         if warnings else 'structural/media integrity; no physical safety or truth certification'}
     except ValueError as error:
         return {'status': 'FAIL', 'errors': [str(error)]}

@@ -2,6 +2,8 @@
 
 Date: 2026-10-20, Asia/Taipei. Branch **develop**. HEAD **9a864c546f5121748079ad58df2879faf8ffb46c**. No commit/push/merge/branch changes.
 
+Clarification: the HEAD recorded above, and the "no commit" wording, are the inspection baseline from when this report was written, before these files were committed. They are not the commit that contains the report.
+
 **IMPLEMENTED / TESTED:** an isolated offline recorder, new v2 dataset contract and quality/integrity checks, blank human-annotation workflow, and identical-input comparison of the existing Greedy IoU and Hungarian trackers. **BLOCKED:** real tracking accuracy because no valid reviewed human annotations were available. No model training, camera, hardware or original runtime integration was performed.
 
 ## 1. Inspection, preservation and architecture

@@ -11,9 +11,9 @@ from ..detection import Detector
 from ..pipeline import Frames
 from .controllers import Observation, RuleBasedController
 from .tracking import create_tracker
-from .dataset import CATEGORIES, envelope, missing, require, integer
+from .dataset import CATEGORIES, envelope, missing, require, integer, loads
 from .dataset_v2 import (VERSION, BUNDLE_VERSION, canonical, digest, json_write, session_id,
-                         frame_uri, validate_record, validate_records, quality_report)
+                         frame_uri, validate_record, validate_records, quality_report, stored_media_path)
 
 
 def implementation_fingerprint():
@@ -22,15 +22,18 @@ def implementation_fingerprint():
 
 
 def record_media(source, destination, *, max_frames=120, method='greedy_iou',
-                 selection_schedule=None, detector=None, detector_fingerprint=None, clock=time.perf_counter):
+                 selection_schedule=None, detector=None, detector_fingerprint=None, clock=time.perf_counter,
+                 media_root=None):
     """Sequential decoded indices start at zero; measured clocks vary per run.
 
     Dependency injection is for offline tests, with an explicit detector identity.
     Selection schedule maps integer frame indices to track IDs, or None to cancel.
     It never supplies human ground truth or demonstration labels.
+    media_root, or P3_MEDIA_ROOT when media_root is omitted, stores a relative media path.
     """
     source, destination = Path(source).resolve(), Path(destination)
     require(source.is_file(), 'local source media required (no URL/device index)')
+    media_path, media_kind = stored_media_path(source, media_root)
     require(integer(max_frames, 1), 'positive frame bound required')
     schedule = {} if selection_schedule is None else dict(selection_schedule)
     require(all(integer(k) and k < max_frames and (v is None or integer(v, 1)) for k, v in schedule.items()), 'invalid selection schedule')
@@ -116,7 +119,6 @@ def record_media(source, destination, *, max_frames=120, method='greedy_iou',
                     validate_record(record)
                     # Round-trip snapshot prevents subsequent tracker/detector mutation from altering prior rows.
                     payload = canonical(record)
-                    from .dataset import loads
                     records.append(loads(payload))
                     journal.write(payload+'\n'); journal.flush()
                     count += 1
@@ -125,12 +127,13 @@ def record_media(source, destination, *, max_frames=120, method='greedy_iou',
         require(digest(source) == media_hash, 'source media changed during recording')
         final = controller.stop(termination).metadata
         manifest = {'bundle_version': BUNDLE_VERSION, 'session_id': sid, 'identity': identity,
-                    'media': {'path': str(source), 'sha256': media_hash, 'bytes': source.stat().st_size},
+                    'media': {'path': media_path, 'path_kind': media_kind, 'sha256': media_hash,
+                              'bytes': source.stat().st_size},
                     'records': {'file': 'records.jsonl', 'count': count, 'sha256': digest(destination/'records.jsonl')},
                     'termination': {'reason': termination, 'final_decision': final},
                     'runtime': {'python': platform.python_version(), 'platform': platform.platform()}}
         json_write(destination/'manifest.json', manifest)
-        quality = quality_report(destination)
+        quality = quality_report(destination, media_root=media_root)
         require(quality['status'] == 'PASS', 'post-record validation failed: '+str(quality))
         json_write(destination/'quality.json', quality)
         return manifest

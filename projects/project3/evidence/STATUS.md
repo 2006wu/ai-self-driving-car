@@ -26,6 +26,10 @@ PASS is limited to executed software scope. Synthetic ID scores do not measure
 real tracking accuracy; ID switches/IDF1 on unannotated video are N/A.
 Camera authorization is notDetermined (read-only query); Webcam Live BLOCKED.
 Real C2C is NOT TESTED / deferred. Native GUI keyboard interaction NOT TESTED.
+The [real-clip MOT/CVAT recipe](../README.md#real-multi-person-annotation-with-cvat--mot)
+supports draft import and opt-in three-tracker comparison. It supplies tooling,
+not new real accuracy evidence: only human-verified annotations of real clips
+can establish that result. Synthetic tests remain software validation only.
 Run2 injected lifecycle/message tests continue to pass, but cannot establish
 real cereal serialization, network communication or device UI integration.
 
