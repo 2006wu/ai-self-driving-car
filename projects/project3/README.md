@@ -524,3 +524,113 @@ Tests use injected captures and generated localhost MJPEG only. Run in Docker:
 Real Mac permission approval/refusal, image quality, latency, key interaction,
 and disconnect behavior still require user hardware acceptance. Synthetic and
 loopback results do not count as that acceptance.
+
+## Run3 direction: PID follow (simulation only)
+
+`p3.research.pid_controller.PIDFollowController` is an opt-in Controller adapter.
+It delegates selection, stale age, loss, overlap, explicit confirmation and
+permanent faults to an unchanged `FollowController`. The unchanged
+`RuleBasedController` is the baseline. Production follow and replay defaults are
+unchanged. Physical control remains disabled; no device interface is implemented.
+
+This is a **synthetic kinematic simulation with an image-size distance proxy**,
+not a calibrated vehicle controller or real hardware acceptance. There is no
+vision inference, identity association error, vehicle dynamics, latency or noise
+in this experiment. Gains were tuned on these authored scenarios; the comparison
+is not held-out validation.
+
+From the repository root, use Docker and a **new** output file:
+
+```sh
+./scripts/dev.sh p3-python -m p3.research.pid_sim --controller both --output artifacts/pid-sim/compare.json
+# Optional configuration / scenario subset:
+./scripts/dev.sh p3-python -m p3.research.pid_sim --controller pid --gains p3/research/pid_gains.json --scenarios straight_walk,turn --steps 200 --output artifacts/pid-sim-custom/compare.json
+./scripts/dev.sh p3-python -m unittest discover -s tests -p test_pid_follow.py
+```
+
+JSON uses exclusive creation, sorted keys and finite numbers; an existing output
+is refused. The CLI defaults to 200 steps at 0.1s (20s), all six scenarios and
+both controllers. `--seed` is recorded; trajectories currently use no randomness.
+`SimConfig` allows Python callers to change image dimensions, HFOV, person size,
+physical simulation scales, desired distance and the safety threshold.
+
+The world has x forward, y left and CCW positive heading. Positive normalized
+turn rotates left; a target right of image centre produces negative PID turn.
+Speed 0.3 maps to 1m/s and turn 0.5 to 1.5rad/s. The camera has 70-degree HFOV,
+640×480 pixels and a 0.5m wide/1.7m tall person. Pinhole boxes are clipped to the
+image; a centre outside HFOV or behind the camera is invisible. The default
+width target 0.2 corresponds to axial distance
+`0.5 / (2*tan(35 degrees)*0.2) = 1.785185m` before clipping.
+Height mode needs its own target fraction for the chosen geometry; neither mode
+is a calibrated range estimate.
+
+Tuned defaults (also in `p3/research/pid_gains.json`):
+
+| Parameter | Lateral | Longitudinal |
+| --- | ---: | ---: |
+| Kp | 0.85 | 6.0 |
+| Ki | 0.06 | 1.0 |
+| Kd | 0.12 | 0.10 |
+| Deadband | 0.015 | 0.003 |
+| Slew (normalized command/s) | 1.5 | 1.2 |
+
+Both axes use derivative on measurement with a 0.15s first-order filter and an
+error-integral clamp of ±0.4. Conditional integration considers both output and
+slew saturation. Output limits are speed [0,0.3], turn [-0.5,0.5]. Forward speed
+is zero when size fraction reaches the target, overriding slew for immediate
+stopping; reverse is never permitted. dt comes from successive observation
+timestamps, with nominal 0.1s for missing or repeated timestamps. Negative,
+nonfinite or numerically tiny positive dt (<1ns) latches STOP. Configuration is
+a frozen, strictly validated dataclass; JSON rejects unknown/duplicate keys.
+Actions include P/I/D terms and legacy follow state/reason.
+
+Selection calls `select(1, tracks)` once before prediction and rearms the replay
+supervisor. This is the same explicit-confirmation method used by the pipeline's
+`r` key. Loss immediately sets both commands to **exactly zero**, resets PID
+memory and latches STOP. There is no nonzero decay after loss. Reappearance
+never auto-resumes. Python callers may explicitly model an operator with
+`operator_reselect_steps=(55,)`; only those steps call select and rearm again.
+The default occlusion removes the target at steps 40–49 with no operator reselect.
+The replay supervisor and CommandReplay gate every integrated action.
+
+Measured 200-step comparison (rule → PID):
+
+| Scenario | Centering RMS | Distance RMS (m) | Safety pass (both) |
+| --- | ---: | ---: | --- |
+| straight_walk | 0.0888 → 0.0393 | 0.4339 → 0.3314 | yes |
+| turn | 0.0893 → 0.0403 | 0.4026 → 0.3250 | yes |
+| stop_go | 0.0797 → 0.0393 | 0.4338 → 0.3356 | yes |
+| lateral_step | 0.0906 → 0.0463 | 0.4370 → 0.3316 | yes |
+| occlusion | 0.1252 → 0.1181 | 2.8797 → 2.9621 | yes |
+| too_close | 0 → 0 | 0.8408 → 0.8408 | yes |
+
+PID improves centering in 5/6 and distance in 4/6 scenarios. The occlusion
+comparison includes the stopped interval: both controllers latch for 160 steps,
+and PID's distance error is worse there. Both too_close runs command zero speed
+while the person approaches to 0.9m and stops. All runs stay above the sampled
+0.65m safety threshold with zero supervisor faults. This threshold pass applies
+only to these authored trajectories: a stationary robot cannot keep a person
+from approaching it. No collision clamp silently changes the trajectories.
+
+Metrics use visible frames for normalized centering RMS and all steps for
+Euclidean distance RMS. Final distance error includes the last integration
+endpoint. Distance overshoot measures approach closer than desired; lateral
+overshoot measures crossing the initial bearing side in metres. Settling time
+is the earliest step after which both |offset|≤0.05 and |distance error|≤0.2m
+hold through the end (null if never settled). Smoothness is mean L1 command
+first difference and second difference (discrete jerk, not divided by dt).
+Safety stop steps count non-TRACKING predictions; latched steps count either
+legacy or supervisor latch. Minimum distance includes sampled steps and the final
+endpoint, not a continuous collision certificate. The JSON also records tracking,
+lost and visible steps, operator reselections and supervisor fault steps.
+
+Local validation used the explicitly requested existing
+`/workspace/scratch/venv-p3/bin/python` because Docker is unavailable in this
+workspace. No environment or dependencies were installed. Docker commands above
+are the supported reproduction path; a Docker execution was not measured here.
+
+Validation for this change: 18 new tests pass in approximately 0.13s; full suite
+203 tests, zero failures, 8 skips (existing optional fixtures/runtime checks).
+The full suite took approximately 12s. Generated local comparison and test log
+are under the fresh `artifacts/pid-sim-tuned/` directory; initial exploratory
+results remain preserved under `artifacts/pid-sim/`.
