@@ -1,4 +1,10 @@
-# Project 3 — native YOLO, evaluation and Run2 preparation
+# Project 3 — Docker YOLO, evaluation and Run2 preparation
+
+Current runtime policy (2026-10-21): all setup, execution and testing use Docker.
+The existing setup/run/verify scripts now delegate to `scripts/dev.sh`.
+See [Docker commands and limits](../../docs/DOCKER.md); older native macOS evidence
+below describes historical measurements, not the current runtime.
+Docker validation: [163/163 Project 3 tests, image/video and Qt/VNC smoke](evidence/docker-20261021/RESULTS.md).
 
 See [requirements/source audit](../../docs/PROJECT3.md),
 [measured acceptance](evidence/STATUS.md), [hardware checklist](HARDWARE.md).
@@ -10,8 +16,8 @@ Latest: [2026-10-16 software validation report](evidence/validation-20261016/REP
 
 ## Environment
 
-Tested: Python **3.11.4 arm64**, macOS native. Dedicated `.venv`; full resolved
-versions in requirements.txt. No TensorFlow, Agno or OpenPilot environment changes.
+Runtime: Python **3.11**, Linux Docker, native host architecture. Dependencies
+in requirements.txt are installed in the image, separately from Agent/ModelB6.
 From repository root:
 
 ```sh
@@ -20,12 +26,11 @@ From repository root:
 ./projects/project3/verify.sh
 ```
 
-If Python 3.11 is elsewhere, set `P3_PYTHON=/absolute/path/to/python3.11` for setup.
 Dependencies are pinned, not a wheel/hash lock or cross-platform guarantee.
 Model remains the original local `external/aJLL/bodyjim/yolov5n_flat.onnx`:
 SHA256 `bf667e5041e89ffaf1faa17c1ecbcf2d87729a514486a46c1996682342386031`.
-Missing model produces an error; no hidden downloads. CoreML is optional and
-requires the provider to be listed by `check`. CPU default uses one intra-op thread.
+Missing model produces an error; no hidden downloads. CoreML is unavailable in
+the Linux container. CPU default uses one intra-op thread.
 `AzureExecutionProvider` is enumerated but not evaluated as a local accelerator.
 
 ## Inputs and reference
@@ -66,12 +71,11 @@ Each output directory must be new or empty; existing evidence is never overwritt
 ```sh
 ./projects/project3/run.sh run artifacts/bus.jpg --output artifacts/my-image
 ./projects/project3/run.sh run artifacts/inputs/usa.hevc --max-frames 2000 --output artifacts/my-video
-./projects/project3/run.sh run 0 --camera --display --max-frames 300 --output artifacts/my-camera
 ```
 
 Paths are relative to `projects/project3/` because run.sh changes to that directory;
-absolute paths also work. Camera is **opt-in**, uses AVFoundation, and requires
-macOS permission and real hardware. It has not been accessed in this work.
+absolute container paths also work. The legacy camera path uses AVFoundation
+and is unavailable in Linux Docker; camera acceptance is pending a container-compatible input.
 File EOF exits; empty/corrupt inputs produce errors; camera disconnect is an
 error. q exits displayed sessions; resources close on normal and error paths.
 A single session is loaded per run; model input remains 640×416. BGR, direct
@@ -83,7 +87,7 @@ Boxes map independently into original image width/height and are clipped.
 
 ```sh
 ./projects/project3/run.sh run artifacts/bus.jpg --track --output artifacts/my-tracking-image
-./projects/project3/run.sh run artifacts/inputs/usa.hevc --track --display --max-frames 300 --output artifacts/my-tracking-video
+./scripts/dev.sh p3-display run artifacts/inputs/usa.hevc --track --display --max-frames 300 --output artifacts/my-tracking-video
 ```
 
 Overlay displays class/objectness, boxes, person track IDs, selected target state,
@@ -101,11 +105,10 @@ reports fatal errors; a reconnecting network dashboard is not implemented.
 ## Benchmark
 
 ```sh
-./projects/project3/run.sh benchmark artifacts/bus.jpg --samples 30 --warmup 5 --output evidence/my-image.json
-./projects/project3/run.sh benchmark artifacts/inputs/usa.hevc --samples 120 --warmup 5 --output evidence/my-video.json
-./projects/project3/run.sh benchmark artifacts/bus.jpg --samples 30 --resolution 640x480 --output evidence/my-small.json
-./projects/project3/run.sh benchmark artifacts/bus.jpg --samples 30 --confidence .5 --output evidence/my-conf50.json
-./projects/project3/run.sh benchmark artifacts/bus.jpg --samples 30 --provider CoreMLExecutionProvider --output evidence/my-coreml.json
+./projects/project3/run.sh benchmark artifacts/bus.jpg --samples 30 --warmup 5 --output artifacts/my-image.json
+./projects/project3/run.sh benchmark artifacts/inputs/usa.hevc --samples 120 --warmup 5 --output artifacts/my-video.json
+./projects/project3/run.sh benchmark artifacts/bus.jpg --samples 30 --resolution 640x480 --output artifacts/my-small.json
+./projects/project3/run.sh benchmark artifacts/bus.jpg --samples 30 --confidence .5 --output artifacts/my-conf50.json
 ```
 
 Resolution changes the *source* size; fixed model input stays 640×416. Threshold
@@ -162,8 +165,8 @@ tracker target does not by itself arm simulation.
 # From repository root; output directories must be new or empty.
 ./projects/project3/run.sh run artifacts/bus.jpg --track --simulate-follow --target-id 1 --output artifacts/my-simulation-image
 ./projects/project3/run.sh run artifacts/inputs/usa.hevc --track --simulate-follow --max-frames 2000 --output artifacts/my-simulation-video
-./projects/project3/run.sh tracking-fixtures --output evidence/my-synthetic-tracking.json
-./projects/project3/run.sh benchmark artifacts/bus.jpg --track --simulate-follow --samples 30 --output evidence/my-tracking-performance.json
+./projects/project3/run.sh tracking-fixtures --output artifacts/my-synthetic-tracking.json
+./projects/project3/run.sh benchmark artifacts/bus.jpg --track --simulate-follow --samples 30 --output artifacts/my-tracking-performance.json
 ```
 
 In display mode: `n` selects the next visible track; `r` explicitly confirms the
@@ -192,21 +195,17 @@ watchdog would be needed for a hard wall-clock deadline.
 ### Manual webcam acceptance — currently BLOCKED
 
 The read-only AVFoundation authorization query returned `notDetermined` on
-2026-10-16. No capture or permission-setting change was performed. Run this
-manually in a local terminal when ready, responding to the macOS permission
-prompt yourself:
-
-```sh
-./projects/project3/run.sh run 0 --camera --display --track --simulate-follow --max-frames 300 --max-seconds 30 --output artifacts/webcam-manual-01
-```
+2026-10-16. No capture or permission-setting change was performed. Under the
+current Docker-only runtime, AVFoundation cannot be used directly; a
+container-compatible camera input must be implemented before webcam acceptance.
+Use `scripts/dev.sh p3-display` with existing files for desktop testing.
 
 Start with simulation IDLE; verify boxes/obj/IDs/FPS, select with `n`, take a
 snapshot with `s`, cancel with `c`, confirm with `r`, then quit with `q`. Repeat
 in separate new output folders for permission refusal and camera disconnection
 when feasible. Check nonzero error exits, final zero simulated output and
 resource release. Actual key interaction, capture, sensor drops and camera FPS
-remain NOT TESTED; injected camera/GUI tests are software checks only. No Docker
-is needed for these commands when the local model and input files already exist.
+remain NOT TESTED; injected camera/GUI tests are software checks only.
 
 ### Annotated tracking evaluation
 
@@ -231,7 +230,7 @@ required. Never label detector outputs as ground truth. No annotation means real
 IDF1/ID precision/ID recall are N/A.
 
 ```sh
-./projects/project3/run.sh tracking-eval /absolute/path/annotations-and-predictions.json --iou .5 --output evidence/my-annotated-tracking.json
+./projects/project3/run.sh tracking-eval /absolute/path/annotations-and-predictions.json --iou .5 --output artifacts/my-annotated-tracking.json
 ```
 
 ID metrics use global identity assignment of all IoU-qualified pairs. Frame
@@ -248,12 +247,11 @@ see [tracking method reference](https://github.com/JonathonLuiten/TrackEval/blob
 
 ```sh
 cd projects/project3
-.venv/bin/python validate_vision.py --output evidence/my-validation-measurements
-.venv/bin/python summarize.py
+../../scripts/dev.sh p3-python validate_vision.py --output artifacts/my-validation-measurements
 ```
 
-Use an idle machine and new output directory; the first command measures local
-files only. Nine conditions compare CPU/CoreML, source sizes, thresholds and
+Use an idle machine and new output directory; the command measures local
+files only. Six CPU conditions compare source sizes, thresholds and
 optional tracking/follow, with five excluded warmups and 30 measured frames each.
 Fixed model input remains 640×416. Synthetic 1/2/5/10/20-person box workloads
 measure tracker cost only; actual detector person counts are reported separately.
@@ -277,10 +275,10 @@ remains `greedy_iou`; `hungarian` remains available. Unmatched tracks coast as
 allows missed tracks to associate with nearby detections. Prediction never
 marks an unmatched target as tracked or grants permission to resume following.
 
-From the repository root, with NumPy installed, choose a new output path:
+From the repository root, after building the Project 3 image, choose a new output path:
 
 ```sh
-PYTHONPATH=projects/project3 python -m p3.research.tracker_benchmark --output /tmp/new-synthetic-tracker-benchmark.json
+./scripts/dev.sh p3-python -m p3.research.tracker_benchmark --output artifacts/new-synthetic-tracker-benchmark.json
 ```
 
 The command refuses overwrite and records seeds, parameters and evaluator metrics

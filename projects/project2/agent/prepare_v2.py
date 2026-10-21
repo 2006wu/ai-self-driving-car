@@ -3,7 +3,9 @@ import argparse
 import base64
 import hashlib
 import json
+import os
 import subprocess
+import sys
 from pathlib import Path
 from v2_evidence import CANONICAL, ROOT, approved_path
 
@@ -40,9 +42,10 @@ print(json.dumps(result))
 
 def collect():
     script = COLLECT.replace('PATHS', repr(list(CANONICAL.values())))
-    result = subprocess.run(['docker','run','--rm','--network','none','--read-only',
+    command = [sys.executable, '-c', script] if os.environ.get('P2_OUTPUT_MOUNTED') == '1' else ['docker','run','--rm','--network','none','--read-only',
         '--mount','type=volume,src=ai-self-driving-car_modelb6-output,dst=/output,readonly',
-        '--entrypoint','python3.8','ai-self-driving-car-modelb6:latest','-c',script],
+        '--entrypoint','python3.8','ai-self-driving-car-modelb6:latest','-c',script]
+    result = subprocess.run(command,
         capture_output=True, text=True, check=True, cwd=REPO)
     return json.loads(result.stdout)
 

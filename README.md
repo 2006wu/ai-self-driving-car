@@ -1,5 +1,19 @@
 # ai-self-driving-car
 
+所有執行環境統一放在 Docker；macOS 只需 Docker Desktop，不需安裝 Python、TensorFlow、ONNX 或本機 `.venv`。
+Project 1 使用 compute/display，Project 2 使用 modelb6/agent，Project 3 使用 project3。
+
+```bash
+./scripts/dev.sh build              # 建立全部環境；已有映像時使用快取
+./scripts/dev.sh up                 # 啟動 OpenPilot 與 VNC/noVNC
+./scripts/dev.sh test               # 三個 Project 的容器內檢查與離線測試
+./scripts/dev.sh p3 check
+./scripts/dev.sh agent diagnosis_agent.py --offline
+```
+
+完整指令、資料位置和 Linux 限制見 [Docker 使用方式](docs/DOCKER.md)。
+Project 2/3 為按需啟動的容器，命令完成即退出；不需要常駐空閒 Python 服務。
+
 macOS Apple Silicon 上的 openpilot v0.9.1 Docker 編譯與顯示環境。兩個服務均為 linux/amd64 Ubuntu 20.04，由 Docker Desktop 模擬執行。
 
 - compute：Python 3.8、Poetry 1.3.2、SCons 4.4.0、原始碼編譯與 replay。

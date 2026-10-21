@@ -1,0 +1,15 @@
+FROM python:3.11-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 libglib2.0-0 libxcb1 libxkbcommon-x11-0 libxext6 libsm6 \
+    && rm -rf /var/lib/apt/lists/*
+COPY projects/project3/requirements.txt /tmp/requirements.txt
+COPY docker/install_requirements.py /tmp/install_requirements.py
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python /tmp/install_requirements.py /tmp/requirements.txt
+WORKDIR /workspace/projects/project3
+CMD ["python", "-m", "p3.cli", "check"]

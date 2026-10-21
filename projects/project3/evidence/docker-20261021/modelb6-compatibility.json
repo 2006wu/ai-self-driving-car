@@ -1,0 +1,160 @@
+{
+  "data_visibility": {
+    "data_b6_mount_read_only": true,
+    "data_b6_sample": "/data/dataB6/UHD--2018-08-02--08-34-47--37/video.hevc",
+    "data_c_mount_read_only": true,
+    "data_c_sample": "/opt/openpilot/tools/replay/dataC/8bfda98c9c9e4291|2020-05-11--03-00-57/61/fcamera.hevc",
+    "data_read_only": true,
+    "derived_writable": true,
+    "openpilot_mount_read_only": true,
+    "openpilot_read_only": true,
+    "output_writable": true,
+    "professor_mount_read_only": true,
+    "professor_read_only": true,
+    "student_root_read_only": true
+  },
+  "installed_distributions": {
+    "atomicwrites": "1.4.1",
+    "h5py": "3.8.0",
+    "keras": "2.13.1",
+    "lru-dict": "1.2.0",
+    "matplotlib": "3.7.5",
+    "numpy": "1.24.3",
+    "opencv-python-headless": "4.8.1.78",
+    "pyzmq": "25.1.2",
+    "requests": "2.31.0",
+    "six": "1.16.0",
+    "tenacity": "8.2.3",
+    "tensorflow-cpu": "2.13.1",
+    "tqdm": "4.66.2"
+  },
+  "modelb6": {
+    "input_shapes": [
+      [
+        null,
+        12,
+        128,
+        256
+      ],
+      [
+        null,
+        8
+      ],
+      [
+        null,
+        2
+      ],
+      [
+        null,
+        512
+      ]
+    ],
+    "output_shape": [
+      null,
+      2383
+    ],
+    "parameter_count": 13039435
+  },
+  "openpilot_modules": {
+    "common.transformations.model": "ok",
+    "common.transformations.orientation": "ok",
+    "tools.lib.framereader": "ok"
+  },
+  "professor_modules": {
+    "cameraB3": "ok",
+    "datagenB6": "ok",
+    "hevc2yuvh5": "ok",
+    "lanes_image_space": "ok",
+    "modelB6": "ok",
+    "parserB6": "ok",
+    "serverB6": "ok"
+  },
+  "python": "3.8.10",
+  "simulatorB6": {
+    "reason": "OSError: No file or directory found at saved_model/B6.keras",
+    "status": "not_import_safe"
+  },
+  "teacher_model": {
+    "input_shapes": [
+      [
+        null,
+        12,
+        128,
+        256
+      ],
+      [
+        null,
+        8
+      ],
+      [
+        null,
+        2
+      ],
+      [
+        null,
+        512
+      ]
+    ],
+    "output_shapes": [
+      [
+        null,
+        385
+      ],
+      [
+        null,
+        386
+      ],
+      [
+        null,
+        386
+      ],
+      [
+        null,
+        58
+      ],
+      [
+        null,
+        200
+      ],
+      [
+        null,
+        200
+      ],
+      [
+        null,
+        200
+      ],
+      [
+        null,
+        8
+      ],
+      [
+        null,
+        4
+      ],
+      [
+        null,
+        32
+      ],
+      [
+        null,
+        12
+      ],
+      [
+        null,
+        512
+      ]
+    ],
+    "path": "/workspace/professor/saved_model/supercombo079.keras"
+  },
+  "versions": {
+    "cv2": "4.8.1",
+    "h5py": "3.8.0",
+    "matplotlib": "3.7.5",
+    "numpy": "1.24.3",
+    "six": "1.16.0",
+    "tensorflow": "2.13.1",
+    "tqdm": "4.66.2",
+    "zmq": "25.1.2"
+  }
+}

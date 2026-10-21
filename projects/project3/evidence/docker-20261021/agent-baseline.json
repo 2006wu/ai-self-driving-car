@@ -1,0 +1,8 @@
+python imports: PASS
+reference source: PASS
+reference constructors: PASS (6 agents; Agno 3 keyword adapters)
+active baseline: agno2 | Gemini + ReasoningTools | travel prompt
+professor/reference model: gemini-2.5-flash
+student runtime model: gemini-3.8-flash
+GOOGLE_API_KEY present: no
+live API call: SKIPPED (offline check never invokes the model)
