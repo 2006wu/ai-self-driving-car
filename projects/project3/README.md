@@ -13,7 +13,7 @@ and real transport is refused.
 
 Current local suite: **286 tests, OK (skipped=8)**. The user-reported Mac
 `develop` **131faef** full health check passed **472 tests across projects**,
-including **276 Project 3 tests at that revision**. These are different snapshots.
+including **283 Project 3 tests at that revision**. These are different snapshots.
 Historical [2026-10-16 validation](evidence/validation-20261016/REPORT.md) and
 [Docker validation](evidence/docker-20261021/RESULTS.md) retain their original counts.
 

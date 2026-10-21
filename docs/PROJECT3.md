@@ -20,7 +20,7 @@ All control output is **simulation_only** and never sent to physical hardware.
 
 Current local verification: **286 tests, OK (skipped=8)**. The user reported a
 Mac `develop` **131faef** full health check passing **472 tests across projects**,
-including **276 Project 3 tests at that time**, and stream software STOP about
+including **283 Project 3 tests at that time**, and stream software STOP about
 **0.05 s after SIGINT**. Historical evidence counts are revision-specific.
 Docker via `./scripts/dev.sh` is the supported runtime; this documentation check
 used the user-authorized existing Linux venv because Docker is unavailable.

@@ -23,7 +23,7 @@ C2C/comma body control is unimplemented by design and needs a separate safety
 review before any adapter work.
 
 Current local suite: **286 tests, OK (skipped=8)**. User-reported Mac `develop`
-**131faef** health check: **472 tests across projects**, including **276 P3**
+**131faef** health check: **472 tests across projects**, including **283 P3**
 at that revision. Mac stream STOP about **0.05 s after SIGINT** measures software,
 not physical braking. These results do not complete Level C acceptance.
 

@@ -6,7 +6,7 @@ from `projects/project3`; Docker is unavailable on this box. No new Docker or
 hardware execution is claimed. Supported reproduction remains `./scripts/dev.sh`.
 
 The user-reported Mac `develop` **131faef** full local health check passed
-**472 tests across projects**, including **276 Project 3 tests at that revision**.
+**472 tests across projects**, including **283 Project 3 tests at that revision**.
 Mac webcam/network stream software STOP was about **0.05 s after SIGINT**.
 Those observations are revision-specific and do not establish actuator latency.
 Historical [107-test validation](validation-20261016/REPORT.md) and
