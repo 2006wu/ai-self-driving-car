@@ -835,3 +835,33 @@ not exceed its teacher. Unlike PID, BC has no explicit "box larger than target =
 speed 0" override; the too_close scenario still passes the minimum-distance check
 in simulation, but this is not a safety guarantee. Distance RMS includes the
 occlusion scenario, where every controller stays latched after loss.
+
+## Report 3 draft figures
+
+`p3.research.report3_figures` collects tracker, PID/rule and behaviour-cloning
+metrics into a new folder of CSV and Markdown tables plus matplotlib PNG charts.
+Matplotlib is pinned in `requirements.txt` (`matplotlib==3.9.4` and its wheels).
+`docker/Dockerfile.project3` installs that file through `install_requirements.py`;
+there is no second pip install.
+
+The run is deterministic for a fixed seed and the same numpy build. Tracker
+numbers come from `p3.research.tracker_benchmark` synthetic boxes. PID and rule
+numbers come from `p3.research.pid_sim`, with one world-frame trajectory plot
+per scenario. Behaviour cloning trains ridge and MLP on a fresh temporary
+`control_dataset build-sim` dataset (PID teacher, fixed seeds) and compares
+closed-loop metrics with PID. Stream stop-latency and unittest counts are read
+from `projects/project3/evidence` when those files exist. Missing measurements
+are marked NOT AVAILABLE and are not invented. Real hardware stays NOT TESTED
+unless a cited evidence line records it.
+
+From the repository root, after the Project 3 image is built, pick a new output
+directory. An existing path is refused. `reports/project3-report3-draft` is used
+only when you pass `--draft`.
+
+```sh
+./scripts/dev.sh p3-python -m p3.research.report3_figures --output artifacts/report3-draft-001
+./scripts/dev.sh p3-python -m unittest discover -s tests -p test_report3_figures.py
+```
+
+`summary.md` in that folder lists every figure and table with the source command
+and separates synthetic/simulated results from real-hardware results.

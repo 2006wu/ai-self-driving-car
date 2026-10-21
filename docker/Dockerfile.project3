@@ -7,6 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 libglib2.0-0 libxcb1 libxkbcommon-x11-0 libxext6 libsm6 \
     && rm -rf /var/lib/apt/lists/*
+# Python packages are pinned in projects/project3/requirements.txt, including
+# matplotlib==3.9.4 for p3.research.report3_figures. This is the only install
+# path; do not pip-install matplotlib separately.
 COPY projects/project3/requirements.txt /tmp/requirements.txt
 COPY docker/install_requirements.py /tmp/install_requirements.py
 RUN --mount=type=cache,target=/root/.cache/pip \
