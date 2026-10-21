@@ -75,7 +75,8 @@ Each output directory must be new or empty; existing evidence is never overwritt
 
 Paths are relative to `projects/project3/` because run.sh changes to that directory;
 absolute container paths also work. The legacy camera path uses AVFoundation
-and is unavailable in Linux Docker; camera acceptance is pending a container-compatible input.
+and is unavailable in Linux Docker; use the opt-in Mac webcam bridge below.
+Real camera acceptance remains pending.
 File EOF exits; empty/corrupt inputs produce errors; camera disconnect is an
 error. q exits displayed sessions; resources close on normal and error paths.
 A single session is loaded per run; model input remains 640×416. BGR, direct
@@ -192,12 +193,13 @@ completed. Filesystem failure can prevent durable logs. `--max-seconds` is check
 between frames; it cannot interrupt blocked native capture/inference. An external
 watchdog would be needed for a hard wall-clock deadline.
 
-### Manual webcam acceptance — currently BLOCKED
+### Manual webcam acceptance — user hardware verification pending
 
 The read-only AVFoundation authorization query returned `notDetermined` on
 2026-10-16. No capture or permission-setting change was performed. Under the
-current Docker-only runtime, AVFoundation cannot be used directly; a
-container-compatible camera input must be implemented before webcam acceptance.
+current Docker runtime, AVFoundation cannot be used directly. The opt-in Mac
+webcam bridge below supplies container-compatible stream input; real webcam
+acceptance still requires user permission and hardware verification.
 Use `scripts/dev.sh p3-display` with existing files for desktop testing.
 
 Start with simulation IDLE; verify boxes/obj/IDs/FPS, select with `n`, take a
@@ -287,3 +289,62 @@ detection dropout. Only matched detections are scored as predictions; synthetic
 boxes remain in ground truth during detection gaps. All annotations and results
 are explicitly `synthetic_ground_truth`. These results do not establish real
 person identity, real-world tracking accuracy or physical safety.
+
+### Mac webcam bridge to Docker (opt-in)
+
+The host helper is a capture-only exception to the Docker runtime: ffmpeg must
+already be installed **on the Mac**, with AVFoundation support. Python, inference
+and tests remain in Docker. No permission settings are changed; macOS may prompt
+for camera access for the terminal running ffmpeg. Approve manually if desired;
+permission refusal must be treated as a failed capture, never a hardware PASS.
+
+From the repository root, in a Mac terminal:
+
+```sh
+./projects/project3/tools/mac-webcam-stream.sh --help
+./projects/project3/tools/mac-webcam-stream.sh --device 0 --size 640x480 --fps 15 --port 8081
+```
+
+In a second terminal (Docker Desktop running, Project 3 image built):
+
+```sh
+./scripts/dev.sh p3-stream http://host.docker.internal:8081/ --track --simulate-follow --max-frames 300 --max-seconds 60 --output artifacts/mac-stream-acceptance-001
+```
+
+Use a fresh output directory each time. The default URL can be omitted. The
+underlying CLI also accepts `p3 run stream:http://host.docker.internal:8081/`.
+For interactive VNC acceptance use `p3-display run` with the same `stream:` source
+and `--display --track --simulate-follow`, then use n/r/c/s/q as described above.
+Without explicit selection simulation stays IDLE; all output is local simulation,
+with no physical control. Expect preview.png, overlay.avi, events.jsonl and
+run-status.json; run.json is produced only on success.
+
+Stop the consumer with Ctrl-C (or q with display), then stop the host helper with
+Ctrl-C. ffmpeg serves one client; explicitly restart the helper and start a new
+consumer session after disconnect. No automatic reconnect occurs. The helper binds
+only 127.0.0.1 and captures no audio; do not expose this unauthenticated feed to a
+LAN. Docker Desktop must support host loopback access via host.docker.internal;
+if your Desktop/network policy blocks it, capture remains blocked. The Linux
+host-gateway mapping does not by itself expose a host loopback listener.
+
+Stream open deadline is 3 seconds; local acquisition/stale deadline is .5 seconds.
+Disconnect, invalid BGR frame or a deadline failure terminates the session,
+latches the source closed and writes a final zero/STOP when simulation is enabled.
+Native FFmpeg open/read timeout parameters are supplied, with a separate caller
+watchdog. If a native backend ignores timeouts, its daemon worker releases capture
+when the native call returns; the main pipeline still stops on deadline. These
+limits do not interrupt model inference. Frame age measures local acquisition,
+not sensor time: buffered/repeated upstream imagery and sensor drops cannot be
+identified reliably from MJPEG. This is software fail-closed behavior, not a
+physical safety guarantee.
+
+Tests use injected captures and generated localhost MJPEG only. Run in Docker:
+
+```sh
+./scripts/dev.sh p3-python -m unittest discover -s tests -p test_stream.py -v
+./scripts/dev.sh test-p3
+```
+
+Real Mac permission approval/refusal, image quality, latency, key interaction,
+and disconnect behavior still require user hardware acceptance. Synthetic and
+loopback results do not count as that acceptance.

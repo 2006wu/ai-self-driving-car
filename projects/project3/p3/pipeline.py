@@ -7,6 +7,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+from .stream import StreamFrames
 
 IMAGE_SUFFIXES = {'.png', '.jpg', '.jpeg', '.bmp', '.webp', '.tif', '.tiff'}
 VIDEO_SUFFIXES = {'.mp4', '.mov', '.avi', '.mkv', '.hevc', '.m4v', '.webm'}
@@ -114,8 +115,8 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
         controller=None, target_id=None, max_seconds=None, record=True):
     """One existing detector pipeline, bounded capture, local simulation/event logs.
 
-    Deadline is checked between frames, not an OS-level interrupt of a blocked
-    backend read. No socket, vehicle API, or robot binding exists here.
+    Run deadline is checked between frames. StreamFrames additionally bounds
+    acquisition waits. No vehicle API or robot binding exists here.
     """
     if max_frames < 1 or (max_seconds is not None and (not math.isfinite(max_seconds) or max_seconds <= 0)):
         raise ValueError('positive finite run limits required')
@@ -139,7 +140,10 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
     try:
         if controller:
             emit('simulated_control', controller.output())
-        with Frames(source, camera) as frames:
+        if camera and str(source).startswith('stream:'):
+            raise ValueError('--camera and stream: are mutually exclusive')
+        capture = StreamFrames(source[7:]) if str(source).startswith('stream:') else Frames(source, camera)
+        with capture as frames:
             iterator = iter(frames)
             for index in range(max_frames):
                 if max_seconds is not None and time.perf_counter()-session_start >= max_seconds:
@@ -256,7 +260,12 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
                    'frame_drop_scope': 'No application frame skipping; camera sensor drops unavailable.',
                    'simulation_only': controller is not None, 'physical_control': False,
                    'timing_scope': 'e2e excludes export IO; loop includes image/video export; wall also includes source opening/journal',
-                   'deadline_scope': 'checked between frames; does not interrupt blocked native capture'}
+                   'deadline_scope': ('stream open/read caller deadlines; run limit checked between frames'
+                                      if str(source).startswith('stream:') else
+                                      'checked between frames; does not interrupt blocked native capture')}
+        if str(source).startswith('stream:'):
+            summary['input_kind'] = 'network_stream'
+            summary['frame_drop_scope'] = 'No intentional skipping; upstream buffering/sensor drops unknown.'
         (output/'run-status.json').write_text(json.dumps(summary, indent=2, allow_nan=False))
         try:
             emit('session_end', summary)
