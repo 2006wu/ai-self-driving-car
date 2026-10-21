@@ -53,6 +53,8 @@ MAX_EVIDENCE_BYTES = 2_000_000
 PNG_METADATA = {'Software': 'p3.research.report3_figures',
                 'Creation Time': 'Thu, 01 Jan 2026 00:00:00 GMT'}
 CONTROLLER_COLORS = {'rule': '#4C78A8', 'pid': '#F58518', 'ridge': '#54A24B', 'mlp': '#E45756'}
+# Fallback palette for series without a fixed colour (e.g. tracker methods).
+SERIES_PALETTE = ('#4C78A8', '#F58518', '#54A24B', '#E45756', '#B279A2', '#72B7B2')
 BC_CHART_CONTROLLERS = ('pid', 'ridge', 'mlp')
 PID_CONTROLLERS = ('rule', 'pid')
 BC_CSV_CONTROLLERS = ('pid', 'rule', 'ridge', 'mlp')
@@ -214,7 +216,7 @@ def draw_grouped(ax, categories, series, ylabel, title):
         offset = (index-(count-1)/2)*width
         heights = [float('nan') if value is None else float(value) for value in values]
         ax.bar(positions+offset, heights, width=width*0.92, label=name,
-               color=CONTROLLER_COLORS.get(name, '#4C78A8'))
+               color=CONTROLLER_COLORS.get(name, SERIES_PALETTE[index % len(SERIES_PALETTE)]))
     ax.set_xticks(positions)
     ax.set_xticklabels(list(categories), rotation=20, ha='right')
     _style_axis(ax, ylabel, title)
