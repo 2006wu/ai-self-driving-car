@@ -74,10 +74,16 @@ def make_sample(episode, step, timestamp, source, frame_ref, observation, teache
 
 
 def _validate_sample(row):
-    require(isinstance(row, dict) and set(row) == {'schema', 'sample_id', 'episode_id', 'split', 'step',
+    require(isinstance(row, dict) and set(row) - {'provenance'} == {'schema', 'sample_id', 'episode_id', 'split', 'step',
         'timestamp', 'source', 'frame_ref', 'observation', 'feature_vector', 'teacher_action', 'safety',
         'sim_ground_truth', 'missing_fields'}, 'sample fields')
     v1.finite_tree(row)
+    if 'provenance' in row:
+        p = row['provenance']
+        require(set(p) == {'kind', 'source_session', 'source_sha256'}
+                and p['kind'] in {'real', 'simulated'} and p['source_session'] == row['episode_id']
+                and v2.is_hash(p['source_sha256']) and p['source_sha256'] == row['source']['reference']
+                and row['source']['kind'] == 'recorded_run', 'session provenance')
     require(row['schema'] == SCHEMA and isinstance(row['episode_id'], str) and bool(row['episode_id']), 'schema/episode')
     require(v1.integer(row['step']) and row['sample_id'] == hash_value([row['episode_id'], row['step']]), 'sample ID/step')
     require(row['split'] in SPLITS, 'invalid split')
@@ -312,6 +318,9 @@ def validate(directory):
     for row in rows:
         episode = row['episode_id']
         require(episode in manifest['episodes'], 'missing episode metadata')
+        if 'provenance' in row:
+            require(row['provenance'] == manifest['episodes'][episode].get('provenance'),
+                    'episode provenance mismatch')
         require(row['split'] == split_episode(episode, manifest['split_ratios']), 'split hash mismatch')
         if row['source']['kind'] == 'closed_loop_simulation':
             identity = manifest['episodes'][episode]
