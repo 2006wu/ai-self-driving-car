@@ -1,0 +1,4 @@
+{"timestamp":0.0,"action":{"linear_velocity_command":0.3,"angular_velocity_command":0.2,"status":"TRACKING","source_controller":"fixture","valid":true}}
+{"timestamp":0.1,"action":{"linear_velocity_command":0.3,"angular_velocity_command":0.2,"status":"TRACKING","source_controller":"fixture","valid":true}}
+{"timestamp":0.2,"action":{"linear_velocity_command":0.0,"angular_velocity_command":0.0,"status":"STOP","source_controller":"fixture","valid":false}}
+{"timestamp":0.3,"action":{"linear_velocity_command":0.3,"angular_velocity_command":0.2,"status":"TRACKING","source_controller":"fixture","valid":true}}
