@@ -1,4 +1,4 @@
-"""Compare both existing trackers on identical recorded detector observations."""
+"""Compare research trackers on identical recorded detector observations."""
 import hashlib
 import time
 
@@ -8,8 +8,48 @@ from .tracking import create_tracker
 from .annotations import validate_annotations
 from .dataset_v2 import canonical, load_bundle
 
+METHODS = ('greedy_iou', 'hungarian', 'kalman_iou')
 
-def compare_dataset(directory, annotations=None, *, media_root=None):
+
+def selected_target_continuity(metrics, annotations):
+    """Anchor the selected GT to its first matched ID; never silently reselect it."""
+    target = annotations['target_person_id']
+    if target is None:
+        return None
+    initial = None
+    counts = dict(same_initial_id_frames=0, different_id_frames=0, lost_frames=0,
+                  target_absent_or_unboxed_frames=0)
+    details = []
+    for frame, evaluated in zip(annotations['frames'], metrics['per_frame']):
+        visible = any(p['person_id'] == target and p['box'] is not None for p in frame['persons'])
+        pid = evaluated['matches'].get(target)
+        if not visible:
+            key = 'target_absent_or_unboxed_frames'
+        elif pid is None:
+            key = 'lost_frames'
+        else:
+            if initial is None:
+                initial = pid
+            key = 'same_initial_id_frames' if pid == initial else 'different_id_frames'
+        counts[key] += 1
+        details.append({'frame_id': frame['frame_id'], 'predicted_id': pid, 'status': key})
+    return {'target_person_id': target, 'initial_predicted_id': initial, **counts,
+            'per_frame': details,
+            'policy': 'Reviewed frames only, same evaluator IoU assignment. First match anchors identity (included in same-ID count). Lost means GT has a box but no match; absent/unboxed GT is separate. No follow permission.'}
+
+
+def compare_dataset(directory, annotations=None, *, media_root=None, trackers=None):
+    # Keep the historical two-method report and fields unchanged without opt-in.
+    if trackers is None:
+        methods = ('greedy_iou', 'hungarian')
+    elif trackers == 'all':
+        methods = METHODS
+    elif isinstance(trackers, str):
+        methods = tuple(m.strip() for m in trackers.split(','))
+    else:
+        methods = tuple(trackers)
+    if not methods or len(set(methods)) != len(methods) or any(m not in METHODS for m in methods):
+        raise ValueError('trackers must be all or a unique list of greedy_iou,hungarian,kalman_iou')
     manifest, records = load_bundle(directory, media_root=media_root)
     gt, annotation_error = None, None
     if annotations is not None:
@@ -27,7 +67,7 @@ def compare_dataset(directory, annotations=None, *, media_root=None):
               'annotation_error': annotation_error, 'methods': {},
               'timing_scope': 'tracker.update only; 5 unmeasured and 30 measured full sequential replays',
               'scope': 'no closed loop or physical control; tracking uses all frames before sampled annotation evaluation'}
-    for method in ('greedy_iou', 'hungarian'):
+    for method in methods:
         latency, predictions = [], {}
         for repeat in range(35):
             tracker = create_tracker(method, threshold=manifest['identity']['configuration']['tracker_threshold'],
@@ -45,6 +85,9 @@ def compare_dataset(directory, annotations=None, *, media_root=None):
             metrics = evaluate_sequence(frames, 'human_ground_truth', target_gt_id=annotations['target_person_id'])
         report['methods'][method] = {'input_sha256': input_hash, 'tracking_ms': stats(latency),
                                      'metrics': metrics, 'predictions': predictions}
+        if trackers is not None:
+            report['methods'][method]['selected_target_continuity'] = (
+                selected_target_continuity(metrics, annotations) if metrics is not None else None)
     report['annotation_coverage'] = None if gt is None else {
         'evaluated_frames': list(gt), 'fraction_of_recorded_frames': len(gt)/len(records),
         'fully_occluded_without_box_excluded': sum(p['box'] is None for f in annotations['frames'] for p in f['persons']),

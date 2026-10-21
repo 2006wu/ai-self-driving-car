@@ -9,10 +9,11 @@ import argparse
 from pathlib import Path
 
 from .dataset import loads
-from .dataset_v2 import json_write, quality_report, load_bundle
+from .dataset_v2 import canonical, json_write, quality_report, load_bundle
 from .recorder import record_media
 from .annotations import annotation_template, validate_annotations, extract_annotation_frames
 from .evaluate_dataset import compare_dataset
+from .mot_import import import_mot
 
 
 def add_media_root(parser):
@@ -49,9 +50,21 @@ def main():
     check = sub.add_parser('validate-annotations')
     check.add_argument('dataset'); check.add_argument('annotations')
     add_media_root(check)
+    mot = sub.add_parser('import-mot', help='Import local MOT/CVAT MOT 1.1 ground truth as draft annotations')
+    mot.add_argument('dataset'); mot.add_argument('source', help='Exported gt/gt.txt (not detector results)')
+    mot.add_argument('--output', required=True)
+    mot.add_argument('--frame-offset', type=int, default=0, help='MOT frame n maps to dataset n-1+offset')
+    mot.add_argument('--frame-count', type=int, help='Contiguous labeled span length; default all remaining dataset frames')
+    mot.add_argument('--box-origin', type=int, choices=(0, 1), default=1, help='MOT x/y origin; default 1, converted to zero-based pixels')
+    mot.add_argument('--clip-boxes', action='store_true', help='Clip to frame bounds and report every changed box')
+    mot.add_argument('--human-verified', action='store_true', help='Attest every imported frame and identity has been human reviewed')
+    mot.add_argument('--annotator', default=''); mot.add_argument('--reviewer', default='')
+    mot.add_argument('--target-person-id', type=int)
+    add_media_root(mot)
     evaluate = sub.add_parser('evaluate')
     evaluate.add_argument('dataset'); evaluate.add_argument('--output', required=True)
     evaluate.add_argument('--annotations')
+    evaluate.add_argument('--trackers', help='Opt-in comparison: all or comma-separated greedy_iou,hungarian,kalman_iou')
     add_media_root(evaluate)
     args = parser.parse_args()
     try:
@@ -87,9 +100,16 @@ def main():
             manifest, records = load_bundle(args.dataset, media_root=args.media_root)
             validate_annotations(loads(Path(args.annotations).read_text()), manifest, records)
             print('PASS: structural reviewed-human annotation contract; source truth requires human review')
+        elif args.command == 'import-mot':
+            summary = import_mot(args.dataset, args.source, args.output,
+                frame_offset=args.frame_offset, frame_count=args.frame_count, box_origin=args.box_origin,
+                clip_boxes=args.clip_boxes, human_verified=args.human_verified,
+                annotator=args.annotator, reviewer=args.reviewer, target_person_id=args.target_person_id,
+                media_root=args.media_root)
+            print(canonical(summary))
         elif args.command == 'evaluate':
             annotations = loads(Path(args.annotations).read_text()) if args.annotations else None
-            report = compare_dataset(args.dataset, annotations, media_root=args.media_root)
+            report = compare_dataset(args.dataset, annotations, media_root=args.media_root, trackers=args.trackers)
             json_write(args.output, report)
             print(report['real_accuracy_status'])
     except (ValueError, OSError, UnicodeError) as error:

@@ -273,16 +273,103 @@ v2 bundle (`manifest.json`, `records.jsonl`, `quality.json`) and can replay the
 existing greedy and Hungarian trackers on the stored detections. It does not
 open a camera, talk to hardware, or change follow/tracking defaults.
 
-From the repository root, with this component on `PYTHONPATH`:
+From the repository root, through the Project 3 Docker runtime (paths inside
+the container are relative to `projects/project3/`). Choose a fresh artifacts
+directory for each run:
 
 ```sh
-PYTHONPATH=projects/project3 python -m p3.research.offline record path/to/clip.mp4 --output path/to/dataset --max-frames 120
-PYTHONPATH=projects/project3 python -m p3.research.offline validate path/to/dataset --output path/to/quality.json
-PYTHONPATH=projects/project3 python -m p3.research.offline template path/to/dataset --output path/to/annotations.json
-PYTHONPATH=projects/project3 python -m p3.research.offline extract path/to/dataset --output path/to/frames --frames 0,30
-PYTHONPATH=projects/project3 python -m p3.research.offline validate-annotations path/to/dataset path/to/annotations.json
-PYTHONPATH=projects/project3 python -m p3.research.offline evaluate path/to/dataset --output path/to/comparison.json
+mkdir projects/project3/artifacts/my-real-annotation-run
+./scripts/dev.sh p3-python -m p3.research.offline record artifacts/inputs/multi-person.mp4 --output artifacts/my-real-annotation-run/dataset --max-frames 120
+./scripts/dev.sh p3-python -m p3.research.offline validate artifacts/my-real-annotation-run/dataset --output artifacts/my-real-annotation-run/quality.json
+./scripts/dev.sh p3-python -m p3.research.offline template artifacts/my-real-annotation-run/dataset --output artifacts/my-real-annotation-run/blank.json
+./scripts/dev.sh p3-python -m p3.research.offline evaluate artifacts/my-real-annotation-run/dataset --output artifacts/my-real-annotation-run/unannotated.json
 ```
+
+### Real multi-person annotation with CVAT / MOT
+
+Real tracking accuracy remains **NOT TESTED** until real clips have been labeled
+and human reviewed. Synthetic unit tests and offline follow simulation do not
+count as real accuracy or hardware acceptance. The recorder above reads an
+existing local clip; it does not capture from a camera.
+
+1. Record the local clip into a bundle as above. Extract **every contiguous
+   frame** you intend to label, preserving order. For a 120-frame bundle:
+
+   ```sh
+   ./scripts/dev.sh p3-python -m p3.research.offline extract artifacts/my-real-annotation-run/dataset --output artifacts/my-real-annotation-run/frames --frames "$(seq -s, 0 119)"
+   ```
+
+   Use the actual recorded count from `manifest.json` if EOF occurs earlier.
+   Upload only `frame-*.png` to CVAT in numeric filename order; `index.json`
+   records the original dataset mapping. Sparse extracts such as `0,30` cannot
+   use the contiguous MOT frame mapping below.
+2. In CVAT, label all persons, keep each person's track identity through
+   crossings/occlusion, and inspect empty frames too. Use pedestrian class 1
+   for the MOT export. Export **MOT 1.1**, unpack it locally, and place its
+   `gt/gt.txt` at `projects/project3/artifacts/my-real-annotation-run/gt.txt`.
+   Only the GT text file is read; no CVAT service or network connection is used.
+3. Import a draft, inspect the printed JSON summary and resulting boxes against
+   the extracted originals:
+
+   ```sh
+   ./scripts/dev.sh p3-python -m p3.research.offline import-mot artifacts/my-real-annotation-run/dataset artifacts/my-real-annotation-run/gt.txt --output artifacts/my-real-annotation-run/draft.json --target-person-id 9
+   ```
+
+   Replace 9 with the ground-truth person identity you want to assess. Omitting
+   it leaves selected-target continuity unavailable. Drafts remain blocked by
+   `validate-annotations` and have no accuracy metrics in `evaluate`.
+4. After human review of **all frames in the span**, import to a new file with
+   explicit verification and provenance, then validate and compare:
+
+   ```sh
+   ./scripts/dev.sh p3-python -m p3.research.offline import-mot artifacts/my-real-annotation-run/dataset artifacts/my-real-annotation-run/gt.txt --output artifacts/my-real-annotation-run/reviewed.json --target-person-id 9 --human-verified --annotator "Annotator name" --reviewer "Reviewer name"
+   ./scripts/dev.sh p3-python -m p3.research.offline validate-annotations artifacts/my-real-annotation-run/dataset artifacts/my-real-annotation-run/reviewed.json
+   ./scripts/dev.sh p3-python -m p3.research.offline evaluate artifacts/my-real-annotation-run/dataset --annotations artifacts/my-real-annotation-run/reviewed.json --trackers all --output artifacts/my-real-annotation-run/comparison.json
+   ```
+
+`--human-verified` maps to the existing contract's `status: reviewed`, reviewed
+frames and `human_annotation` provenance; it is a user attestation, not automated
+verification of truth. An import always refuses to overwrite an existing file.
+Results count as real tracking accuracy only for human-verified **real** clips.
+
+MOT rows are `frame,id,x,y,width,height[,mark[,class[,visibility]]]` (6–9 numeric
+columns, consistent within a file). Frames and IDs must be positive integers;
+duplicate IDs within any frame are errors. The mapping is
+`dataset_frame_id = MOT_frame - 1 + frame_offset`: frame 1 maps to dataset frame
+0 by default. For a contiguous extract of dataset frames 30–59, use
+`--frame-offset 30 --frame-count 30`; MOT frames 1–30 then map to those records.
+Without `--frame-count`, the span extends to the final recorded frame. Missing
+rows within that span mean no labeled persons, including trailing empty frames;
+verify the export covers the entire chosen span before marking it reviewed.
+Out-of-range rows fail instead of being dropped.
+
+MOT x/y are 1-based by default and converted to zero-based `[x1,y1,x2,y2]`;
+width/height are unchanged. Use `--box-origin 0` only for exports with zero-based
+x/y, and verify alignment against originals. Nonfinite numbers, nonpositive
+sizes, and boxes outside the image fail. `--clip-boxes` explicitly permits
+clipping with every original/result box reported; boxes with no area inside the
+image still fail. Optional GT mark is 0 or 1 (default 1); mark 0 rows are excluded.
+Class must be a positive integer (default 1); only class 1 pedestrians are
+included. Visibility must be in [0,1] (default 1), mapped to none/partial/full
+occlusion. A visibility-0 row retains its trusted box and is scored; visibility
+alone never creates a missing box. All rows, including excluded rows, undergo
+validation. Detector result files with confidence/XYZ columns are unsupported.
+The summary includes exclusions, clipping, frame mapping and the source SHA256;
+it is also retained as JSON in `provenance.reference` without extending the
+annotation schema. Excluded rows do not create ignore regions, so predictions
+there can count as false positives. This is not full MOTChallenge preprocessing.
+
+`--trackers all` compares `greedy_iou`, `hungarian` and `kalman_iou`, or pass a
+comma-separated subset. Each replays every stored detection frame, using the
+same recorded threshold/max-missed settings and input hash. Each method reports
+the existing evaluator metrics (including ID switches, IDF1 and recovery), timing,
+predictions, plus `selected_target_continuity`. Continuity anchors the selected
+GT person to its first matched prediction ID, counting frames on that ID
+(including the first match), on a different ID, lost while a GT box is present,
+and absent/unboxed GT separately. It uses only reviewed frames and the same
+IoU matching as the evaluator; sampled frames cannot prove continuity between
+samples. Without `--trackers`, the historical greedy/Hungarian report and its
+fields stay unchanged. None of these results authorizes physical following.
 
 `--media-root` (or the `P3_MEDIA_ROOT` environment variable) stores and resolves
 the original media path relative to that directory. Recordings made without a
