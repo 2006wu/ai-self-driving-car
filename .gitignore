@@ -83,3 +83,12 @@ projects/project2/modelb6/wheelhouse/
 
 # Local presentation history, backups and private build evidence
 reports/.archive/
+
+
+# ========================================
+# Regenerable large report outputs (see projects/project3/README.md,
+# "Regenerable large evidence files"). Hashes are kept in the tracked JSON.
+# ========================================
+reports/ai-control-readiness-20261020/export-sample.jsonl
+reports/ai-control-milestone2-20261020/annotation-frames/*.png
+reports/ai-control-milestone3-20261020/audit/audit-contact-sheet.jpg

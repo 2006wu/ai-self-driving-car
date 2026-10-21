@@ -307,6 +307,46 @@ the canonical identity JSON. Any later change under `p3/` changes the session
 id of datasets recorded after that change. Manifests that are already written
 keep the fingerprints and session id they were saved with.
 
+### Regenerable large evidence files (not stored in git)
+
+To keep the repository small, these generated files (about 5.5 MB together) were
+removed from git on 2026-10-21. They are reproducible from local, gitignored inputs
+under `projects/project3/artifacts/`, no test depends on them, and their original
+SHA-256 values remain in the tracked JSON evidence (`integrity.json`,
+`annotation-frames/index.json`, `checks.json`, `preservation-*.json`). Git history
+still contains the old copies. Regenerate them in Docker from the repository root.
+Outputs go to the writable `artifacts/` mount; the source tree is read-only.
+
+| Removed file | SHA-256 (original) | Regenerate with |
+|---|---|---|
+| `reports/ai-control-readiness-20261020/export-sample.jsonl` (2.3 MB) | `846efc8b…07cfe` | export command below |
+| `reports/ai-control-milestone2-20261020/annotation-frames/frame-{000000,000030,000060,000090,000119}.png` (~0.5 MB each) | see `annotation-frames/index.json` and `checks.json` | extract command below |
+| `reports/ai-control-milestone3-20261020/audit/audit-contact-sheet.jpg` (0.6 MB) | `92e0d5c3…0f017` | local-audit command below |
+
+```sh
+# 1. Offline export sample (needs artifacts/validation-20261016/stability-video-final/events.jsonl)
+./scripts/dev.sh p3-python -m p3.research.export \
+  artifacts/validation-20261016/stability-video-final/events.jsonl \
+  artifacts/regenerated/export-sample.jsonl
+sha256sum projects/project3/artifacts/regenerated/export-sample.jsonl   # expect 846efc8ba74133b091fa64f6c7480c9a22a508d833f93816631be8f0e3407cfe
+
+# 2. Annotation frames (needs artifacts/inputs/usa.hevc)
+./scripts/dev.sh p3-python -m p3.research.offline extract \
+  /workspace/reports/ai-control-milestone2-20261020/usa-verified \
+  --frames 0,30,60,90,119 --media-root artifacts/inputs \
+  --output artifacts/regenerated/annotation-frames
+
+# 3. Milestone 3 audit contact sheet (runs from repo root; needs local media under artifacts/)
+docker compose -f docker/docker-compose.yaml --profile project3 run --rm --no-deps \
+  -w /workspace -e PYTHONPATH=/workspace/projects/project3 project3 \
+  python reports/ai-control-milestone3-20261020/local-audit.py \
+  --output projects/project3/artifacts/regenerated/milestone3-audit
+```
+
+The `.gitignore` lists the removed paths so a regenerated copy is not re-committed
+by accident. Course deliverables (Report PDFs/PPTX) and the small sample bundles
+(`usa-sample`, `usa-verified`, `image-sample`, each record file < 500 KB) stay in git.
+
 ### Opt-in motion tracker and synthetic tracker benchmark
 
 Research callers can use `p3.research.tracking.create_tracker('kalman_iou')`
