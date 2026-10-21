@@ -1,18 +1,42 @@
-# Project 3 — Docker YOLO, evaluation and Run2 preparation
+# Project 3 — perception, offline control and Run2 preparation
 
-Current runtime policy (2026-10-21): all setup, execution and testing use Docker.
-The existing setup/run/verify scripts now delegate to `scripts/dev.sh`.
-See [Docker commands and limits](../../docs/DOCKER.md); older native macOS evidence
-below describes historical measurements, not the current runtime.
-Docker validation: [163/163 Project 3 tests, image/video and Qt/VNC smoke](evidence/docker-20261021/RESULTS.md).
+## Overview and status
+
+Run1 image/video YOLO, tracking/overlay and file benchmarks are implemented.
+Software/offline work also includes `kalman_iou` and its synthetic benchmark,
+MOT/CVAT import and `evaluate --trackers all`, latest-frame `stream:` input,
+PID simulation, `p3_control_dataset/1.0`, ridge/MLP behaviour cloning, a shared
+1.0 m width-based too-close stop, mock/dry-run body transport, Run2 log export
+and measured acceptance tooling, and Report 3 figure generation.
+All follow/control output is **simulation_only**; physical control is disabled
+and real transport is refused.
+
+Current local suite: **286 tests, OK (skipped=8)**. The user-reported Mac
+`develop` **131faef** full health check passed **472 tests across projects**,
+including **276 Project 3 tests at that revision**. These are different snapshots.
+Historical [2026-10-16 validation](evidence/validation-20261016/REPORT.md) and
+[Docker validation](evidence/docker-20261021/RESULTS.md) retain their original counts.
+
+Remaining user/hardware work: Run2 real-car session and acceptance; human CVAT
+annotation/evaluation of a real multi-person video; manual `q/c/n/r/s` keyboard
+checks with `--display`; an online Gemini call with an API key; Report 3 write-up
+and slides due **2026-12-25**. Run2 tracker continuity needs reviewed human
+`target_identity` annotations. Physical C2C/comma body control is unimplemented
+by design and needs a separate safety review.
 
 See [requirements/source audit](../../docs/PROJECT3.md),
-[measured acceptance](evidence/STATUS.md), [hardware checklist](HARDWARE.md).
-Required: Run1 PC YOLO and Run2 C2C/Wi-Fi/UI. Benchmark/robustness are engineering
-additions; tracking/overlay are Do New. Hardware and webcam acceptance are pending.
+[current evidence status](evidence/STATUS.md), [hardware checklist](HARDWARE.md)
+and [verified command inventory](evidence/COMMANDS.md).
 
-Latest: [2026-10-16 software validation report](evidence/validation-20261016/REPORT.md).
-107/107 Project 3 tests pass; real annotated tracking accuracy remains NOT TESTED.
+Contents: [Environment](#environment) · [Inputs](#inputs-and-reference) ·
+[Run1](#run1-commands-from-repository-root) ·
+[Tracking and benchmarks](#tracking-overlay-and-benchmark) ·
+[Webcam/stream](#webcam-and-network-stream) ·
+[Vision evaluation](#vision-validation-and-annotated-evaluation) ·
+[Simulation/control](#simulation-and-control) ·
+[Run2](#run2-boundaries-session-export-and-acceptance) ·
+[Report figures](#report-3-draft-figures) ·
+[Evidence](#evidence-and-regenerable-files) · [Safety](#safety-boundaries).
 
 ## Environment
 
@@ -21,13 +45,17 @@ in requirements.txt are installed in the image, separately from Agent/ModelB6.
 From repository root:
 
 ```sh
-./projects/project3/setup.sh
-./projects/project3/run.sh check
-./projects/project3/verify.sh
+./scripts/dev.sh build project3
+./scripts/dev.sh p3 check
+./scripts/dev.sh test-p3
 ```
 
+The existing wrappers remain equivalent: `./projects/project3/setup.sh`,
+`./projects/project3/run.sh check`, and `./projects/project3/verify.sh`.
+
 Dependencies are pinned, not a wheel/hash lock or cross-platform guarantee.
-Model remains the original local `external/aJLL/bodyjim/yolov5n_flat.onnx`:
+The required model is the original local
+`external/aJLL/bodyjim/yolov5n_flat.onnx` (not bundled in this checkout):
 SHA256 `bf667e5041e89ffaf1faa17c1ecbcf2d87729a514486a46c1996682342386031`.
 Missing model produces an error; no hidden downloads. CoreML is unavailable in
 the Linux container. CPU default uses one intra-op thread.
@@ -66,14 +94,14 @@ and output media stay ignored; small JSON/test evidence is retained separately.
 
 ## Run1 (commands from repository root)
 
-Each output directory must be new or empty; existing evidence is never overwritten.
+Each run output directory must be new or empty; existing evidence is never overwritten.
 
 ```sh
-./projects/project3/run.sh run artifacts/bus.jpg --output artifacts/my-image
-./projects/project3/run.sh run artifacts/inputs/usa.hevc --max-frames 2000 --output artifacts/my-video
+./scripts/dev.sh p3 run artifacts/bus.jpg --output artifacts/my-image
+./scripts/dev.sh p3 run artifacts/inputs/usa.hevc --max-frames 2000 --output artifacts/my-video
 ```
 
-Paths are relative to `projects/project3/` because run.sh changes to that directory;
+Paths are relative to `projects/project3/`, the Docker service working directory;
 absolute container paths also work. The legacy camera path uses AVFoundation
 and is unavailable in Linux Docker; use the opt-in Mac webcam bridge below.
 Real camera acceptance remains pending.
@@ -84,10 +112,10 @@ resize, objectness threshold and class-agnostic NMS reproduce professor math.
 Boxes map independently into original image width/height and are clipped.
 `obj=` is objectness, not a calibrated class confidence or objectness×class score.
 
-## Do New: tracking and overlay dashboard
+## Tracking, overlay and benchmark
 
 ```sh
-./projects/project3/run.sh run artifacts/bus.jpg --track --output artifacts/my-tracking-image
+./scripts/dev.sh p3 run artifacts/bus.jpg --track --output artifacts/my-tracking-image
 ./scripts/dev.sh p3-display run artifacts/inputs/usa.hevc --track --display --max-frames 300 --output artifacts/my-tracking-video
 ```
 
@@ -103,13 +131,13 @@ silently switch to a new person. No re-identification or physical human followin
 dimensionless software simulation only, saved locally and never sent to a motor. The status is local, not a live C2C connection monitor. CLI
 reports fatal errors; a reconnecting network dashboard is not implemented.
 
-## Benchmark
+### File-pipeline benchmark
 
 ```sh
-./projects/project3/run.sh benchmark artifacts/bus.jpg --samples 30 --warmup 5 --output artifacts/my-image.json
-./projects/project3/run.sh benchmark artifacts/inputs/usa.hevc --samples 120 --warmup 5 --output artifacts/my-video.json
-./projects/project3/run.sh benchmark artifacts/bus.jpg --samples 30 --resolution 640x480 --output artifacts/my-small.json
-./projects/project3/run.sh benchmark artifacts/bus.jpg --samples 30 --confidence .5 --output artifacts/my-conf50.json
+./scripts/dev.sh p3 benchmark artifacts/bus.jpg --samples 30 --warmup 5 --output artifacts/my-image.json
+./scripts/dev.sh p3 benchmark artifacts/inputs/usa.hevc --samples 120 --warmup 5 --output artifacts/my-video.json
+./scripts/dev.sh p3 benchmark artifacts/bus.jpg --samples 30 --resolution 640x480 --output artifacts/my-small.json
+./scripts/dev.sh p3 benchmark artifacts/bus.jpg --samples 30 --confidence .5 --output artifacts/my-conf50.json
 ```
 
 Resolution changes the *source* size; fixed model input stays 640×416. Threshold
@@ -122,83 +150,87 @@ decisions are included only when their flags are enabled. Inference FPS
 and file-pipeline FPS are 1000 / mean stage latency, not video playback rate.
 Per-stage mean, median, P95, population std/count, per-frame process RSS, detection
 count and objectness stats are recorded. Load-time repeated statistics and provider
-output comparison: `evaluate.py` (run from this directory, output must not exist).
+output comparison was historically generated by `evaluate.py`; see the
+[script limitations](#historical-evidence-scripts) before attempting regeneration.
 CoreML uses fallback CPU partitions; GPU-only speed/utilization is not measured.
 No ground truth: **precision/recall/mAP not evaluated**. Dark/blur/occlusion image
 perturbations are software probes, not real adverse-scene accuracy measurements.
 
-## Run2 verification boundaries
+## Webcam and network stream
 
-Exact course script is materially different from uiviewJLL: four device processes,
-four cereal services and a persistent Params write. The Wi-Fi workflow is PC SSH
-to **device-side UI**. No YOLO-to-PC/C2C streaming protocol is specified by it.
-`p3/run2.py` preserves process/message APIs through dependency injection and adds
-bounded retries/cleanup. It intentionally has no real-device default bindings.
-API-double tests include normal/invalid data, timeout, disconnect/recreate-publisher,
-partial startup and cleanup. These are not actual network or Capnp/msgq tests.
-No network emulator is added without a confirmed streaming interface. Hardware
-firmware and bindings must be checked before adding a runnable device adapter.
+The helper captures at 30 fps by default; `--fps 15` downsamples output with
+ffmpeg `-r 15`, keeping the capture rate at 30.
 
-## Evidence and report outline
+The host helper is a capture-only exception to the Docker runtime: ffmpeg must
+already be installed **on the Mac**, with AVFoundation support. Python, inference
+and tests remain in Docker. No permission settings are changed; macOS may prompt
+for camera access for the terminal running ffmpeg. Approve manually if desired;
+permission refusal must be treated as a failed capture, never a hardware PASS.
 
-Small evidence contains source/environment hashes, measured benchmarks, unit/model
-integration logs, API-double results, supplemental probes and preservation checks.
-Generated run.json/PNG/AVI remain in ignored artifacts. See COMMANDS.md and STATUS.md.
-Tests distinguish executed PASS from explicit fixture SKIP; missing private assets
-are not silently treated as passes. `verify.sh` exits on test failure; unittest
-SKIPs remain visible in the test summary. No physical test is represented as a skip
-that counts toward a hardware PASS.
-
-Report narrative: requirements → original source limits → isolated architecture →
-Run1 numerical/file verification → measured provider/scenario results → Run2 device
-architecture/API preparation → tracking/robustness extensions → hardware/accuracy
-limits → next experiments. No report deck or PDF is generated in this iteration.
-
-## Vision validation and simulated follow (2026-10-16)
-
-The same detector/capture/render pipeline supports simulation; the greedy IoU
-association algorithm is unchanged. `--track` alone retains the original initial
-tracking target selection. **Simulation begins IDLE and requires explicit selection**
-(`n` in display mode, or `--target-id` in a bounded offline run). A displayed
-tracker target does not by itself arm simulation.
+From the repository root, in a Mac terminal:
 
 ```sh
-# From repository root; output directories must be new or empty.
-./projects/project3/run.sh run artifacts/bus.jpg --track --simulate-follow --target-id 1 --output artifacts/my-simulation-image
-./projects/project3/run.sh run artifacts/inputs/usa.hevc --track --simulate-follow --max-frames 2000 --output artifacts/my-simulation-video
-./projects/project3/run.sh tracking-fixtures --output artifacts/my-synthetic-tracking.json
-./projects/project3/run.sh benchmark artifacts/bus.jpg --track --simulate-follow --samples 30 --output artifacts/my-tracking-performance.json
+./projects/project3/tools/mac-webcam-stream.sh --help
+./projects/project3/tools/mac-webcam-stream.sh --device 0 --size 640x480 --fps 30 --port 8081
 ```
 
-In display mode: `n` selects the next visible track; `r` explicitly confirms the
-current visible target; `c` cancels selection and stops; `s` saves a screenshot;
-`q` stops and exits. Selection first emits zero output. A later unambiguous frame
-can emit FOLLOW. Loss immediately emits zero, progresses from
-TARGET_TEMPORARILY_LOST to TARGET_LOST after five missed updates, and latches
-stopped. Reappearance of even the same ID requires explicit confirmation.
-Overlap with another tracked person at IoU >= .15 also latches STOP; ambiguous
-selection cannot arm. Invalid boxes/IDs, model errors and unexpected exceptions
-stop and clean up; faults require a new session. Frame age over .5 seconds stops.
-Speed/turn are normalized heuristics based on box center/width, not calibrated
-vehicle commands or metric distance. STOP has priority over selection/follow.
-An undetected identity swap without observable overlap/loss can evade this policy;
-tracking IDs and software STOP behavior do not establish real identity or physical safety.
+In a second terminal (Docker Desktop running, Project 3 image built):
 
-Successful runs save `run.json`, first-frame `preview.png`, and an `overlay.avi`
-for video/camera unless `--no-record` is used. `events.jsonl` is flushed per event;
-`run-status.json` records termination and cleanup even on failed runs. The final
-simulation event is STOP at EOF, limits, quit or error. Failed runs exit nonzero;
-frame records remain available in the event journal even if `run.json` was not
-completed. Filesystem failure can prevent durable logs. `--max-seconds` is checked
-between frames; it cannot interrupt blocked native capture/inference. An external
-watchdog would be needed for a hard wall-clock deadline.
+```sh
+./scripts/dev.sh p3-stream http://host.docker.internal:8081/ --track --simulate-follow --max-frames 300 --max-seconds 60 --output artifacts/mac-stream-acceptance-001
+```
+
+Use a fresh output directory each time. The default URL can be omitted. The
+underlying CLI also accepts `p3 run stream:http://host.docker.internal:8081/`.
+For interactive VNC acceptance use `p3-display run` with the same `stream:` source
+and `--display --track --simulate-follow`, then use n/r/c/s/q as described in [simulated follow](#explicit-selection-and-simulated-follow).
+Without explicit selection simulation stays IDLE; all output is local simulation,
+with no physical control. Expect preview.png, overlay.avi, events.jsonl and
+run-status.json; run.json is produced only on success.
+
+Stop the consumer with Ctrl-C (or q with display), then stop the host helper with
+Ctrl-C. ffmpeg serves one client; explicitly restart the helper and start a new
+consumer session after disconnect. No automatic reconnect occurs. The helper binds
+only 127.0.0.1 and captures no audio; do not expose this unauthenticated feed to a
+LAN. Docker Desktop must support host loopback access via host.docker.internal;
+if your Desktop/network policy blocks it, capture remains blocked. The Linux
+host-gateway mapping does not by itself expose a host loopback listener.
+
+The reader continuously drains capture and retains only the latest frame.
+`application_skipped_frames` and `stream_dropped_frames` in run-status.json and
+the session_end event count replaced, unconsumed frames; sensor drops remain unknown.
+A read failure latches disconnect immediately, discarding any pending frame.
+Stream open deadline is 3 seconds; local acquisition/stale deadline is .5 seconds.
+Disconnect, invalid BGR frame or a deadline failure terminates the session,
+latches the source closed and writes a final zero/STOP when simulation is enabled.
+Native FFmpeg open/read timeout parameters are supplied, with a separate caller
+watchdog. If a native backend ignores timeouts, its daemon worker releases capture
+when the native call returns; the main pipeline still stops on deadline. These
+limits do not interrupt model inference. Frame age measures local acquisition,
+not sensor time: buffered/repeated upstream imagery and sensor drops cannot be
+identified reliably from MJPEG. This is software fail-closed behavior, not a
+physical safety guarantee.
+
+Automated stream tests use injected captures and generated localhost MJPEG.
+Separately, the user reported a Mac webcam stream smoke with software STOP about
+**0.05 s after SIGINT**; this is local software timing, not actuator latency or
+complete hardware acceptance. Run automated checks in Docker:
+
+```sh
+./scripts/dev.sh p3-python -m unittest discover -s tests -p test_stream.py -v
+./scripts/dev.sh test-p3
+```
+
+Full Mac permission approval/refusal, image quality, latency, key interaction,
+and disconnect acceptance still require user verification. Synthetic and
+loopback results do not count as that acceptance.
 
 ### Manual webcam acceptance — user hardware verification pending
 
-The read-only AVFoundation authorization query returned `notDetermined` on
+The historical read-only AVFoundation authorization query returned `notDetermined` on
 2026-10-16. No capture or permission-setting change was performed. Under the
 current Docker runtime, AVFoundation cannot be used directly. The opt-in Mac
-webcam bridge below supplies container-compatible stream input; real webcam
+webcam bridge above supplies container-compatible stream input; real webcam
 acceptance still requires user permission and hardware verification.
 Use `scripts/dev.sh p3-display` with existing files for desktop testing.
 
@@ -206,8 +238,11 @@ Start with simulation IDLE; verify boxes/obj/IDs/FPS, select with `n`, take a
 snapshot with `s`, cancel with `c`, confirm with `r`, then quit with `q`. Repeat
 in separate new output folders for permission refusal and camera disconnection
 when feasible. Check nonzero error exits, final zero simulated output and
-resource release. Actual key interaction, capture, sensor drops and camera FPS
-remain NOT TESTED; injected camera/GUI tests are software checks only.
+resource release. Actual keyboard interaction (`q/c/n/r/s` with `--display`), sensor drops and
+comprehensive camera acceptance remain pending; injected camera/GUI tests are
+software checks only. The Mac stream smoke above is a separate measured result.
+
+## Vision validation and annotated evaluation
 
 ### Annotated tracking evaluation
 
@@ -232,7 +267,7 @@ required. Never label detector outputs as ground truth. No annotation means real
 IDF1/ID precision/ID recall are N/A.
 
 ```sh
-./projects/project3/run.sh tracking-eval /absolute/path/annotations-and-predictions.json --iou .5 --output artifacts/my-annotated-tracking.json
+./scripts/dev.sh p3 tracking-eval /absolute/path/annotations-and-predictions.json --iou .5 --output artifacts/my-annotated-tracking.json
 ```
 
 ID metrics use global identity assignment of all IoU-qualified pairs. Frame
@@ -247,9 +282,10 @@ see [tracking method reference](https://github.com/JonathonLuiten/TrackEval/blob
 
 ### Reproduce the full local benchmark and summaries
 
+From the repository root:
+
 ```sh
-cd projects/project3
-../../scripts/dev.sh p3-python validate_vision.py --output artifacts/my-validation-measurements
+./scripts/dev.sh p3-python validate_vision.py --output artifacts/my-validation-measurements
 ```
 
 Use an idle machine and new output directory; the command measures local
@@ -257,8 +293,8 @@ files only. Six CPU conditions compare source sizes, thresholds and
 optional tracking/follow, with five excluded warmups and 30 measured frames each.
 Fixed model input remains 640×416. Synthetic 1/2/5/10/20-person box workloads
 measure tracker cost only; actual detector person counts are reported separately.
-`summarize.py` rebuilds the current report from the saved final evidence, without
-rerunning inference. Its historical 2026-10-14 report remains available separately.
+`summarize.py` is a historical fixed-path report writer, not the current status
+updater; see [script limitations](#historical-evidence-scripts).
 Detection FPS is 1000 / mean(preprocess + inference + postprocess); inference FPS
 uses inference alone; file pipeline FPS includes decode/resize/render and optional
 tracking/decisions. None is webcam FPS. Per-stage mean/median/P95/std and samples
@@ -267,12 +303,12 @@ includes opening/journaling. CPU percent uses one core = 100% and may exceed 100
 RSS is sampled process memory, not continuous peak or GPU memory. Application
 skipped frames = 0 means no intentional skipping; sensor drops are N/A.
 
-## Opt-in offline research (`p3.research`)
+### Offline bundles (`p3.research`)
 
 `p3.research` is not imported by `p3.cli` or the Run1/Run2 commands. Nothing in
 this package runs unless you start it. It records a local image or video into a
 v2 bundle (`manifest.json`, `records.jsonl`, `quality.json`) and can replay the
-existing greedy and Hungarian trackers on the stored detections. It does not
+greedy, Hungarian and opt-in Kalman/IoU trackers on the stored detections. It does not
 open a camera, talk to hardware, or change follow/tracking defaults.
 
 From the repository root, through the Project 3 Docker runtime (paths inside
@@ -396,46 +432,6 @@ the canonical identity JSON. Any later change under `p3/` changes the session
 id of datasets recorded after that change. Manifests that are already written
 keep the fingerprints and session id they were saved with.
 
-### Regenerable large evidence files (not stored in git)
-
-To keep the repository small, these generated files (about 5.5 MB together) were
-removed from git on 2026-10-21. They are reproducible from local, gitignored inputs
-under `projects/project3/artifacts/`, no test depends on them, and their original
-SHA-256 values remain in the tracked JSON evidence (`integrity.json`,
-`annotation-frames/index.json`, `checks.json`, `preservation-*.json`). Git history
-still contains the old copies. Regenerate them in Docker from the repository root.
-Outputs go to the writable `artifacts/` mount; the source tree is read-only.
-
-| Removed file | SHA-256 (original) | Regenerate with |
-|---|---|---|
-| `reports/ai-control-readiness-20261020/export-sample.jsonl` (2.3 MB) | `846efc8b…07cfe` | export command below |
-| `reports/ai-control-milestone2-20261020/annotation-frames/frame-{000000,000030,000060,000090,000119}.png` (~0.5 MB each) | see `annotation-frames/index.json` and `checks.json` | extract command below |
-| `reports/ai-control-milestone3-20261020/audit/audit-contact-sheet.jpg` (0.6 MB) | `92e0d5c3…0f017` | local-audit command below |
-
-```sh
-# 1. Offline export sample (needs artifacts/validation-20261016/stability-video-final/events.jsonl)
-./scripts/dev.sh p3-python -m p3.research.export \
-  artifacts/validation-20261016/stability-video-final/events.jsonl \
-  artifacts/regenerated/export-sample.jsonl
-sha256sum projects/project3/artifacts/regenerated/export-sample.jsonl   # expect 846efc8ba74133b091fa64f6c7480c9a22a508d833f93816631be8f0e3407cfe
-
-# 2. Annotation frames (needs artifacts/inputs/usa.hevc)
-./scripts/dev.sh p3-python -m p3.research.offline extract \
-  /workspace/reports/ai-control-milestone2-20261020/usa-verified \
-  --frames 0,30,60,90,119 --media-root artifacts/inputs \
-  --output artifacts/regenerated/annotation-frames
-
-# 3. Milestone 3 audit contact sheet (runs from repo root; needs local media under artifacts/)
-docker compose -f docker/docker-compose.yaml --profile project3 run --rm --no-deps \
-  -w /workspace -e PYTHONPATH=/workspace/projects/project3 project3 \
-  python reports/ai-control-milestone3-20261020/local-audit.py \
-  --output projects/project3/artifacts/regenerated/milestone3-audit
-```
-
-The `.gitignore` lists the removed paths so a regenerated copy is not re-committed
-by accident. Course deliverables (Report PDFs/PPTX) and the small sample bundles
-(`usa-sample`, `usa-verified`, `image-sample`, each record file < 500 KB) stay in git.
-
 ### Opt-in motion tracker and synthetic tracker benchmark
 
 Research callers can use `p3.research.tracking.create_tracker('kalman_iou')`
@@ -459,79 +455,55 @@ boxes remain in ground truth during detection gaps. All annotations and results
 are explicitly `synthetic_ground_truth`. These results do not establish real
 person identity, real-world tracking accuracy or physical safety.
 
-### Mac webcam bridge to Docker (opt-in)
+## Simulation and control
 
-The helper captures at 30 fps by default; `--fps 15` downsamples output with
-ffmpeg `-r 15`, keeping the capture rate at 30.
+### Explicit selection and simulated follow
 
-The host helper is a capture-only exception to the Docker runtime: ffmpeg must
-already be installed **on the Mac**, with AVFoundation support. Python, inference
-and tests remain in Docker. No permission settings are changed; macOS may prompt
-for camera access for the terminal running ffmpeg. Approve manually if desired;
-permission refusal must be treated as a failed capture, never a hardware PASS.
-
-From the repository root, in a Mac terminal:
+The detector/capture/render pipeline supports simulation with the production
+greedy IoU tracker. The opt-in research trackers above do not change this
+default. `--track` alone retains the original initial tracking target selection. **Simulation begins IDLE and requires explicit selection**
+(`n` in display mode, or `--target-id` in a bounded offline run). A displayed
+tracker target does not by itself arm simulation.
 
 ```sh
-./projects/project3/tools/mac-webcam-stream.sh --help
-./projects/project3/tools/mac-webcam-stream.sh --device 0 --size 640x480 --fps 30 --port 8081
+# From repository root; output directories must be new or empty.
+./scripts/dev.sh p3 run artifacts/bus.jpg --track --simulate-follow --target-id 1 --output artifacts/my-simulation-image
+./scripts/dev.sh p3 run artifacts/inputs/usa.hevc --track --simulate-follow --max-frames 2000 --output artifacts/my-simulation-video
+./scripts/dev.sh p3 tracking-fixtures --output artifacts/my-synthetic-tracking.json
+./scripts/dev.sh p3 benchmark artifacts/bus.jpg --track --simulate-follow --samples 30 --output artifacts/my-tracking-performance.json
 ```
 
-In a second terminal (Docker Desktop running, Project 3 image built):
+In display mode: `n` selects the next visible track; `r` explicitly confirms the
+current visible target; `c` cancels selection and stops; `s` saves a screenshot;
+`q` stops and exits. Selection first emits zero output. A later unambiguous frame
+can emit FOLLOW. Loss immediately emits zero, progresses from
+TARGET_TEMPORARILY_LOST to TARGET_LOST after five missed updates, and latches
+stopped. Reappearance of even the same ID requires explicit confirmation.
+Overlap with another tracked person at IoU >= .15 also latches STOP; ambiguous
+selection cannot arm. Invalid boxes/IDs, model errors and unexpected exceptions
+stop and clean up; faults require a new session. Frame age over .5 seconds stops.
+Speed/turn are normalized heuristics based on box center/width, not calibrated
+vehicle commands or metric distance. STOP has priority over selection/follow.
+An undetected identity swap without observable overlap/loss can evade this policy;
+tracking IDs and software STOP behavior do not establish real identity or physical safety.
 
-```sh
-./scripts/dev.sh p3-stream http://host.docker.internal:8081/ --track --simulate-follow --max-frames 300 --max-seconds 60 --output artifacts/mac-stream-acceptance-001
-```
+Successful runs save `run.json`, first-frame `preview.png`, and an `overlay.avi`
+for video/camera unless `--no-record` is used. `events.jsonl` is flushed per event;
+`run-status.json` records termination and cleanup even on failed runs. The final
+simulation event is STOP at EOF, limits, quit or error. Failed runs exit nonzero;
+frame records remain available in the event journal even if `run.json` was not
+completed. Filesystem failure can prevent durable logs. `--max-seconds` is checked
+between frames; it cannot interrupt blocked native capture/inference. An external
+watchdog would be needed for a hard wall-clock deadline.
 
-Use a fresh output directory each time. The default URL can be omitted. The
-underlying CLI also accepts `p3 run stream:http://host.docker.internal:8081/`.
-For interactive VNC acceptance use `p3-display run` with the same `stream:` source
-and `--display --track --simulate-follow`, then use n/r/c/s/q as described above.
-Without explicit selection simulation stays IDLE; all output is local simulation,
-with no physical control. Expect preview.png, overlay.avi, events.jsonl and
-run-status.json; run.json is produced only on success.
-
-Stop the consumer with Ctrl-C (or q with display), then stop the host helper with
-Ctrl-C. ffmpeg serves one client; explicitly restart the helper and start a new
-consumer session after disconnect. No automatic reconnect occurs. The helper binds
-only 127.0.0.1 and captures no audio; do not expose this unauthenticated feed to a
-LAN. Docker Desktop must support host loopback access via host.docker.internal;
-if your Desktop/network policy blocks it, capture remains blocked. The Linux
-host-gateway mapping does not by itself expose a host loopback listener.
-
-The reader continuously drains capture and retains only the latest frame.
-`application_skipped_frames` and `stream_dropped_frames` in run-status.json and
-the session_end event count replaced, unconsumed frames; sensor drops remain unknown.
-A read failure latches disconnect immediately, discarding any pending frame.
-Stream open deadline is 3 seconds; local acquisition/stale deadline is .5 seconds.
-Disconnect, invalid BGR frame or a deadline failure terminates the session,
-latches the source closed and writes a final zero/STOP when simulation is enabled.
-Native FFmpeg open/read timeout parameters are supplied, with a separate caller
-watchdog. If a native backend ignores timeouts, its daemon worker releases capture
-when the native call returns; the main pipeline still stops on deadline. These
-limits do not interrupt model inference. Frame age measures local acquisition,
-not sensor time: buffered/repeated upstream imagery and sensor drops cannot be
-identified reliably from MJPEG. This is software fail-closed behavior, not a
-physical safety guarantee.
-
-Tests use injected captures and generated localhost MJPEG only. Run in Docker:
-
-```sh
-./scripts/dev.sh p3-python -m unittest discover -s tests -p test_stream.py -v
-./scripts/dev.sh test-p3
-```
-
-Real Mac permission approval/refusal, image quality, latency, key interaction,
-and disconnect behavior still require user hardware acceptance. Synthetic and
-loopback results do not count as that acceptance.
-
-## Run3 direction: PID follow (simulation only)
+### PID follow and `pid_sim`
 
 `p3.research.pid_controller.PIDFollowController` is an opt-in Controller adapter.
 It delegates selection, stale age, loss, overlap, explicit confirmation and
 permanent faults to an unchanged `FollowController`. The unchanged
 `RuleBasedController` is the baseline. Production follow and replay defaults are
-unchanged. Physical control remains disabled; no device interface is implemented.
+unchanged. Physical control remains disabled; the body interface below supports
+only mock/dry-run transport.
 
 This is a **synthetic kinematic simulation with an image-size distance proxy**,
 not a calibrated vehicle controller or real hardware acceptance. There is no
@@ -642,18 +614,10 @@ legacy or supervisor latch. Minimum distance includes sampled steps and the fina
 endpoint, not a continuous collision certificate. The JSON also records tracking,
 lost and visible steps, operator reselections and supervisor fault steps.
 
-Local validation used the explicitly requested existing
-`/workspace/scratch/venv-p3/bin/python` because Docker is unavailable in this
-workspace. No environment or dependencies were installed. Docker commands above
-are the supported reproduction path; a Docker execution was not measured here.
+The current suite result is listed in [status](evidence/STATUS.md). Earlier
+PID-only test counts and local artifacts describe their original revision.
 
-Validation for this change: 18 new tests pass in approximately 0.13s; full suite
-203 tests, zero failures, 8 skips (existing optional fixtures/runtime checks).
-The full suite took approximately 12s. Generated local comparison and test log
-are under the fresh `artifacts/pid-sim-tuned/` directory; initial exploratory
-results remain preserved under `artifacts/pid-sim/`.
-
-## Control training dataset (comma body / AI-control direction)
+### Control training dataset
 
 `p3.research.control_dataset` builds versioned observation/action pairs without
 copying images or sending commands. These are **synthetic teacher datasets** or
@@ -747,9 +711,10 @@ references, target/tracking associations, human or controller action provenance,
 command validity plus requested versus actually gated actuator commands, measured
 robot motion/odometry and independent stop/fault state. Human review, real-world
 coverage and separate hardware acceptance would still be required before any
-physical-control claims. No model training or hardware adapter is included here.
+physical-control claims. This builder does not train a model; the separate BC baseline below does.
+No physical hardware adapter is included.
 
-## Behaviour-cloning baseline (simulation only)
+### Behaviour-cloning baseline
 
 `p3.research.bc_baseline` provides standardized ridge regression and a small
 numpy MLP (16 tanh hidden units, full-batch Adam). `BCFollowController` is a new
@@ -869,37 +834,7 @@ occlusion scenario, where every standard controller stays latched after loss.
 Dataset teacher labels remain the proposed controller action, with the final
 gated command recorded separately; the committed sample is not regenerated.
 
-## Report 3 draft figures
-
-`p3.research.report3_figures` collects tracker, PID/rule and behaviour-cloning
-metrics into a new folder of CSV and Markdown tables plus matplotlib PNG charts.
-Matplotlib is pinned in `requirements.txt` (`matplotlib==3.9.4` and its wheels).
-`docker/Dockerfile.project3` installs that file through `install_requirements.py`;
-there is no second pip install.
-
-The run is deterministic for a fixed seed and the same numpy build. Tracker
-numbers come from `p3.research.tracker_benchmark` synthetic boxes. PID and rule
-numbers come from `p3.research.pid_sim`, with one world-frame trajectory plot
-per scenario. Behaviour cloning trains ridge and MLP on a fresh temporary
-`control_dataset build-sim` dataset (PID teacher, fixed seeds) and compares
-closed-loop metrics with PID. Stream stop-latency and unittest counts are read
-from `projects/project3/evidence` when those files exist. Missing measurements
-are marked NOT AVAILABLE and are not invented. Real hardware stays NOT TESTED
-unless a cited evidence line records it.
-
-From the repository root, after the Project 3 image is built, pick a new output
-directory. An existing path is refused. `reports/project3-report3-draft` is used
-only when you pass `--draft`.
-
-```sh
-./scripts/dev.sh p3-python -m p3.research.report3_figures --output artifacts/report3-draft-001
-./scripts/dev.sh p3-python -m unittest discover -s tests -p test_report3_figures.py
-```
-
-`summary.md` in that folder lists every figure and table with the source command
-and separates synthetic/simulated results from real-hardware results.
-
-## Body interface (simulation only)
+### Body interface (mock/dry-run only)
 
 `p3.research.body_interface` is the Run4/Run5 software command boundary behind
 `SafetySupervisor`. It lives in `research` alongside the simulation contracts
@@ -909,13 +844,11 @@ in memory only; `RealTransport` always raises `NotImplementedError`. Factory
 and interface defaults are `simulation_only=True`; `--transport real` is refused
 before creating output. No network, device discovery or hardware sends occur.
 
-From the Project 3 directory, using its Python 3.11 runtime (use
-`./scripts/dev.sh p3-python` from the repository root for the supported Docker
-path), choose a fresh output directory:
+From the repository root, choose a fresh output directory:
 
 ```sh
-python -m p3.research.body_interface replay-sim --scenario straight_walk --controller pid --steps 100 --output artifacts/body-sim-001
-python -m p3.research.body_interface replay-log tests/fixtures/body-actions.jsonl --output artifacts/body-log-001
+./scripts/dev.sh p3-python -m p3.research.body_interface replay-sim --scenario straight_walk --controller pid --steps 100 --output artifacts/body-sim-001
+./scripts/dev.sh p3-python -m p3.research.body_interface replay-log tests/fixtures/body-actions.jsonl --output artifacts/body-log-001
 ```
 
 `replay-sim` consumes the existing simulator callback's supervisor-gated `safe`
@@ -964,7 +897,19 @@ Reasons are `ok`, `clamped`, `rate_limited`, `watchdog_zero`, `estop_latched`,
 `clamped` and `rate_limited`. All results are synthetic/offline simulation,
 separate from real hardware acceptance, which remains untested.
 
-## Run2 session export and measured checklist (software only)
+## Run2: boundaries, session export and acceptance
+
+Exact course script is materially different from uiviewJLL: four device processes,
+four cereal services and a persistent Params write. The Wi-Fi workflow is PC SSH
+to **device-side UI**. No YOLO-to-PC/C2C streaming protocol is specified by it.
+`p3/run2.py` preserves process/message APIs through dependency injection and adds
+bounded retries/cleanup. It intentionally has no real-device default bindings.
+API-double tests include normal/invalid data, timeout, disconnect/recreate-publisher,
+partial startup and cleanup. These are not actual network or Capnp/msgq tests.
+No network emulator is added without a confirmed streaming interface. Hardware
+firmware and bindings must be checked before adding a runnable device adapter.
+
+### Session export and pipeline measurements
 
 These read-only tools consume existing local logs. They never open a camera,
 connect to a stream, discover a device or send commands. Use a fresh output path:
@@ -1023,13 +968,13 @@ the final zero software command supplies STOP timing. `run-status.json` and
 `e2e_ms` is not frame age, and recorder processing age is not exposure age.
 Old logs without these fields retain their previous measurement behavior.
 
-For example, from `projects/project3` in the Project 3 runtime, use a fresh
+For example, from the repository root through Docker, use a fresh
 output directory for an offline local video run (add `--display` to quit with `q`,
 or interrupt with Ctrl-C to exercise stop latency):
 
 ```sh
-python -m p3.cli run /path/to/local-video.mp4 --output artifacts/run2-offline-001 --track --simulate-follow --target-id 1
-python -m p3.research.run2_acceptance artifacts/run2-offline-001
+./scripts/dev.sh p3 run /path/to/local-video.mp4 --output artifacts/run2-offline-001 --track --simulate-follow --target-id 1
+./scripts/dev.sh p3-python -m p3.research.run2_acceptance artifacts/run2-offline-001
 ```
 
 For missing measurements, an optional local `run2-measurements.json` sidecar
@@ -1088,3 +1033,111 @@ PASS/FAIL/NOT_MEASURED. Overall PASS requires every item PASS. Exit codes:
 Report/dataset destinations must be new. **Synthetic fixture PASS is NOT a
 hardware acceptance**, and real-input software-log PASS still requires the
 separate physical checks in HARDWARE.md.
+
+## Report 3 draft figures
+
+`p3.research.report3_figures` collects tracker, PID/rule and behaviour-cloning
+metrics into a new folder of CSV and Markdown tables plus matplotlib PNG charts.
+Matplotlib is pinned in `requirements.txt` (`matplotlib==3.9.4` and its wheels).
+`docker/Dockerfile.project3` installs that file through `install_requirements.py`;
+there is no second pip install.
+
+The run is deterministic for a fixed seed and the same numpy build. Tracker
+numbers come from `p3.research.tracker_benchmark` synthetic boxes. PID and rule
+numbers come from `p3.research.pid_sim`, with one world-frame trajectory plot
+per scenario. Behaviour cloning trains ridge and MLP on a fresh temporary
+`control_dataset build-sim` dataset (PID teacher, fixed seeds) and compares
+closed-loop metrics with PID. Stream stop-latency and unittest counts are read
+from `projects/project3/evidence` when those files exist. Missing measurements
+are marked NOT AVAILABLE and are not invented. Real hardware stays NOT TESTED
+unless a cited evidence line records it.
+
+From the repository root, after the Project 3 image is built, pick a new output
+directory. An existing path is refused. Always use `--output artifacts/...` here.
+The legacy `--draft` default targets `reports/project3-report3-draft`, which is
+outside the writable Docker artifacts mount.
+
+```sh
+./scripts/dev.sh p3-python -m p3.research.report3_figures --output artifacts/report3-draft-001
+./scripts/dev.sh p3-python -m unittest discover -s tests -p test_report3_figures.py
+```
+
+`summary.md` in that folder lists every figure and table with the source command
+and separates synthetic/simulated results from real-hardware results.
+
+## Evidence and regenerable files
+
+Small evidence preserves hashes, measured benchmarks, test logs and API-double
+results. New results belong in a fresh `projects/project3/artifacts/` path;
+never overwrite historical evidence. Missing optional assets produce explicit
+SKIPs, not hardware PASS. Synthetic results, offline simulation and real hardware
+acceptance must remain distinct. See [status](evidence/STATUS.md) and
+[commands](evidence/COMMANDS.md).
+
+### Historical evidence scripts
+
+`audit.py`, `evaluate.py` and `summarize.py` have **no argument parser** and ignore
+`--help`. They are historical scripts, not general output-configurable CLIs:
+`audit.py` exclusively creates `evidence/source-audit.json`; `evaluate.py`
+exclusively creates `evidence/supplemental.json` and requires CoreML (unavailable
+in Linux Docker); `summarize.py` invokes `report_validation.py` when final
+validation evidence exists and rewrites dated reports, otherwise overwrites
+`evidence/STATUS.md`. Do not use them to refresh current status or immutable
+reports. Their help attempts were checked only in temporary copies; no evidence
+was rewritten. Use `validate_vision.py --output artifacts/...` for new file
+measurements and `report3_figures --output artifacts/...` for current figures.
+
+### Regenerable large evidence files (not stored in git)
+
+To keep the repository small, these generated files (about 5.5 MB together) were
+removed from git on 2026-10-21. They are reproducible from local, gitignored inputs
+under `projects/project3/artifacts/`, no test depends on them, and their original
+SHA-256 values remain in the tracked JSON evidence (`integrity.json`,
+`annotation-frames/index.json`, `checks.json`, `preservation-*.json`). Git history
+still contains the old copies. Regenerate them in Docker from the repository root.
+Outputs go to the writable `artifacts/` mount; the source tree is read-only.
+
+| Removed file | SHA-256 (original) | Regenerate with |
+|---|---|---|
+| `reports/ai-control-readiness-20261020/export-sample.jsonl` (2.3 MB) | `846efc8b…07cfe` | export command below |
+| `reports/ai-control-milestone2-20261020/annotation-frames/frame-{000000,000030,000060,000090,000119}.png` (~0.5 MB each) | see `annotation-frames/index.json` and `checks.json` | extract command below |
+| `reports/ai-control-milestone3-20261020/audit/audit-contact-sheet.jpg` (0.6 MB) | `92e0d5c3…0f017` | local-audit command below |
+
+```sh
+# 1. Offline export sample (needs artifacts/validation-20261016/stability-video-final/events.jsonl)
+mkdir -p projects/project3/artifacts/regenerated
+./scripts/dev.sh p3-python -m p3.research.export \
+  artifacts/validation-20261016/stability-video-final/events.jsonl \
+  artifacts/regenerated/export-sample.jsonl
+sha256sum projects/project3/artifacts/regenerated/export-sample.jsonl   # expect 846efc8ba74133b091fa64f6c7480c9a22a508d833f93816631be8f0e3407cfe
+
+# 2. Annotation frames (needs artifacts/inputs/usa.hevc)
+./scripts/dev.sh p3-python -m p3.research.offline extract \
+  /workspace/reports/ai-control-milestone2-20261020/usa-verified \
+  --frames 0,30,60,90,119 --media-root artifacts/inputs \
+  --output artifacts/regenerated/annotation-frames
+
+# 3. Milestone 3 audit contact sheet (runs from repo root; needs local media under artifacts/)
+./scripts/dev.sh p3-python -c "import os, runpy; os.chdir('/workspace'); runpy.run_path('reports/ai-control-milestone3-20261020/local-audit.py', run_name='__main__')" \
+  --output projects/project3/artifacts/regenerated/milestone3-audit
+```
+
+The `.gitignore` lists the removed paths so a regenerated copy is not re-committed
+by accident. Course deliverables (Report PDFs/PPTX) and the small sample bundles
+(`usa-sample`, `usa-verified`, `image-sample`, each record file < 500 KB) stay in git.
+
+## Safety boundaries
+
+All commands and learned/PID/rule actions are normalized software simulation,
+never physical actuator feedback. `simulation_only=True` is the default; mock
+and dry-run transports retain commands in memory, and real transport is refused.
+The 1.0 m width-based hard stop forces zero forward speed and cannot reverse;
+uncalibrated monocular geometry and approaching people limit clearance guarantees.
+Body watchdogs require callers to keep ticking. E-stop latch, rate/acceleration
+limits and STOP journals establish software behavior only.
+
+Tracking IDs cannot prove human identity. No real accuracy claim is supported
+without reviewed annotation; no software or synthetic PASS completes physical
+Run2 acceptance. Device firmware, schema, Wi-Fi/SSH/UI and independent physical
+safety need the separate [hardware checklist](HARDWARE.md). Online Gemini use
+needs an API key and is not covered by these offline tests.

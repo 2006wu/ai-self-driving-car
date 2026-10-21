@@ -10,6 +10,30 @@ publishes local cereal messages. The PC connects by SSH over Wi-Fi. It is not
 a YOLO-result viewer or PC video streaming server. The source's example IP/key
 is not the user's configuration. No device has been contacted or modified.
 
+## Software available; hardware work remaining
+
+Implemented software includes `kalman_iou`/tracker benchmark, MOT/CVAT import
+and all-tracker evaluation, latest-frame webcam/network stream, PID simulation,
+`p3_control_dataset/1.0`, ridge/MLP BC, the shared SafetySupervisor 1.0 m
+width-based too-close stop (no reverse), Run2 real-session export and measured
+checklist, pipeline logging and Report 3 figures. The body interface is
+**mock/dry-run only**: watchdog, e-stop latch and rate/acceleration limits are
+software checks. `simulation_only=True`; real transport is refused. Physical
+C2C/comma body control is unimplemented by design and needs a separate safety
+review before any adapter work.
+
+Current local suite: **286 tests, OK (skipped=8)**. User-reported Mac `develop`
+**131faef** health check: **472 tests across projects**, including **276 P3**
+at that revision. Mac stream STOP about **0.05 s after SIGINT** measures software,
+not physical braking. These results do not complete Level C acceptance.
+
+- [ ] Run and document a real-car Run2 session and physical acceptance below.
+- [ ] Human-label/review a real multi-person CVAT video and evaluate all trackers.
+- [ ] Manually verify `q/c/n/r/s` with `--display`, plus full camera/disconnect checks.
+- [ ] Supply reviewed `target_identity` for Run2 continuity; tracker IDs alone are insufficient.
+- [ ] Run the online Gemini check with an API key when available.
+- [ ] Complete Report 3 write-up/slides by **2026-12-25**.
+
 ## Before touching hardware
 
 - [ ] Confirm availability, device type/owner and permission to operate it.
@@ -39,9 +63,16 @@ not cereal compatibility, camera input, UI or inference.
 
 ## Isolated startup and observation
 
-For the software log checklist, run `python -m p3.research.run2_acceptance
-SESSION_DIR --report NEW_REPORT.md --json NEW_REPORT.json`. See README's
-Run2 session section for supported logs, measurement sidecars and thresholds.
+For the software log checklist, run from the repository root:
+
+```sh
+./scripts/dev.sh p3-python -m p3.research.run2_acceptance artifacts/my-real-session --report artifacts/run2-real-001.md --json artifacts/run2-real-001.json
+```
+
+Use fresh report paths. See [Run2 session documentation](README.md#run2-boundaries-session-export-and-acceptance)
+for supported logs, measurement sidecars and thresholds. New pipeline logs supply
+frame age, too-close gates and `safety_stop`, `operator_stop` and drop counters;
+continuity still requires reviewed human `target_identity` annotations.
 Missing measurements are NOT_MEASURED; synthetic fixture PASS is not hardware
 acceptance. This checker does not perform any device interaction.
 
