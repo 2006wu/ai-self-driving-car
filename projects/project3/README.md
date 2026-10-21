@@ -11,7 +11,7 @@ and measured acceptance tooling, and Report 3 figure generation.
 All follow/control output is **simulation_only**; physical control is disabled
 and real transport is refused.
 
-Current local suite: **286 tests, OK (skipped=8)**. The user-reported Mac
+Current suite: **293 tests, OK (skipped=0)** (Mac Docker, `./scripts/dev.sh test-p3`, `develop` 31f5527). The user-reported Mac
 `develop` **131faef** full health check passed **472 tests across projects**,
 including **283 Project 3 tests at that revision**. These are different snapshots.
 Historical [2026-10-16 validation](evidence/validation-20261016/REPORT.md) and

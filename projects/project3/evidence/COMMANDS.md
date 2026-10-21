@@ -84,7 +84,7 @@ Compose supplies Project 3 PYTHONPATH. No Docker command was executed here.
   historical `reports/`; Docker users must select a fresh artifacts output.
 - Removed stale current-status claims of 107/163/203 tests and blanket webcam
   BLOCKED text. Historical reports retain their original counts; Mac smoke is
-  separated from full manual acceptance and the present 286-test suite.
+  separated from full manual acceptance and the present 293-test suite (Mac Docker).
 - Clarified that new pipeline logs provide Run2 age/stop/drop measurements;
   stop latency needs an operator stop, and continuity needs human identity labels.
   PID/BC descriptions now acknowledge the too-close gate and mock body boundary.
@@ -104,7 +104,8 @@ Executed from `projects/project3` (the explicit docs-check exception):
 /workspace/scratch/venv-p3/bin/python -m unittest discover -s tests
 ```
 
-Result: **Ran 286 tests in 11.898s — OK (skipped=8)**. No dependency installation,
+Result (box venv): **Ran 286 tests — OK (skipped=7)**. Mac Docker
+(`./scripts/dev.sh test-p3`, `develop` 31f5527): **293 tests, OK (skipped=0)**. No dependency installation,
 model training, device access, commit/push or Python behavior changes occurred.
 For supported user reproduction run `./scripts/dev.sh test-p3` from repository root.
 

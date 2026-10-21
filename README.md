@@ -312,7 +312,7 @@ Project 3：YOLO 圖片／影片、kalman_iou／tracker benchmark、MOT/CVAT 匯
 `p3_control_dataset/1.0`、ridge/MLP BC、SafetySupervisor 1.0 m width-based too-close
 stop（不能倒車）、mock/dry-run body interface（watchdog、e-stop latch、rate/accel
 limits）、Run2 匯出／pipeline 量測 checklist、Report 3 圖表工具已完成。
-目前 286 tests，OK (skipped=8)；Mac `develop` 131faef 健檢通過 472 tests，
+目前 293 tests，OK (skipped=0)（Mac Docker `./scripts/dev.sh test-p3`，`develop` 31f5527）；Mac `develop` 131faef 健檢通過 472 tests，
 當時 P3 為 283；Mac stream SIGINT 後軟體 STOP 約 0.05 s。這些不是實體致動器量測。
 仍待 Run2 真車 session／驗收、真人多目標 CVAT 標註與評估、`--display` q/c/n/r/s
 手動測試、需 API key 的 Gemini online call，及 2026-12-25 Report 3 文字／投影片。

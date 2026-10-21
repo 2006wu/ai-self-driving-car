@@ -36,7 +36,7 @@
 - Project 3 ACT：YOLO、kalman_iou／benchmark、MOT/CVAT 匯入與三追蹤器評估、
   latest-frame webcam/stream、PID 模擬、control dataset、ridge/MLP BC、1.0 m
   too-close stop、mock/dry-run body interface、Run2 匯出／量測 checklist 及 Report 3
-  圖表工具已完成；目前 286 tests，OK (skipped=8)。Mac `develop` 131faef 全機健檢
+  圖表工具已完成；目前 293 tests，OK (skipped=0)（Mac Docker `./scripts/dev.sh test-p3`，`develop` 31f5527）。Mac `develop` 131faef 全機健檢
   為 472 tests（當時 P3 283），stream SIGINT 後軟體 STOP 約 0.05 s。
   仍待 Run2 真車 session／驗收、真人 CVAT 標註評估、`--display` 的 q/c/n/r/s
   手動測試、需 API key 的 Gemini online call，以及 2026-12-25 Report 3 文字／投影片。
