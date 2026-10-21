@@ -730,3 +730,108 @@ command validity plus requested versus actually gated actuator commands, measure
 robot motion/odometry and independent stop/fault state. Human review, real-world
 coverage and separate hardware acceptance would still be required before any
 physical-control claims. No model training or hardware adapter is included here.
+
+## Behaviour-cloning baseline (simulation only)
+
+`p3.research.bc_baseline` provides standardized ridge regression and a small
+numpy MLP (16 tanh hidden units, full-batch Adam). `BCFollowController` is a new
+opt-in controller with source `bc`; the `AIController` placeholder still returns
+invalid zero-command `UNAVAILABLE`. Existing follow, PID, rule, replay and
+simulator defaults are unchanged. Physical control is disabled.
+
+From the repository root, use Docker. Every dataset directory, model and report
+must be new; these commands refuse overwrite:
+
+```sh
+./scripts/dev.sh p3-python -m p3.research.control_dataset build-sim --output artifacts/control-ds --episodes-per-scenario 8
+./scripts/dev.sh p3-python -m p3.research.bc_baseline train --dataset artifacts/control-ds --model ridge --output artifacts/bc-run/ridge.json --seed 0
+./scripts/dev.sh p3-python -m p3.research.bc_baseline train --dataset artifacts/control-ds --model mlp --output artifacts/bc-run/mlp.json --seed 0
+./scripts/dev.sh p3-python -m p3.research.bc_baseline eval-offline --dataset artifacts/control-ds --model-file artifacts/bc-run/ridge.json --output artifacts/bc-run/ridge-offline.json
+./scripts/dev.sh p3-python -m p3.research.bc_baseline eval-closed-loop --model-file artifacts/bc-run/ridge.json --output artifacts/bc-run/ridge-closed.json --steps 200
+./scripts/dev.sh p3-python -m p3.research.bc_baseline eval-offline --dataset artifacts/control-ds --model-file artifacts/bc-run/mlp.json --output artifacts/bc-run/mlp-offline.json
+./scripts/dev.sh p3-python -m p3.research.bc_baseline eval-closed-loop --model-file artifacts/bc-run/mlp.json --output artifacts/bc-run/mlp-closed.json --steps 200
+./scripts/dev.sh p3-python -m unittest discover -s tests -p test_bc_baseline.py
+```
+
+The dataset is fully validated before reading any training features. Only its
+`FEATURES` vector enters the model; `ACTIONS` (linear, angular) are targets.
+Ground-truth distance/bearing, follow state/reason, episode identifiers and labels
+are excluded from model inputs. `--teacher pid|rule|all` defaults to PID.
+Training defaults to TRACKING rows: other states have forced zero commands from
+the safety layer and should be handled by that layer rather than learned.
+`--all-states` explicitly includes these zero labels in training.
+
+Only train rows determine imputation (per-feature train mean, or zero for an
+entirely missing train feature), mean/std normalization and weight updates.
+Constant features use scale 1. Validation MSE selects ridge alpha from
+0.0001/0.01/1/10, or MLP learning rate from 0.003/0.01 and the early-stopping epoch
+(maximum 500, patience 35). Seeds fix MLP initialization; training uses no test
+labels for fitting or selection and does not refit on validation data. Numerical
+reproducibility assumes the same numpy/BLAS runtime. Empty train/val selections
+are rejected; empty test metrics are null.
+
+Models are finite JSON with schema `p3_bc_model/1.0`, exact feature/action names,
+normalization, list-valued weights, training manifest SHA256, configuration,
+validation selection scores and per-split metrics. Loading checks schema, shapes,
+finite values, positive scales, feature names and duplicate JSON keys.
+Offline metrics use clamped commands and the authoritative non-TRACKING zero
+gate; each split also reports a TRACKING-only subset. MAE/RMSE and R² are per
+action. Constant-target R² is 1 for a perfect fit, otherwise 0. STOP agreement
+means both command magnitudes are at most 0.001; it is a command comparison,
+not a prediction of safety state. Non-TRACKING zeros can inflate all-state scores.
+
+The controller uses the dataset's own `observation_features` function and an
+unchanged `FollowController` for selection, loss, overlap, stale age, latches and
+faults. Model inference runs only in TRACKING. Other states return exactly 0,0;
+outputs are clamped to speed [0,0.3] and turn [-0.5,0.5], with no reverse.
+Non-finite or malformed model output latches STOP with a permanent controller
+fault. No controller automatically rearms after loss.
+
+Closed-loop evaluation calls the unchanged `closed_loop.run_scenario` for BC,
+PID and rule on all six scenarios. It reports all original metrics, including
+centering RMS, distance RMS, sampled safety pass, supervisor fault steps and
+mean command difference/jerk. Besides nominal episodes, it evaluates two fresh
+plant speed scales in [0.65,0.75] and [1.25,1.35], outside the dataset builder's
+training perturbation range [0.8,1.2]. A deterministic evaluation seed is the
+training dataset seed plus 100003; the seed actually generates perturbations.
+Nominal episodes can duplicate training trajectories and are not held out.
+
+This baseline imitates a synthetic PID teacher from low-dimensional bbox
+features. PID has history (integral, filtered derivative, slew) absent from this
+memoryless policy. Repeated unperturbed training episodes are correlated across
+splits. Held-out plant scales exercise only narrow synthetic variation, with no
+perception noise or real dynamics. Offline imitation errors do not establish
+closed-loop stability: covariate shift can put the learner in states the teacher
+did not visit. It is not trained on real comma body data, not validated on
+hardware, and provides no real hardware acceptance evidence. Physical control
+remains disabled.
+
+Reference results (2026-10-21, Linux box with the Project 3 Python 3.11
+dependencies; not yet re-run in Docker on the Mac). Dataset:
+`build-sim --episodes-per-scenario 8` (default seed), 8,600 samples, PID teacher,
+TRACKING rows only; offline metrics on the held-out **test** split (1,800 rows):
+
+| Model | MAE linear | MAE angular | R² linear | R² angular | STOP agreement |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| ridge | 0.0157 | 0.0057 | 0.853 | 0.870 | 0.976 |
+| mlp (seed 0) | 0.0123 | 0.0048 | 0.904 | 0.936 | 0.897 |
+
+Closed loop (`eval-closed-loop`, 200 steps, all six scenarios; mean over
+scenarios; held-out = 2 perturbed plant episodes per scenario):
+
+| Partition | Controller | Centering RMS | Distance RMS (m) | Safety pass | Supervisor faults |
+| --- | --- | ---: | ---: | ---: | ---: |
+| nominal | rule | 0.0789 | 0.905 | 6/6 | 0 |
+| nominal | pid (teacher) | 0.0472 | 0.854 | 6/6 | 0 |
+| nominal | bc ridge | 0.0494 | 0.867 | 6/6 | 0 |
+| nominal | bc mlp | 0.0494 | 0.864 | 6/6 | 0 |
+| held-out | rule | 0.0777 | 0.962 | 12/12 | 0 |
+| held-out | pid (teacher) | 0.0472 | 0.886 | 12/12 | 0 |
+| held-out | bc ridge | 0.0487 | 0.914 | 12/12 | 0 |
+| held-out | bc mlp | 0.0510 | 0.916 | 12/12 | 0 |
+
+BC closely imitates the PID teacher and clearly beats the rule baseline, but does
+not exceed its teacher. Unlike PID, BC has no explicit "box larger than target =>
+speed 0" override; the too_close scenario still passes the minimum-distance check
+in simulation, but this is not a safety guarantee. Distance RMS includes the
+occlusion scenario, where every controller stays latched after loss.
