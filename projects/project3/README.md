@@ -592,6 +592,24 @@ never auto-resumes. Python callers may explicitly model an operator with
 `operator_reselect_steps=(55,)`; only those steps call select and rearm again.
 The default occlusion removes the target at steps 40–49 with no operator reselect.
 The replay supervisor and CommandReplay gate every integrated action.
+In `run_scenario`, the supervisor independently estimates target camera depth
+from bbox width using the configured pinhole geometry. Below 1.0m it forces
+forward speed to zero, preserves turning and TRACKING status, and adds
+`safety_stop: too_close` and `estimated_distance_m` metadata. It releases at
+or above 1.0m without latching or hysteresis. Horizontally clipped boxes
+(`x1 <= 0` or `x2 >= image width`) and missing target boxes conservatively
+use a zero estimate. Vertical clipping leaves the width-based estimate intact.
+Controller
+metadata cannot override this gate. The default lies between the 0.65m pass
+threshold and 1.785m desired distance. For a stationary person, one 0.1s step
+at 1m/s can take the robot to `1.0 - dt * max_linear = 0.9m`, still above
+0.65m. This bound does not cover a person continuing to approach after stopping:
+the hostile controller in the authored `too_close` scenario first stops at
+0.976m, then the person continues to its endpoint, reducing the gap to 0.600m
+(below 0.65m, so `safety_pass` is false). No forward command is emitted below
+1.0m; a forward-only stop cannot guarantee clearance from an approaching person.
+Results count these steps separately as `too_close_stop_steps`. Command-only
+replay calls without an observation retain their existing behavior.
 
 Measured 200-step comparison (rule → PID):
 
@@ -831,10 +849,25 @@ scenarios; held-out = 2 perturbed plant episodes per scenario):
 | held-out | bc mlp | 0.0510 | 0.916 | 12/12 | 0 |
 
 BC closely imitates the PID teacher and clearly beats the rule baseline, but does
-not exceed its teacher. Unlike PID, BC has no explicit "box larger than target =>
-speed 0" override; the too_close scenario still passes the minimum-distance check
-in simulation, but this is not a safety guarantee. Distance RMS includes the
-occlusion scenario, where every controller stays latched after loss.
+not exceed its teacher. The table above predates the shared distance hard stop.
+BC has no controller-local "box larger than target => speed 0" override;
+the supervisor now enforces the distance stop for BC, PID, rule and future
+controllers through `run_scenario`. The `tests/test_too_close_stop.py` regression
+trains ridge and MLP models and checks zero forward commands whenever true
+distance is below 1.0m (only 1e-9m pinhole roundoff tolerance). With a stationary
+person, hostile, BC, PID and rule runs must meet the derived 0.9m one-step
+bound and the 0.65m safety floor. The authored moving-person BC/PID/rule runs
+retain an empirical 0.88m regression floor; it is not a one-step clearance
+guarantee. The hostile moving-person test explicitly records the 0.600m
+limitation above. Measured in a Python
+3.11 environment (same pinned requirements), that test's tiny dataset
+(`episodes_per_scenario=8`, `steps=25`, `seed=5`, perturbed PID teacher) gives
+`too_close` minimum distances before → after: ridge 0.900 → 0.900m,
+MLP 0.750355 → 0.885022m, PID and rule both 0.900 → 0.900m. These are synthetic
+simulation checks, not physical safety acceptance. Distance RMS includes the
+occlusion scenario, where every standard controller stays latched after loss.
+Dataset teacher labels remain the proposed controller action, with the final
+gated command recorded separately; the committed sample is not regenerated.
 
 ## Report 3 draft figures
 

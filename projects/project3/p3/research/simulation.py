@@ -10,14 +10,52 @@ class SafetySupervisor:
     Controller's legacy latch remains authoritative. Explicit replay rearm cannot
     clear a FollowController latch or fault. Emergency/fault/stale input relatches.
     """
-    def __init__(self):
+    def __init__(self, too_close_distance_m=1., hfov_degrees=70., person_width_m=.5):
+        """Non-latching distance stop, with no hysteresis.
+
+        The default 1m lies between SimConfig's .65m pass threshold and
+        1.785m desired distance, leaving margin for a .1s step at 1m/s.
+        Horizontal image-edge clipping may underestimate box width, so it
+        uses a conservative zero estimate, as do missing target boxes.
+        Vertical clipping does not affect the width-based estimate.
+        Distance is camera depth, not radial range.
+        """
+        for value in (too_close_distance_m, hfov_degrees, person_width_m):
+            if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
+                raise ValueError('finite positive safety geometry required')
+        if not 1 < hfov_degrees < 179:
+            raise ValueError('invalid horizontal FOV')
+        self.too_close_distance_m = too_close_distance_m
+        self.hfov_degrees = hfov_degrees
+        self.person_width_m = person_width_m
+        self.too_close_stop_steps = 0
         self.latched = True
         self.faulted = False
+
+    def _distance(self, observation):
+        if observation is None:
+            return None  # Compatibility with command-only replay callers.
+        _, width = observation.frame_dimensions
+        # Target identity comes from the observation, never action metadata.
+        tracks = [t for t in observation.tracks if t.get('state') == 'tracked'
+                  and (observation.target_id is None or t.get('id') == observation.target_id)]
+        # With no explicit selection, conservatively gate on every visible track.
+        distances = []
+        for track in tracks:
+            x1, y1, x2, y2 = track['box']
+            if (not all(math.isfinite(v) for v in (x1, y1, x2, y2))
+                    or x2 <= x1 or y2 <= y1
+                    or x1 <= 0 or x2 >= width):
+                distances.append(0.)
+            else:
+                focal = width/(2*math.tan(math.radians(self.hfov_degrees)/2))
+                distances.append(self.person_width_m*focal/(x2-x1))
+        return min(distances) if distances else 0.
 
     def rearm(self):
         if not self.faulted: self.latched = False
 
-    def apply(self, action, *, emergency_stop=False, fault=False, age_seconds=0.):
+    def apply(self, action, *, emergency_stop=False, fault=False, age_seconds=0., observation=None):
         valid = (isinstance(action, Action) and action.units == 'normalized_simulation'
                  and type(action.valid) is bool and action.valid
                  and all(type(v) in (int, float) and math.isfinite(v) for v in
@@ -31,6 +69,12 @@ class SafetySupervisor:
         if self.latched:
             return Action(0., 0., 'STOP', 'safety_supervisor', False,
                           metadata={'reason': 'replay_gate_latched', 'faulted': self.faulted})
+        distance = self._distance(observation)
+        if distance is not None and distance < self.too_close_distance_m:
+            self.too_close_stop_steps += 1
+            return replace(action, linear_velocity_command=0.,
+                           metadata={**action.metadata, 'safety_stop': 'too_close',
+                                     'estimated_distance_m': distance})
         return replace(action)
 
 
