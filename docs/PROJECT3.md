@@ -18,7 +18,7 @@ latch and rate/acceleration limits (real transport refused); `real_session`
 export, `run2_acceptance` and pipeline measurements; `report3_figures`.
 All control output is **simulation_only** and never sent to physical hardware.
 
-Current local verification: **286 tests, OK (skipped=8)**. The user reported a
+Current verification: **293 tests, OK (skipped=0)** (Mac Docker, `./scripts/dev.sh test-p3`, `develop` 31f5527). The user reported a
 Mac `develop` **131faef** full health check passing **472 tests across projects**,
 including **283 Project 3 tests at that time**, and stream software STOP about
 **0.05 s after SIGINT**. Historical evidence counts are revision-specific.

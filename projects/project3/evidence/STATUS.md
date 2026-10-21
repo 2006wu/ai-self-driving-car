@@ -1,7 +1,7 @@
 # Project 3 verification status — 2026-10-21
 
-Current local verification: **286 tests, OK (skipped=8)**, 11.898 s. This docs-only
-check used the user-authorized existing `/workspace/scratch/venv-p3/bin/python`
+Current verification: **293 tests, OK (skipped=0)** (Mac Docker, `./scripts/dev.sh test-p3`, `develop` 31f5527).
+Box venv docs check: **286 tests, OK (skipped=7)**. That check used the user-authorized existing `/workspace/scratch/venv-p3/bin/python`
 from `projects/project3`; Docker is unavailable on this box. No new Docker or
 hardware execution is claimed. Supported reproduction remains `./scripts/dev.sh`.
 
