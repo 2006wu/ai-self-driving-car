@@ -129,6 +129,7 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
     if any(output.iterdir()):
         raise FileExistsError(f'output directory must be empty: {output}')
     records, writer, failure = [], None, None
+    capture = None
     status, reason, screenshot_count = 'PASS', 'frame_limit', 0
     session_start, cpu_start = time.perf_counter(), time.process_time()
     process = psutil.Process()
@@ -225,9 +226,13 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
                 timing['loop_ms'] = (time.perf_counter()-start)*1000
                 row = {'frame': index, 'detections': detections, 'tracks': tracks,
                        'target': tracker.target if tracker else None, 'decision': decision, 'timing': timing}
+                if str(source).startswith('stream:'):
+                    row['stream_dropped_frames'] = frames.dropped_frames
                 records.append(row)
                 emit('frame', {'frame': index, 'target': row['target'], 'target_state': timing['target_state'],
-                               'decision': decision, 'timing': timing})
+                               'decision': decision, 'timing': timing,
+                               **({'stream_dropped_frames': frames.dropped_frames}
+                                  if str(source).startswith('stream:') else {})})
                 if key == ord('q'): break
         if not records:
             raise ValueError('input yielded zero frames (empty/corrupt video)')
@@ -264,8 +269,10 @@ def run(detector, source, output, camera=False, max_frames=300, display=False, t
                                       if str(source).startswith('stream:') else
                                       'checked between frames; does not interrupt blocked native capture')}
         if str(source).startswith('stream:'):
-            summary['input_kind'] = 'network_stream'
-            summary['frame_drop_scope'] = 'No intentional skipping; upstream buffering/sensor drops unknown.'
+            summary["input_kind"] = "network_stream"
+            summary["application_skipped_frames"] = getattr(capture, "dropped_frames", 0)
+            summary["stream_dropped_frames"] = summary["application_skipped_frames"]
+            summary['frame_drop_scope'] = 'Latest-frame replacement count; upstream buffering/sensor drops unknown.'
         (output/'run-status.json').write_text(json.dumps(summary, indent=2, allow_nan=False))
         try:
             emit('session_end', summary)

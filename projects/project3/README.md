@@ -461,6 +461,9 @@ person identity, real-world tracking accuracy or physical safety.
 
 ### Mac webcam bridge to Docker (opt-in)
 
+The helper captures at 30 fps by default; `--fps 15` downsamples output with
+ffmpeg `-r 15`, keeping the capture rate at 30.
+
 The host helper is a capture-only exception to the Docker runtime: ffmpeg must
 already be installed **on the Mac**, with AVFoundation support. Python, inference
 and tests remain in Docker. No permission settings are changed; macOS may prompt
@@ -471,7 +474,7 @@ From the repository root, in a Mac terminal:
 
 ```sh
 ./projects/project3/tools/mac-webcam-stream.sh --help
-./projects/project3/tools/mac-webcam-stream.sh --device 0 --size 640x480 --fps 15 --port 8081
+./projects/project3/tools/mac-webcam-stream.sh --device 0 --size 640x480 --fps 30 --port 8081
 ```
 
 In a second terminal (Docker Desktop running, Project 3 image built):
@@ -496,6 +499,10 @@ LAN. Docker Desktop must support host loopback access via host.docker.internal;
 if your Desktop/network policy blocks it, capture remains blocked. The Linux
 host-gateway mapping does not by itself expose a host loopback listener.
 
+The reader continuously drains capture and retains only the latest frame.
+`application_skipped_frames` and `stream_dropped_frames` in run-status.json and
+the session_end event count replaced, unconsumed frames; sensor drops remain unknown.
+A read failure latches disconnect immediately, discarding any pending frame.
 Stream open deadline is 3 seconds; local acquisition/stale deadline is .5 seconds.
 Disconnect, invalid BGR frame or a deadline failure terminates the session,
 latches the source closed and writes a final zero/STOP when simulation is enabled.

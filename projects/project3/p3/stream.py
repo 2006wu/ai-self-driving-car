@@ -1,6 +1,5 @@
-"""Opt-in, fail-closed OpenCV network capture; never reconnects."""
+"""Opt-in latest-frame network capture; fail closed and never reconnect."""
 import math
-import queue
 import threading
 import time
 from urllib.parse import urlsplit
@@ -10,11 +9,10 @@ import numpy as np
 
 
 class StreamFrames:
-    """Worker owns capture, including release; native FFmpeg deadlines plus caller deadlines.
+    """Continuously drain capture; retain at most one unconsumed frame.
 
-    Age measures local acquisition, not sensor time (MJPEG has no trusted timestamp).
-    A backend ignoring native timeouts may retain its worker until it returns, but
-    cannot delay STOP or deliver another frame after the caller deadline.
+    Acquisition age is local, not sensor time. Native reads have deadlines;
+    a backend ignoring them may outlive close until its daemon worker returns.
     """
     image = None
     fps = 0.0
@@ -27,8 +25,12 @@ class StreamFrames:
         self.url, self.factory = url, capture_factory or cv2.VideoCapture
         self.open_timeout, self.stale_timeout = open_timeout, stale_timeout
         self.closed = threading.Event()
-        self.opened = queue.Queue(maxsize=1)
-        self.frames = queue.Queue(maxsize=1)
+        self.condition = threading.Condition()
+        self.opened = False
+        self.error = None
+        self.latest = None
+        self.last_read = None
+        self.dropped_frames = 0
         self.thread = None
         self.stopped = False
 
@@ -40,9 +42,15 @@ class StreamFrames:
                 cv2.CAP_PROP_READ_TIMEOUT_MSEC, max(1, int(self.stale_timeout*1000))])
             if not cap.isOpened():
                 raise RuntimeError('stream could not open')
-            self.fps = float(cap.get(cv2.CAP_PROP_FPS))
-            self._worker_opened = True
-            self.opened.put(None)
+            try:
+                cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            except (AttributeError, cv2.error):
+                pass  # Some backends do not implement buffer sizing.
+            with self.condition:
+                self.fps = float(cap.get(cv2.CAP_PROP_FPS))
+                self.opened = True
+                self.last_read = time.monotonic()
+                self.condition.notify_all()
             while not self.closed.is_set():
                 ok, frame = cap.read()
                 if not ok:
@@ -50,21 +58,19 @@ class StreamFrames:
                 if (not isinstance(frame, np.ndarray) or frame.dtype != np.uint8 or
                         frame.ndim != 3 or frame.shape[2] != 3 or not frame.size):
                     raise RuntimeError('invalid stream frame; expected nonempty uint8 BGR')
-                item = (time.monotonic(), frame)
-                while not self.closed.is_set():
-                    try:
-                        self.frames.put(item, timeout=.01)
+                with self.condition:
+                    if self.closed.is_set():
                         break
-                    except queue.Full:
-                        pass
+                    if self.latest is not None:
+                        self.dropped_frames += 1
+                    self.latest = frame
+                    self.last_read = time.monotonic()
+                    self.condition.notify_all()
         except BaseException as error:
-            target = self.frames if getattr(self, '_worker_opened', False) else self.opened
-            while not self.closed.is_set():
-                try:
-                    target.put(error, timeout=.01)
-                    break
-                except queue.Full:
-                    pass
+            with self.condition:
+                self.error = error
+                self.latest = None  # A disconnect takes priority over buffered imagery.
+                self.condition.notify_all()
         finally:
             if cap is not None:
                 cap.release()
@@ -74,14 +80,17 @@ class StreamFrames:
             raise RuntimeError('stream stopped; create a new session explicitly')
         self.thread = threading.Thread(target=self._worker, daemon=True)
         self.thread.start()
+        deadline = time.monotonic() + self.open_timeout
         try:
-            result = self.opened.get(timeout=self.open_timeout)
-            if isinstance(result, BaseException):
-                raise result
+            with self.condition:
+                while not self.opened and self.error is None:
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        raise TimeoutError('stream open timeout')
+                    self.condition.wait(remaining)
+                if not self.opened and self.error is not None:
+                    raise self.error
             return self
-        except queue.Empty:
-            self.close()
-            raise TimeoutError('stream open timeout') from None
         except BaseException:
             self.close()
             raise
@@ -93,16 +102,19 @@ class StreamFrames:
         if self.stopped:
             raise RuntimeError('stream STOP latched; new session required')
         try:
-            item = self.frames.get(timeout=self.stale_timeout)
-            if isinstance(item, BaseException):
-                raise item
-            acquired, frame = item
-            if time.monotonic()-acquired > self.stale_timeout:
-                raise TimeoutError('stale stream frame')
-            return frame
-        except queue.Empty:
-            self.close()
-            raise TimeoutError('stale stream: frame acquisition timeout') from None
+            with self.condition:
+                while True:
+                    if self.closed.is_set():
+                        raise RuntimeError('stream STOP latched; new session required')
+                    if self.error is not None:
+                        raise self.error
+                    remaining = self.stale_timeout - (time.monotonic() - self.last_read)
+                    if remaining <= 0:
+                        raise TimeoutError('stale stream: frame acquisition timeout')
+                    if self.latest is not None:
+                        frame, self.latest = self.latest, None
+                        return frame
+                    self.condition.wait(remaining)
         except BaseException:
             self.close()
             raise
@@ -110,6 +122,9 @@ class StreamFrames:
     def close(self):
         self.stopped = True
         self.closed.set()
+        with self.condition:
+            self.latest = None
+            self.condition.notify_all()
         if self.thread is not None:
             self.thread.join(timeout=.02)
 
