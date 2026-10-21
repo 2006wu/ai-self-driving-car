@@ -265,6 +265,88 @@ includes opening/journaling. CPU percent uses one core = 100% and may exceed 100
 RSS is sampled process memory, not continuous peak or GPU memory. Application
 skipped frames = 0 means no intentional skipping; sensor drops are N/A.
 
+## Opt-in offline research (`p3.research`)
+
+`p3.research` is not imported by `p3.cli` or the Run1/Run2 commands. Nothing in
+this package runs unless you start it. It records a local image or video into a
+v2 bundle (`manifest.json`, `records.jsonl`, `quality.json`) and can replay the
+existing greedy and Hungarian trackers on the stored detections. It does not
+open a camera, talk to hardware, or change follow/tracking defaults.
+
+From the repository root, with this component on `PYTHONPATH`:
+
+```sh
+PYTHONPATH=projects/project3 python -m p3.research.offline record path/to/clip.mp4 --output path/to/dataset --max-frames 120
+PYTHONPATH=projects/project3 python -m p3.research.offline validate path/to/dataset --output path/to/quality.json
+PYTHONPATH=projects/project3 python -m p3.research.offline template path/to/dataset --output path/to/annotations.json
+PYTHONPATH=projects/project3 python -m p3.research.offline extract path/to/dataset --output path/to/frames --frames 0,30
+PYTHONPATH=projects/project3 python -m p3.research.offline validate-annotations path/to/dataset path/to/annotations.json
+PYTHONPATH=projects/project3 python -m p3.research.offline evaluate path/to/dataset --output path/to/comparison.json
+```
+
+`--media-root` (or the `P3_MEDIA_ROOT` environment variable) stores and resolves
+the original media path relative to that directory. Recordings made without a
+media root still store an absolute path. Bundles written before this option,
+including the samples under `reports/ai-control-milestone2-20261020/`, keep
+their original absolute paths and no `path_kind`. `validate` checks record
+order, the journal hash, and manifest identity either way. If the original file
+is absent, the command exits 0 with status `WARN` and names the missing media;
+that is not treated as a corrupt dataset. `--require-media` makes that absence
+a `FAIL` (exit 2). A file that is present but has a different size or SHA256 is
+still `FAIL`, including a same-named file under the media root
+(`media found under media root but hash mismatch`). `--verify-pixels` re-decodes
+when the file is available. If the file is absent, pixel verification fails
+(exit 2) instead of skipping. Point `--media-root` at a directory that contains
+a byte-identical copy to check those bytes on another machine. The contract is
+described in
+[SCHEMA.md](../../reports/ai-control-milestone2-20261020/SCHEMA.md).
+
+`implementation_fingerprint()` hashes every `p3/**/*.py` file. That map is part
+of the manifest `identity`, and `session_id` is `offline-` plus the SHA256 of
+the canonical identity JSON. Any later change under `p3/` changes the session
+id of datasets recorded after that change. Manifests that are already written
+keep the fingerprints and session id they were saved with.
+
+### Regenerable large evidence files (not stored in git)
+
+To keep the repository small, these generated files (about 5.5 MB together) were
+removed from git on 2026-10-21. They are reproducible from local, gitignored inputs
+under `projects/project3/artifacts/`, no test depends on them, and their original
+SHA-256 values remain in the tracked JSON evidence (`integrity.json`,
+`annotation-frames/index.json`, `checks.json`, `preservation-*.json`). Git history
+still contains the old copies. Regenerate them in Docker from the repository root.
+Outputs go to the writable `artifacts/` mount; the source tree is read-only.
+
+| Removed file | SHA-256 (original) | Regenerate with |
+|---|---|---|
+| `reports/ai-control-readiness-20261020/export-sample.jsonl` (2.3 MB) | `846efc8b…07cfe` | export command below |
+| `reports/ai-control-milestone2-20261020/annotation-frames/frame-{000000,000030,000060,000090,000119}.png` (~0.5 MB each) | see `annotation-frames/index.json` and `checks.json` | extract command below |
+| `reports/ai-control-milestone3-20261020/audit/audit-contact-sheet.jpg` (0.6 MB) | `92e0d5c3…0f017` | local-audit command below |
+
+```sh
+# 1. Offline export sample (needs artifacts/validation-20261016/stability-video-final/events.jsonl)
+./scripts/dev.sh p3-python -m p3.research.export \
+  artifacts/validation-20261016/stability-video-final/events.jsonl \
+  artifacts/regenerated/export-sample.jsonl
+sha256sum projects/project3/artifacts/regenerated/export-sample.jsonl   # expect 846efc8ba74133b091fa64f6c7480c9a22a508d833f93816631be8f0e3407cfe
+
+# 2. Annotation frames (needs artifacts/inputs/usa.hevc)
+./scripts/dev.sh p3-python -m p3.research.offline extract \
+  /workspace/reports/ai-control-milestone2-20261020/usa-verified \
+  --frames 0,30,60,90,119 --media-root artifacts/inputs \
+  --output artifacts/regenerated/annotation-frames
+
+# 3. Milestone 3 audit contact sheet (runs from repo root; needs local media under artifacts/)
+docker compose -f docker/docker-compose.yaml --profile project3 run --rm --no-deps \
+  -w /workspace -e PYTHONPATH=/workspace/projects/project3 project3 \
+  python reports/ai-control-milestone3-20261020/local-audit.py \
+  --output projects/project3/artifacts/regenerated/milestone3-audit
+```
+
+The `.gitignore` lists the removed paths so a regenerated copy is not re-committed
+by accident. Course deliverables (Report PDFs/PPTX) and the small sample bundles
+(`usa-sample`, `usa-verified`, `image-sample`, each record file < 500 KB) stay in git.
+
 ### Opt-in motion tracker and synthetic tracker benchmark
 
 Research callers can use `p3.research.tracking.create_tracker('kalman_iou')`

@@ -3,7 +3,6 @@ import copy
 import hashlib
 import os
 import sys
-import json
 from pathlib import Path
 import subprocess
 import tempfile
@@ -14,7 +13,7 @@ import cv2
 import numpy as np
 
 from p3.research.dataset import loads, validate_record as validate_v1
-from p3.research.dataset_v2 import (canonical, digest, json_write, load_bundle, quality_report,
+from p3.research.dataset_v2 import (canonical, digest, load_bundle, quality_report,
                                    validate_record, validate_records, session_id)
 from p3.research.recorder import record_media
 from p3.research.annotations import (annotation_template, validate_annotations, extract_annotation_frames)
@@ -36,7 +35,9 @@ class Clock:
 class OfflineFixture(unittest.TestCase):
     def setUp(self):
         # Keep generated fixtures within this repository; no camera or network.
+        # artifacts/ is gitignored, so a fresh clone does not have the directory yet.
         base = Path(__file__).resolve().parents[1]/'artifacts'
+        base.mkdir(parents=True, exist_ok=True)
         self.temp = tempfile.TemporaryDirectory(dir=base, prefix='milestone2-tests-')
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
@@ -82,6 +83,8 @@ class RecorderTests(OfflineFixture):
         self.assertEqual(len(self.records), 4)
         self.assertEqual(self.manifest['termination']['reason'], 'EOF')
         self.assertEqual(digest(self.source), self.manifest['media']['sha256'])
+        self.assertEqual(self.manifest['media']['path_kind'], 'absolute')
+        self.assertEqual(self.manifest['media']['path'], str(self.source.resolve()))
         self.assertEqual(load_bundle(self.bundle, verify_pixels=True)[1], self.records)
         for i, row in enumerate(self.records):
             self.assertEqual(row['frame_id'], i)
@@ -163,6 +166,27 @@ class RecorderTests(OfflineFixture):
         self.assertEqual(rows[1]['legacy_decision']['action'],'STOP')
         self.assertEqual(rows[1]['legacy_decision']['reason'],'stale_or_invalid_frame_age')
 
+    def test_env_media_root_used_when_argument_omitted(self):
+        directory = self.root/'env-dataset'
+        with patch.dict(os.environ, {'P3_MEDIA_ROOT': str(self.root)}):
+            manifest = self.record(directory)
+            self.assertEqual(manifest['media']['path'], 'source.avi')
+            self.assertEqual(manifest['media']['path_kind'], 'relative')
+            self.assertEqual(quality_report(directory)['status'], 'PASS')
+
+    def test_media_root_stores_relative_path(self):
+        directory = self.root/'relative-dataset'
+        manifest = self.record(directory, media_root=self.root)
+        self.assertEqual(manifest['media']['path'], 'source.avi')
+        self.assertEqual(manifest['media']['path_kind'], 'relative')
+        self.assertEqual(quality_report(directory, media_root=self.root)['status'], 'PASS')
+        outside = self.root/'not-a-root'
+        outside.mkdir()
+        rejected = self.root/'rejected'
+        with self.assertRaises(ValueError):
+            self.record(rejected, media_root=outside)
+        self.assertFalse(rejected.exists())
+
     def test_detector_mutating_image_rejected(self):
         detector = FakeDetector()
         original = detector.predict
@@ -214,9 +238,88 @@ class ContractTests(OfflineFixture):
     def test_missing_or_modified_original_media(self):
         raw=self.source.read_bytes()
         self.source.write_bytes(raw+b'changed')
-        self.assertEqual(quality_report(self.bundle)['status'],'FAIL')
-        self.source.write_bytes(raw); self.source.unlink()
-        self.assertEqual(quality_report(self.bundle)['status'],'FAIL')
+        failed=quality_report(self.bundle)
+        self.assertEqual(failed['status'],'FAIL')
+        self.assertIn('media integrity failure', failed['errors'][0])
+        library=self.root/'library'
+        library.mkdir()
+        (library/'source.avi').write_bytes(raw)
+        # A wrong file at the recorded absolute path is corruption even if a good copy exists.
+        self.assertEqual(quality_report(self.bundle, media_root=library)['status'],'FAIL')
+        self.source.write_bytes(raw)
+        self.source.unlink()
+        missing=quality_report(self.bundle)
+        self.assertEqual(missing['status'],'WARN')
+        self.assertEqual(missing['original_media'],'missing')
+        self.assertFalse(missing['media_hash_verified'])
+        self.assertTrue(missing['record_hash_verified'])
+        self.assertTrue(any(item.startswith('missing original media reference:') for item in missing['warnings']))
+        self.assertGreater(missing['frames'],0)
+        with self.assertRaises(ValueError) as caught:
+            load_bundle(self.bundle)
+        self.assertIn('missing original media reference', str(caught.exception))
+        (library/'source.avi').write_bytes(raw+b'not-the-original')
+        mismatched=quality_report(self.bundle, media_root=library)
+        self.assertEqual(mismatched['status'],'FAIL')
+        self.assertIn('media found under media root but hash mismatch', mismatched['errors'][0])
+        (library/'source.avi').write_bytes(raw)
+        relocated=quality_report(self.bundle, media_root=library)
+        self.assertEqual(relocated['status'],'PASS')
+        self.assertTrue(relocated['media_hash_verified'])
+        self.assertEqual(relocated['original_media'],'present')
+
+    def test_legacy_manifest_without_path_kind_and_relative_not_cwd(self):
+        manifest=copy.deepcopy(self.manifest)
+        manifest['media'].pop('path_kind', None)
+        self.rewrite(manifest=manifest)
+        stored=loads((self.bundle/'manifest.json').read_text())
+        self.assertNotIn('path_kind', stored['media'])
+        self.assertEqual(quality_report(self.bundle)['status'],'PASS')
+        manifest['media']['path']='source.avi'
+        manifest['media']['path_kind']='relative'
+        self.rewrite(manifest=manifest)
+        cwd=os.getcwd()
+        try:
+            os.chdir(self.root)
+            report=quality_report(self.bundle)
+        finally:
+            os.chdir(cwd)
+        self.assertEqual(report['status'],'WARN')
+        self.assertFalse(report['media_hash_verified'])
+        self.assertEqual(quality_report(self.bundle, media_root=self.root)['status'],'PASS')
+        manifest['media']['path']='../source.avi'
+        self.rewrite(manifest=manifest)
+        escaped=quality_report(self.bundle, media_root=self.bundle)
+        self.assertEqual(escaped['status'],'FAIL')
+        self.assertIn('escapes media root', escaped['errors'][0])
+
+    def test_cli_validate_missing_media_warns(self):
+        self.source.unlink()
+        env=dict(os.environ)
+        env.pop('P3_MEDIA_ROOT', None)
+        env['PYTHONPATH']=str(Path(__file__).resolve().parents[1])
+        output=self.root/'warn-quality.json'
+        result=subprocess.run([sys.executable,'-m','p3.research.offline','validate',str(self.bundle),'--output',str(output)],
+                              env=env,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('WARN', result.stdout)
+        self.assertIn('missing original media reference', result.stdout)
+        report=loads(output.read_text())
+        self.assertEqual(report['status'],'WARN')
+        self.assertTrue(report['record_hash_verified'])
+        pixels=self.root/'warn-pixels.json'
+        result=subprocess.run([sys.executable,'-m','p3.research.offline','validate',str(self.bundle),'--output',str(pixels),'--verify-pixels'],
+                              env=env,capture_output=True,text=True)
+        self.assertEqual(result.returncode,2,result.stdout+result.stderr)
+        failed=loads(pixels.read_text())
+        self.assertEqual(failed['status'],'FAIL')
+        self.assertTrue(any('decoded pixel verification failed' in item for item in failed['errors']))
+        required=self.root/'require-media.json'
+        result=subprocess.run([sys.executable,'-m','p3.research.offline','validate',str(self.bundle),'--output',str(required),'--require-media'],
+                              env=env,capture_output=True,text=True)
+        self.assertEqual(result.returncode,2,result.stdout+result.stderr)
+        self.assertEqual(loads(required.read_text())['status'],'FAIL')
+        self.assertTrue(any('original media required' in item for item in loads(required.read_text())['errors']))
 
     def test_pixel_integrity_even_when_record_hash_recomputed(self):
         rows=copy.deepcopy(self.records); rows[0]['frame_reference']['decoded_bgr_sha256']='0'*64

@@ -2,6 +2,8 @@
 
 2026-10-20 (Asia/Taipei). Branch **develop**. HEAD **9a864c546f5121748079ad58df2879faf8ffb46c**.
 
+Clarification: the HEAD recorded above is the inspection baseline from when this report was written, before these files were committed. It is not the commit that contains the report.
+
 **Overall: PREPARED / BLOCKED. The real human-verified benchmark is not complete.** Existing tools are sufficient, but no suitable accepted multi-person scenario suite or genuine reviewed identity annotations are available. No real IDF1, switches, fragmentation, recovery or benchmark latency result is reported. No source/runtime/default/interface was modified.
 
 ## Existing tools reviewed and reused

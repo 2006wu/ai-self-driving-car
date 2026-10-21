@@ -3,13 +3,13 @@ import hashlib
 from pathlib import Path
 
 from .dataset import require, integer, box
-from .dataset_v2 import frame_uri, load_bundle, json_write
+from .dataset_v2 import frame_uri, load_bundle, json_write, resolve_original_media
 
 ANNOTATION_VERSION = 'comma_body_annotations/1.0'
 
 
-def annotation_template(directory, frame_ids=None):
-    manifest, records = load_bundle(directory)
+def annotation_template(directory, frame_ids=None, *, media_root=None):
+    manifest, records = load_bundle(directory, media_root=media_root)
     ids = list(range(len(records))) if frame_ids is None else list(frame_ids)
     require(ids and all(integer(i) and i < len(records) for i in ids)
             and ids == sorted(set(ids)), 'annotation frame IDs must be ordered unique dataset indices')
@@ -74,17 +74,19 @@ def validate_annotations(document, manifest, records, *, require_reviewed=True):
         raise ValueError('malformed annotations') from error
 
 
-def extract_annotation_frames(directory, destination, frame_ids):
+def extract_annotation_frames(directory, destination, frame_ids, *, media_root=None):
     """Save unannotated original decoded BGR pixels as lossless PNG, never overlays."""
     import cv2
     from ..pipeline import Frames
-    manifest, records = load_bundle(directory)
-    template = annotation_template(directory, frame_ids)
+    manifest, records = load_bundle(directory, media_root=media_root)
+    template = annotation_template(directory, frame_ids, media_root=media_root)
+    source = resolve_original_media(manifest['media'], media_root=media_root)
+    require(source is not None, 'missing original media reference: '+manifest['media']['path'])
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=False)
     wanted, index = set(frame_ids), []
     try:
-        with Frames(manifest['media']['path'], camera=False) as frames:
+        with Frames(str(source), camera=False) as frames:
             for i, image in enumerate(frames):
                 if i in wanted:
                     require(hashlib.sha256(image.tobytes()).hexdigest() == records[i]['frame_reference']['decoded_bgr_sha256'], 'decoded annotation pixels mismatch')

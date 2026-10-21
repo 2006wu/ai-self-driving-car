@@ -7,12 +7,12 @@ ERROR: test_baseline (unittest.loader._FailedTest.test_baseline)
 ----------------------------------------------------------------------
 ImportError: Failed to import test module: test_baseline
 Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/loader.py", line 407, in _find_test_path
+  File "unittest/loader.py", line 407, in _find_test_path
     module = self._get_module_from_name(name)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/loader.py", line 350, in _get_module_from_name
+  File "unittest/loader.py", line 350, in _get_module_from_name
     __import__(name)
-  File "/Users/2006wu/Desktop/ai-self-drive-car-ws/projects/project3/tests/test_baseline.py", line 10, in <module>
+  File "projects/project3/tests/test_baseline.py", line 10, in <module>
     from p3.detection import Detector, ROOT, decode, iou, map_boxes
 ModuleNotFoundError: No module named 'p3'
 
@@ -22,12 +22,12 @@ ERROR: test_extensions (unittest.loader._FailedTest.test_extensions)
 ----------------------------------------------------------------------
 ImportError: Failed to import test module: test_extensions
 Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/loader.py", line 407, in _find_test_path
+  File "unittest/loader.py", line 407, in _find_test_path
     module = self._get_module_from_name(name)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/loader.py", line 350, in _get_module_from_name
+  File "unittest/loader.py", line 350, in _get_module_from_name
     __import__(name)
-  File "/Users/2006wu/Desktop/ai-self-drive-car-ws/projects/project3/tests/test_extensions.py", line 8, in <module>
+  File "projects/project3/tests/test_extensions.py", line 8, in <module>
     from p3.tracking import Tracker
 ModuleNotFoundError: No module named 'p3'
 
@@ -37,12 +37,12 @@ ERROR: test_validation (unittest.loader._FailedTest.test_validation)
 ----------------------------------------------------------------------
 ImportError: Failed to import test module: test_validation
 Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/loader.py", line 407, in _find_test_path
+  File "unittest/loader.py", line 407, in _find_test_path
     module = self._get_module_from_name(name)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/loader.py", line 350, in _get_module_from_name
+  File "unittest/loader.py", line 350, in _get_module_from_name
     __import__(name)
-  File "/Users/2006wu/Desktop/ai-self-drive-car-ws/projects/project3/tests/test_validation.py", line 10, in <module>
+  File "projects/project3/tests/test_validation.py", line 10, in <module>
     from p3.follow import FollowController, valid_box
 ModuleNotFoundError: No module named 'p3'
 

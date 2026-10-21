@@ -3,9 +3,12 @@
 From repo root:
 PYTHONPATH=projects/project3 projects/project3/.venv/bin/python reports/ai-control-milestone3-20261020/local-audit.py --output reports/my-new-milestone3-audit
 Output directory must not already exist. Original media and prior evidence read-only.
+
+File discovery prefers ripgrep (`rg`) when it is on PATH. If `rg` is not installed,
+the script walks the tree in Python and skips .git, .venv, node_modules and __pycache__.
 """
 import argparse
-import json
+import os
 from pathlib import Path
 import subprocess
 
@@ -17,10 +20,33 @@ from p3.research.dataset_v2 import digest, json_write, load_bundle
 from p3.research.annotations import validate_annotations
 
 
+def repository_files():
+    """Paths relative to the current directory, matching the rg filters below."""
+    command = ['rg', '--files', '--hidden', '--no-ignore',
+               '-g', '!**/.git/**', '-g', '!**/.venv/**', '-g', '!**/node_modules/**',
+               '-g', '!**/__pycache__/**']
+    try:
+        completed = subprocess.run(command, check=True, capture_output=True, text=True)
+    except FileNotFoundError:
+        return _walk_repository_files()
+    return [line for line in completed.stdout.splitlines() if line]
+
+
+def _walk_repository_files():
+    excluded = {'.git', '.venv', 'node_modules', '__pycache__'}
+    found = []
+    for dirpath, dirnames, filenames in os.walk('.'):
+        dirnames[:] = [name for name in dirnames if name not in excluded]
+        for name in filenames:
+            rel = Path(dirpath, name).as_posix()
+            if rel.startswith('./'):
+                rel = rel[2:]
+            found.append(rel)
+    return found
+
+
 def audit(out):
-    candidates = subprocess.check_output(['rg', '--files', '--hidden', '--no-ignore',
-        '-g', '!**/.git/**', '-g', '!**/.venv/**', '-g', '!**/node_modules/**',
-        '-g', '!**/__pycache__/**']).decode().splitlines()
+    candidates = repository_files()
     videos = []
     for name in sorted(candidates):
         path = Path(name)

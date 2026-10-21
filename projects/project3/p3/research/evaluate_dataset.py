@@ -9,8 +9,8 @@ from .annotations import validate_annotations
 from .dataset_v2 import canonical, load_bundle
 
 
-def compare_dataset(directory, annotations=None):
-    manifest, records = load_bundle(directory)
+def compare_dataset(directory, annotations=None, *, media_root=None):
+    manifest, records = load_bundle(directory, media_root=media_root)
     gt, annotation_error = None, None
     if annotations is not None:
         try:
